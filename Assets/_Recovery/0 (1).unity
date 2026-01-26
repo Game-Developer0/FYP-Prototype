@@ -22810,7 +22810,7 @@ MonoBehaviour:
   maxSlopeAngle: 35
   slideForce: 400
   slideCounterMovement: 0.2
-  jumpForce: 400
+  jumpForce: 300
 --- !u!54 &874045540
 Rigidbody:
   m_ObjectHideFlags: 0

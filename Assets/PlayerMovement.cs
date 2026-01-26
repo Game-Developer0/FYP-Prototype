@@ -65,10 +65,19 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 normalVector = Vector3.up;
     private Vector3 wallNormalVector;
 
+    //CapsuleCollider
+    private CapsuleCollider playerCollider;
+    private float originalColliderHeight;
+    private Vector3 originalColliderCenter;
+
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
         animator = GetComponent<Animator>();
+
+        playerCollider = GetComponent<CapsuleCollider>();
+        originalColliderHeight = playerCollider.height;
+        originalColliderCenter = playerCollider.center;
     }
 
     void Start()
@@ -113,29 +122,74 @@ public class PlayerMovement : MonoBehaviour
         x = Input.GetAxisRaw("Horizontal");
         y = Input.GetAxisRaw("Vertical");
         jumping = Input.GetButton("Jump");
-        crouching = Input.GetKey(KeyCode.LeftControl);
         sprinting = Input.GetKey(KeyCode.LeftShift);
-        //Crouching
-        if (Input.GetKeyDown(KeyCode.LeftControl))
-            StartCrouch();
-        if (Input.GetKeyUp(KeyCode.LeftControl))
-            StopCrouch();
-    }
-    private void Animate()
-    {
-        float multiplier = 0f;
 
-        if (grounded && (x != 0 || y != 0))
+        bool controlHeld = Input.GetKey(KeyCode.LeftControl);
+
+        // Decide crouch vs slide
+        if (sprinting && Input.GetKeyDown(KeyCode.LeftControl) && grounded)
         {
-            if (sprinting)
-                multiplier = 6f;   // Run
-            else
-                multiplier = 2f;   // Walk
+            StartSlide();
+        }
+        else if (!sprinting && Input.GetKeyDown(KeyCode.LeftControl))
+        {
+            StartCrouch();
         }
 
-        animator.SetFloat("X_Velocity", x * multiplier, 0.1f, Time.deltaTime);
-        animator.SetFloat("Y_Velocity", y * multiplier, 0.1f, Time.deltaTime);
+        // Stop crouch/slide when releasing control
+        if (Input.GetKeyUp(KeyCode.LeftControl))
+        {
+            StopCrouch();
+            StopSlide();
+        }
+
+        // Update crouching bool for Animator
+        crouching = controlHeld && !sprinting; // Only crouching when not sliding
     }
+
+    private void Animate()
+    {
+        if (!animator) return;
+        // Jump animation
+        animator.SetBool("Jump", !grounded);
+        // Set crouch bool in Animator
+        animator.SetBool("Crouch", crouching);
+
+        if (grounded)
+        {
+            if (crouching)
+            {
+                // Crouch movement blend
+                animator.SetFloat("X_Crouch", x, 0.1f, Time.deltaTime);
+                animator.SetFloat("Y_Crouch", y, 0.1f, Time.deltaTime);
+
+                // Reset standing blend to avoid conflicts
+                animator.SetFloat("X_Velocity", 0f);
+                animator.SetFloat("Y_Velocity", 0f);
+            }
+            else
+            {
+                // Standing movement blend
+                float multiplier = (x != 0 || y != 0) ? (sprinting ? 6f : 2f) : 0f;
+                animator.SetFloat("X_Velocity", x * multiplier, 0.1f, Time.deltaTime);
+                animator.SetFloat("Y_Velocity", y * multiplier, 0.1f, Time.deltaTime);
+
+                // Reset crouch blend
+                animator.SetFloat("X_Crouch", 0f);
+                animator.SetFloat("Y_Crouch", 0f);
+            }
+        }
+        else
+        {
+            // In air, reset all movement blends
+            animator.SetFloat("X_Velocity", 0f);
+            animator.SetFloat("Y_Velocity", 0f);
+            animator.SetFloat("X_Crouch", 0f);
+            animator.SetFloat("Y_Crouch", 0f);
+        }
+    }
+
+
 
 
 
@@ -148,24 +202,64 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    private bool sliding = false;
+
+    private void StartSlide()
+    {
+        sliding = true;
+
+        // Set Running parameter for slide animation
+        animator.SetBool("Running", true);
+
+        // Shrink collider if needed
+        //playerCollider.height = originalColliderHeight * 0.5f;
+        //playerCollider.center = originalColliderCenter * 0.5f;
+
+        // Apply forward force
+        rb.AddForce(orientation.forward * slideForce);
+    }
+
+    private void StopSlide()
+    {
+        if (!sliding) return;
+        sliding = false;
+
+        animator.SetBool("Running", false);
+
+        // Restore collider
+       // playerCollider.height = originalColliderHeight;
+       // playerCollider.center = originalColliderCenter;
+    }
 
     private void StartCrouch()
     {
-        transform.localScale = crouchScale;
-        transform.position = new Vector3(transform.position.x, transform.position.y - 0.5f, transform.position.z);
-        if (rb.linearVelocity.magnitude > 0.5f)
+        sliding = true;
+        animator.SetBool("Running", true); // Set running parameter for slide animation
+        // Shrink collider only
+        playerCollider.height = originalColliderHeight * 0.5f;
+        playerCollider.center = originalColliderCenter * 0.5f;
+
+        // Optional: push player down so feet stay on ground
+        Vector3 pos = transform.position;
+        pos.y -= (originalColliderHeight - playerCollider.height) / 2f;
+        transform.position = pos;
+
+        if (rb.linearVelocity.magnitude > 0.5f && grounded)
         {
-            if (grounded)
-            {
-                rb.AddForce(orientation.transform.forward * slideForce);
-            }
+            rb.AddForce(orientation.forward * slideForce);
         }
     }
 
     private void StopCrouch()
     {
-        transform.localScale = playerScale;
-        transform.position = new Vector3(transform.position.x, transform.position.y + 0.5f, transform.position.z);
+        // Restore collider
+        playerCollider.height = originalColliderHeight;
+        playerCollider.center = originalColliderCenter;
+
+        // Optional: move player up to match collider height
+        Vector3 pos = transform.position;
+        pos.y += (originalColliderHeight - playerCollider.height) / 2f;
+        transform.position = pos;
     }
 
     private void Movement()
@@ -221,7 +315,11 @@ public class PlayerMovement : MonoBehaviour
             multiplier = 0.5f;
             multiplierV = 0.5f;
         }
-
+        if (sliding)
+        {
+            rb.AddForce(orientation.forward * slideForce * Time.deltaTime);
+            return; // Skip normal movement while sliding
+        }
         // Movement while sliding
         if (grounded && crouching) multiplierV = 0f;
 
