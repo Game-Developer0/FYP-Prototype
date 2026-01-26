@@ -22794,10 +22794,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   playerCam: {fileID: 330585546}
   orientation: {fileID: 933152221}
-  walkMoveSpeed: 3000
-  sprintMoveSpeed: 4000
-  walkMaxSpeed: 8
-  sprintMaxSpeed: 13
+  walkMoveSpeed: 2000
+  sprintMoveSpeed: 3000
+  walkMaxSpeed: 4
+  sprintMaxSpeed: 8
   grounded: 0
   whatIsGround:
     serializedVersion: 2

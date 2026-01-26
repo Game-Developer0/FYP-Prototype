@@ -111,11 +111,22 @@ public class PlayerMovement : MonoBehaviour
     }
     private void Animate()
     {
-        animator.SetFloat("Strafe", x);
-        animator.SetFloat("Forward", y);
+        float multiplier = 0f;
 
-        animator.SetBool("run", sprinting && y > 0.1f && grounded);
+        if (grounded && (x != 0 || y != 0))
+        {
+            if (sprinting)
+                multiplier = 6f;   // Run
+            else
+                multiplier = 2f;   // Walk
+        }
+
+        animator.SetFloat("X_Velocity", x * multiplier, 0.1f, Time.deltaTime);
+        animator.SetFloat("Y_Velocity", y * multiplier, 0.1f, Time.deltaTime);
     }
+
+
+
     void OnAnimatorMove()
     {
         if (animator)
