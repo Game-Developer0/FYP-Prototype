@@ -8,8 +8,18 @@ public class PlayerMovement : MonoBehaviour
     //Animation
     Animator animator;
 
-    //Assingables
+    [Header("Camera")]
+    public Transform cameraRoot;   // Empty GameObject following head/chest bone
     public Transform playerCam;
+
+    public float mouseSensitivity = 50f;
+    public float upperLimit = -40f;
+    public float bottomLimit = 70f;
+
+    private float xRotation;
+
+    //Assingables
+
     public Transform orientation;
 
     //Other
@@ -18,7 +28,6 @@ public class PlayerMovement : MonoBehaviour
     //Rotation and look
     private float yRotation;
     private float yRotInput;
-    private float xRotation;
     private float sensitivity = 50f;
     private float sensMultiplier = 1f;
 
@@ -87,12 +96,15 @@ public class PlayerMovement : MonoBehaviour
         MyInput();
         Look();
         Animate();
-        // In Update or LateUpdate
-        playerCam.position = transform.position + Vector3.up * 1.8f; // default camera height
-        playerCam.position += animator.GetFloat("CameraYOffset") * Vector3.up;
 
     }
+    private void LateUpdate()
+    {
+        if (!cameraRoot) return;
 
+        // Camera follows animated root (head / spine)
+        playerCam.position = cameraRoot.position;
+    }
     /// <summary>
     /// Find user input. Should put this in its own class but im lazy
     /// </summary>
@@ -247,17 +259,19 @@ public class PlayerMovement : MonoBehaviour
 
     private void Look()
     {
-        float mouseX = Input.GetAxis("Mouse X") * sensitivity * Time.deltaTime * sensMultiplier;
-        float mouseY = Input.GetAxis("Mouse Y") * sensitivity * Time.deltaTime * sensMultiplier;
+        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
+        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
 
-        // Store horizontal input
+        // Horizontal rotation (player body)
         yRotInput = mouseX;
 
-        // Vertical rotation (camera)
+        // Vertical rotation (camera only)
         xRotation -= mouseY;
-        xRotation = Mathf.Clamp(xRotation, -90f, 90f);
+        xRotation = Mathf.Clamp(xRotation, upperLimit, bottomLimit);
+
         playerCam.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
     }
+
 
 
     private void CounterMovement(float x, float y, Vector2 mag)

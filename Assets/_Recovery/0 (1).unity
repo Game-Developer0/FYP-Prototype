@@ -10479,11 +10479,11 @@ Transform:
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 1.276, z: 0.18099976}
   m_LocalScale: {x: 1, y: 0.6666667, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1780300749}
+  m_Father: {fileID: 874045538}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &330585547
 MonoBehaviour:
@@ -22774,10 +22774,10 @@ Transform:
   m_LocalScale: {x: 1, y: 1.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 330585546}
   - {fileID: 87864768954373606}
   - {fileID: 933152221}
   - {fileID: 1895581569}
-  - {fileID: 1780300749}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &874045539
@@ -22792,7 +22792,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d7b7ef5b242be34c975fb6ce71127ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
+  cameraRoot: {fileID: 1780300749}
   playerCam: {fileID: 330585546}
+  mouseSensitivity: 300
+  upperLimit: -40
+  bottomLimit: 70
   orientation: {fileID: 933152221}
   walkMoveSpeed: 2000
   sprintMoveSpeed: 3000
@@ -87117,7 +87121,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1780300749}
   m_Layer: 0
-  m_Name: Camera Holder
+  m_Name: Camera Root
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -87131,13 +87135,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1780300748}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.276, z: 0.18099976}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.0237, y: -0.0015, z: 0.0547}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 330585546}
-  m_Father: {fileID: 874045538}
+  m_Children: []
+  m_Father: {fileID: 561700218128583976}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!43 &1784967195
 Mesh:
@@ -94612,7 +94615,8 @@ Transform:
   m_LocalPosition: {x: -0.03074141, y: 0.06257682, z: 0.093996875}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1780300749}
   m_Father: {fileID: 6292859628175296357}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &638665684402396024
