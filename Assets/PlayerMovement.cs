@@ -2,6 +2,8 @@
 
 using System;
 using UnityEngine;
+using System.Collections;
+
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -19,6 +21,8 @@ public class PlayerMovement : MonoBehaviour
     private float xRotation;
 
     //Assingables
+    [Header("Arrow")]
+    public GameObject HandArrow;
 
     public Transform orientation;
 
@@ -82,9 +86,14 @@ public class PlayerMovement : MonoBehaviour
 
     void Start()
     {
+        HandArrow.gameObject.SetActive(false);
         playerScale = transform.localScale;
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        //Cursor.lockState = CursorLockMode.Locked;
+        //Cursor.visible = false;
+    }
+    void HandArrowActive()
+    {
+        HandArrow.gameObject.SetActive(true);
     }
 
 
@@ -125,6 +134,23 @@ public class PlayerMovement : MonoBehaviour
         sprinting = Input.GetKey(KeyCode.LeftShift);
 
         bool controlHeld = Input.GetKey(KeyCode.LeftControl);
+        //shoot
+        if (Input.GetButton("Fire1"))
+        {
+            animator.SetBool("aim", true);
+        }
+
+        if (Input.GetButtonUp("Fire1"))
+        {
+            animator.SetBool("shoot", true);
+            animator.SetBool("aim", false);
+        }
+        else
+        {
+            animator.SetBool("shoot", false);
+        }
+
+
 
         // Decide crouch vs slide
         if (sprinting && Input.GetKeyDown(KeyCode.LeftControl) && grounded)
@@ -146,6 +172,7 @@ public class PlayerMovement : MonoBehaviour
         // Update crouching bool for Animator
         crouching = controlHeld && !sprinting; // Only crouching when not sliding
     }
+   
 
     private void Animate()
     {
