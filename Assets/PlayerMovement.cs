@@ -6,6 +6,8 @@ using System.Collections;
 
 public class PlayerMovement : MonoBehaviour
 {
+    public float movingDrag = 0f;
+    public float idleGroundDrag = 10f;   // try 6–12
     //Animation
     Animator animator;
     Coroutine showStringRoutine;
@@ -89,8 +91,8 @@ public class PlayerMovement : MonoBehaviour
     {
         HandArrow.gameObject.SetActive(false);
         playerScale = transform.localScale;
-        //Cursor.lockState = CursorLockMode.Locked;
-        //Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
         animator.applyRootMotion = false;
 
     }
@@ -104,11 +106,21 @@ public class PlayerMovement : MonoBehaviour
     {
         Movement();
 
-        // Apply horizontal rotation to Rigidbody in FixedUpdate
+        bool noInput = Mathf.Abs(x) < 0.01f && Mathf.Abs(y) < 0.01f;
+
+        // Smooth idle braking without sleep
+        if (grounded && noInput && !sliding)
+        {
+            rb.drag = idleGroundDrag;
+        }
+        else
+        {
+            rb.drag = movingDrag;
+            rb.WakeUp(); // ensures instant response
+        }
+
         yRotation += yRotInput;
         rb.MoveRotation(Quaternion.Euler(0f, yRotation, 0f));
-
-        // Orientation follows player rotation
         orientation.rotation = Quaternion.Euler(0f, yRotation, 0f);
     }
 
