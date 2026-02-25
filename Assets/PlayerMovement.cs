@@ -8,7 +8,9 @@ public class PlayerMovement : MonoBehaviour
 {
     //Animation
     Animator animator;
+    Coroutine showStringRoutine;
 
+    public GameObject BowString;
     [Header("Camera")]
     public Transform cameraRoot;   // Empty GameObject following head/chest bone
     public Transform playerCam;
@@ -87,8 +89,8 @@ public class PlayerMovement : MonoBehaviour
     {
         HandArrow.gameObject.SetActive(false);
         playerScale = transform.localScale;
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        //Cursor.lockState = CursorLockMode.Locked;
+        //Cursor.visible = false;
         animator.applyRootMotion = false;
 
     }
@@ -135,9 +137,21 @@ public class PlayerMovement : MonoBehaviour
         sprinting = Input.GetKey(KeyCode.LeftShift);
 
         bool controlHeld = Input.GetKey(KeyCode.LeftControl);
-        //shoot
+
+        // Hold-to-true: while F is held -> true, otherwise -> false
+        bool fHeld = Input.GetKey(KeyCode.F);
+        animator.SetBool("examine", fHeld);   // <-- change "equip" to your bool name
+
+        // shoot
         if (Input.GetButton("Fire1"))
         {
+            if (showStringRoutine != null)
+            {
+                StopCoroutine(showStringRoutine);
+                showStringRoutine = null;
+            }
+
+            BowString.SetActive(false);
             animator.SetBool("aim", true);
         }
 
@@ -145,13 +159,12 @@ public class PlayerMovement : MonoBehaviour
         {
             animator.SetBool("shoot", true);
             animator.SetBool("aim", false);
+            showStringRoutine = StartCoroutine(ShowStringAfterDelay(1f));
         }
         else
         {
             animator.SetBool("shoot", false);
         }
-
-
 
         // Decide crouch vs slide
         if (sprinting && Input.GetKeyDown(KeyCode.LeftControl) && grounded)
@@ -170,11 +183,15 @@ public class PlayerMovement : MonoBehaviour
             StopSlide();
         }
 
-        // Update crouching bool for Animator
-        crouching = controlHeld && !sprinting; // Only crouching when not sliding
+        crouching = controlHeld && !sprinting;
     }
 
-
+    IEnumerator ShowStringAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        BowString.SetActive(true);
+        showStringRoutine = null;
+    }
     private void Animate()
     {
         if (!animator) return;
