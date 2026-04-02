@@ -1,4 +1,5 @@
-﻿
+// Some stupid rigidbody based movement by Dani
+
 using System;
 using UnityEngine;
 using System.Collections;
@@ -40,7 +41,7 @@ public class PlayerMovement : MonoBehaviour
 
     //Movement
     [Header("Movement Speeds")]
-    public float walkMoveSpeed = 350f;
+    public float walkMoveSpeed = 3500f;
     public float sprintMoveSpeed = 5500f;
 
     public float walkMaxSpeed = 12f;
@@ -91,10 +92,8 @@ public class PlayerMovement : MonoBehaviour
     {
         HandArrow.gameObject.SetActive(false);
         playerScale = transform.localScale;
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-        animator.applyRootMotion = false;
-
+        //Cursor.lockState = CursorLockMode.Locked;
+        //Cursor.visible = false;
     }
     void HandArrowActive()
     {
@@ -197,6 +196,7 @@ public class PlayerMovement : MonoBehaviour
 
         crouching = controlHeld && !sprinting;
     }
+<<<<<<< HEAD
 
     IEnumerator ShowStringAfterDelay(float delay)
     {
@@ -204,42 +204,45 @@ public class PlayerMovement : MonoBehaviour
         BowString.SetActive(true);
         showStringRoutine = null;
     }
+=======
+   
+
+>>>>>>> parent of e3d9918 (root motion off)
     private void Animate()
     {
         if (!animator) return;
-
         // Jump animation
         animator.SetBool("Jump", !grounded);
-
-        // Set crouch bool
+        // Set crouch bool in Animator
         animator.SetBool("Crouch", crouching);
-
-        // Enable root motion only when crouching
-        animator.applyRootMotion = crouching;
 
         if (grounded)
         {
             if (crouching)
             {
+                // Crouch movement blend
                 animator.SetFloat("X_Crouch", x, 0.1f, Time.deltaTime);
                 animator.SetFloat("Y_Crouch", y, 0.1f, Time.deltaTime);
 
-                // Disable normal blend movement while crouching
+                // Reset standing blend to avoid conflicts
                 animator.SetFloat("X_Velocity", 0f);
                 animator.SetFloat("Y_Velocity", 0f);
             }
             else
             {
+                // Standing movement blend
                 float multiplier = (x != 0 || y != 0) ? (sprinting ? 6f : 2f) : 0f;
                 animator.SetFloat("X_Velocity", x * multiplier, 0.1f, Time.deltaTime);
                 animator.SetFloat("Y_Velocity", y * multiplier, 0.1f, Time.deltaTime);
 
+                // Reset crouch blend
                 animator.SetFloat("X_Crouch", 0f);
                 animator.SetFloat("Y_Crouch", 0f);
             }
         }
         else
         {
+            // In air, reset all movement blends
             animator.SetFloat("X_Velocity", 0f);
             animator.SetFloat("Y_Velocity", 0f);
             animator.SetFloat("X_Crouch", 0f);
@@ -248,6 +251,17 @@ public class PlayerMovement : MonoBehaviour
     }
 
 
+
+
+
+    void OnAnimatorMove()
+    {
+        if (animator)
+        {
+            // Apply animation movement to Rigidbody
+            rb.MovePosition(rb.position + animator.deltaPosition);
+        }
+    }
 
     private bool sliding = false;
 
@@ -311,11 +325,6 @@ public class PlayerMovement : MonoBehaviour
 
     private void Movement()
     {
-        if (crouching)
-        {
-            // Let Root Motion handle movement
-            return;
-        }
         //Extra gravity
         rb.AddForce(Vector3.down * Time.deltaTime * 10);
 
