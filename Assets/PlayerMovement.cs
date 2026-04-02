@@ -197,6 +197,7 @@ public class PlayerMovement : MonoBehaviour
         crouching = controlHeld && !sprinting;
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
 
     IEnumerator ShowStringAfterDelay(float delay)
     {
@@ -205,6 +206,8 @@ public class PlayerMovement : MonoBehaviour
         showStringRoutine = null;
     }
 =======
+=======
+>>>>>>> parent of e3d9918 (root motion off)
    
 
 >>>>>>> parent of e3d9918 (root motion off)
