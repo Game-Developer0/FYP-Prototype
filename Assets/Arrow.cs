@@ -2,25 +2,18 @@ using UnityEngine;
 
 public class Arrow : MonoBehaviour
 {
-    public Vector3 m_target;
-    public float Speed;
+    private Rigidbody rb;
+
+    void Awake()
+    {
+        rb = GetComponent<Rigidbody>();
+    }
 
     void Update()
     {
-        float step = Speed * Time.deltaTime;
-
-        if (m_target != null)
+        if (rb != null && rb.linearVelocity.sqrMagnitude > 0.1f)
         {
-            transform.position = Vector3.MoveTowards(
-                transform.position,
-                m_target,
-                step
-            );
+            transform.forward = rb.linearVelocity.normalized;
         }
-    }
-
-    public void setTarget(Vector3 target)
-    {
-        m_target = target;
     }
 }

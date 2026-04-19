@@ -3,29 +3,45 @@ using UnityEngine;
 public class ArrowShoot : MonoBehaviour
 {
     public GameObject ArrowPrefab;
-    RaycastHit hit;
-    float range = 1000f;
     public Transform ArrowSpawnPosition;
-
     public GameObject HandArrow;
+    public Camera playerCam;
+
+    public float range = 1000f;
+    public float arrowForce = 40f;
+
+    private RaycastHit hit;
 
     void Shoot()
     {
-        HandArrow.gameObject.SetActive(false);
+        HandArrow.SetActive(false);
 
-        Vector2 ScreenCenter = new Vector2(Screen.width / 2f, Screen.height / 2f);
-        Ray ray = Camera.main.ScreenPointToRay(ScreenCenter);
+        Ray ray = playerCam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+
+        Vector3 targetPoint;
 
         if (Physics.Raycast(ray, out hit, range))
         {
-            GameObject ArrowInstantiate =
-                GameObject.Instantiate(
-                    ArrowPrefab,
-                    ArrowSpawnPosition.transform.position,
-                    ArrowSpawnPosition.transform.rotation
-                ) as GameObject;
+            targetPoint = hit.point;
+        }
+        else
+        {
+            targetPoint = ray.origin + ray.direction * range;
+        }
 
-            ArrowInstantiate.GetComponent<Arrow>().setTarget(hit.point);
+        Vector3 shootDirection = (targetPoint - ArrowSpawnPosition.position).normalized;
+        Quaternion shootRotation = Quaternion.LookRotation(shootDirection);
+
+        GameObject arrowInstance = Instantiate(
+            ArrowPrefab,
+            ArrowSpawnPosition.position,
+            shootRotation
+        );
+
+        Rigidbody rb = arrowInstance.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.linearVelocity = shootDirection * arrowForce;
         }
     }
 }

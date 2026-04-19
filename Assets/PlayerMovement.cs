@@ -1,4 +1,4 @@
-﻿
+﻿using UnityEngine.Animations.Rigging;
 using System;
 using UnityEngine;
 using System.Collections;
@@ -6,6 +6,12 @@ using System.Collections;
 
 public class PlayerMovement : MonoBehaviour
 {
+    [Header("Aiming Rig")]
+    public Rig aimingRig;
+    public float rigLerpSpeed = 10f;
+
+    private bool isAiming;
+
     //Animation
     Animator animator;
 
@@ -114,8 +120,15 @@ public class PlayerMovement : MonoBehaviour
     {
         MyInput();
         Look();
+        UpdateAimRig();
         Animate();
+    }
+    private void UpdateAimRig()
+    {
+        if (aimingRig == null) return;
 
+        float targetWeight = isAiming ? 1f : 0f;
+        aimingRig.weight = Mathf.Lerp(aimingRig.weight, targetWeight, Time.deltaTime * rigLerpSpeed);
     }
     private void LateUpdate()
     {
@@ -135,25 +148,19 @@ public class PlayerMovement : MonoBehaviour
         sprinting = Input.GetKey(KeyCode.LeftShift);
 
         bool controlHeld = Input.GetKey(KeyCode.LeftControl);
-        //shoot
-        if (Input.GetButton("Fire1"))
-        {
-            animator.SetBool("aim", true);
-        }
+
+        isAiming = Input.GetButton("Fire1");
+        animator.SetBool("aim", isAiming);
 
         if (Input.GetButtonUp("Fire1"))
         {
             animator.SetBool("shoot", true);
-            animator.SetBool("aim", false);
         }
         else
         {
             animator.SetBool("shoot", false);
         }
 
-
-
-        // Decide crouch vs slide
         if (sprinting && Input.GetKeyDown(KeyCode.LeftControl) && grounded)
         {
             StartSlide();
@@ -163,15 +170,13 @@ public class PlayerMovement : MonoBehaviour
             StartCrouch();
         }
 
-        // Stop crouch/slide when releasing control
         if (Input.GetKeyUp(KeyCode.LeftControl))
         {
             StopCrouch();
             StopSlide();
         }
 
-        // Update crouching bool for Animator
-        crouching = controlHeld && !sprinting; // Only crouching when not sliding
+        crouching = controlHeld && !sprinting;
     }
 
 
