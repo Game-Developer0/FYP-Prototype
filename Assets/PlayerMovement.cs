@@ -6,11 +6,16 @@ using System.Collections;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [Header("Aiming Rig")]
-    public Rig aimingRig;
+    [Header("Weapon")]
+    public bool isGunEquipped = false;
+    [Header("Aiming Rigs")]
+    public Rig bowAimingRig;
+
+    public Rig gunAimingRig;
     public float rigLerpSpeed = 10f;
 
-    private bool isAiming;
+    private bool bowAiming;
+    private bool gunAiming;
 
     //Animation
     Animator animator;
@@ -122,13 +127,67 @@ public class PlayerMovement : MonoBehaviour
         Look();
         UpdateAimRig();
         Animate();
+
     }
     private void UpdateAimRig()
     {
-        if (aimingRig == null) return;
+        float bowTargetWeight = (!isGunEquipped && bowAiming) ? 1f : 0f;
+        float gunTargetWeight = (isGunEquipped && gunAiming) ? 1f : 0f;
 
-        float targetWeight = isAiming ? 1f : 0f;
-        aimingRig.weight = Mathf.Lerp(aimingRig.weight, targetWeight, Time.deltaTime * rigLerpSpeed);
+        if (bowAimingRig != null)
+        {
+            bowAimingRig.weight = Mathf.Lerp(
+                bowAimingRig.weight,
+                bowTargetWeight,
+                Time.deltaTime * rigLerpSpeed
+            );
+        }
+
+        if (gunAimingRig != null)
+        {
+            gunAimingRig.weight = Mathf.Lerp(
+                gunAimingRig.weight,
+                gunTargetWeight,
+                Time.deltaTime * rigLerpSpeed
+            );
+        }
+    }
+    public void EquipBow()
+    {
+        isGunEquipped = false;
+
+        bowAiming = false;
+        gunAiming = false;
+
+        if (animator != null)
+        {
+            animator.SetBool("IsGunEquipped", false);
+            animator.SetBool("aim", false);
+        }
+
+        if (gunAimingRig != null)
+        {
+            gunAimingRig.weight = 0f;
+        }
+    }
+
+    public void EquipGun()
+    {
+        isGunEquipped = true;
+
+        bowAiming = false;
+        gunAiming = false;
+
+        if (animator != null)
+        {
+            animator.SetBool("IsGunEquipped", true);
+            animator.SetBool("aim", false);
+        }
+
+        if (bowAimingRig != null)
+        {
+            bowAimingRig.weight = 0f;
+        }
     }
     private void LateUpdate()
     {
@@ -149,17 +208,34 @@ public class PlayerMovement : MonoBehaviour
 
         bool controlHeld = Input.GetKey(KeyCode.LeftControl);
 
-        isAiming = Input.GetButton("Fire1");
-        animator.SetBool("aim", isAiming);
+        // Bow aim = hold right click
+        if (!isGunEquipped)
+        {
+            bowAiming = Input.GetMouseButton(1);
+            gunAiming = false;
 
-        if (Input.GetButtonUp("Fire1"))
-        {
-            animator.SetBool("shoot", true);
+            animator.SetBool("aim", bowAiming);
         }
-        else
+
+        // Gun aim = toggle right click
+        if (isGunEquipped)
         {
-            animator.SetBool("shoot", false);
+            bowAiming = false;
+
+            if (Input.GetMouseButtonDown(1))
+            {
+                gunAiming = !gunAiming;
+            }
+
+            animator.SetBool("aim", gunAiming);
         }
+
+        // Right mouse = shoot
+        if (Input.GetMouseButtonDown(0))
+        {
+            animator.SetTrigger("shoot");
+        }
+        
 
         if (sprinting && Input.GetKeyDown(KeyCode.LeftControl) && grounded)
         {
