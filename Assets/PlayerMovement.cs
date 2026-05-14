@@ -6,8 +6,17 @@ using System.Collections;
 
 public class PlayerMovement : MonoBehaviour
 {
+
+    [Header("Gun Aim Collider Fix")]
+    public float gunAimColliderYOffset = 0.90f;
+    public float aimColliderLerpSpeed = 12f;
+
     [Header("Weapon")]
     public bool isGunEquipped = false;
+
+    [Header("Grappling")]
+    public GrapplingGun grapplingGun;
+
     [Header("Aiming Rigs")]
     public Rig bowAimingRig;
 
@@ -113,11 +122,11 @@ public class PlayerMovement : MonoBehaviour
     {
         Movement();
 
-        // Apply horizontal rotation to Rigidbody in FixedUpdate
+        StopGroundSliding();
+
         yRotation += yRotInput;
         rb.MoveRotation(Quaternion.Euler(0f, yRotation, 0f));
 
-        // Orientation follows player rotation
         orientation.rotation = Quaternion.Euler(0f, yRotation, 0f);
     }
 
@@ -126,8 +135,8 @@ public class PlayerMovement : MonoBehaviour
         MyInput();
         Look();
         UpdateAimRig();
+        UpdateGunAimCollider();
         Animate();
-
     }
     private void UpdateAimRig()
     {
@@ -196,6 +205,32 @@ public class PlayerMovement : MonoBehaviour
         // Camera follows animated root (head / spine)
         playerCam.position = cameraRoot.position;
     }
+    public void ExitAim()
+    {
+        bowAiming = false;
+        gunAiming = false;
+
+        if (animator != null)
+        {
+            animator.SetBool("aim", false);
+        }
+
+        if (bowAimingRig != null)
+        {
+            bowAimingRig.weight = 0f;
+        }
+
+        if (gunAimingRig != null)
+        {
+            gunAimingRig.weight = 0f;
+        }
+
+        if (playerCollider != null && !crouching && !sliding)
+        {
+            playerCollider.center = originalColliderCenter;
+        }
+    }
+
     /// <summary>
     /// Find user input. Should put this in its own class but im lazy
     /// </summary>
@@ -208,34 +243,50 @@ public class PlayerMovement : MonoBehaviour
 
         bool controlHeld = Input.GetKey(KeyCode.LeftControl);
 
-        // Bow aim = hold right click
-        if (!isGunEquipped)
-        {
-            bowAiming = Input.GetMouseButton(1);
-            gunAiming = false;
+        bool isGrapplingNow = grapplingGun != null && grapplingGun.IsGrappling();
 
-            animator.SetBool("aim", bowAiming);
+        if (isGrapplingNow)
+        {
+            ExitAim();
         }
-
-        // Gun aim = toggle right click
-        if (isGunEquipped)
+        else
         {
-            bowAiming = false;
-
-            if (Input.GetMouseButtonDown(1))
+            // Bow aim = hold right click
+            if (!isGunEquipped)
             {
-                gunAiming = !gunAiming;
+                bowAiming = Input.GetMouseButton(1);
+                gunAiming = false;
+
+                animator.SetBool("aim", bowAiming);
             }
 
-            animator.SetBool("aim", gunAiming);
+            // Gun aim = toggle right click
+            if (isGunEquipped)
+            {
+                bowAiming = false;
+
+                if (Input.GetMouseButtonDown(1))
+                {
+                    gunAiming = !gunAiming;
+                }
+
+                animator.SetBool("aim", gunAiming);
+            }
         }
 
-        // Right mouse = shoot
+        
+        // Left mouse = shoot only if this click is NOT used for grapple
         if (Input.GetMouseButtonDown(0))
         {
-            animator.SetTrigger("shoot");
+            bool clickWillGrapple = grapplingGun != null && grapplingGun.CanStartGrapple();
+
+            if (!clickWillGrapple)
+            {
+                ExitAim();
+                animator.SetTrigger("shoot");
+            }
         }
-        
+
 
         if (sprinting && Input.GetKeyDown(KeyCode.LeftControl) && grounded)
         {
@@ -332,33 +383,61 @@ public class PlayerMovement : MonoBehaviour
 
     private void StartCrouch()
     {
-        sliding = true;
-        animator.SetBool("Running", true); // Set running parameter for slide animation
-        // Shrink collider only
+        // Do NOT set sliding = true here
+        animator.SetBool("Running", false);
+
         playerCollider.height = originalColliderHeight * 0.5f;
         playerCollider.center = originalColliderCenter * 0.5f;
 
-        // Optional: push player down so feet stay on ground
         Vector3 pos = transform.position;
         pos.y -= (originalColliderHeight - playerCollider.height) / 2f;
         transform.position = pos;
-
-        if (rb.linearVelocity.magnitude > 0.5f && grounded)
-        {
-            rb.AddForce(orientation.forward * slideForce);
-        }
     }
 
     private void StopCrouch()
     {
-        // Restore collider
+        sliding = false;
+
         playerCollider.height = originalColliderHeight;
         playerCollider.center = originalColliderCenter;
 
-        // Optional: move player up to match collider height
         Vector3 pos = transform.position;
         pos.y += (originalColliderHeight - playerCollider.height) / 2f;
         transform.position = pos;
+    }
+    private void StopGroundSliding()
+    {
+        if (!grounded) return;
+        if (jumping) return;
+        if (crouching) return;
+        if (sliding) return;
+
+        bool noInput = Mathf.Abs(x) < 0.01f && Mathf.Abs(y) < 0.01f;
+
+        if (!noInput) return;
+
+        Vector3 horizontalVelocity = new Vector3(
+            rb.linearVelocity.x,
+            0f,
+            rb.linearVelocity.z
+        );
+
+        horizontalVelocity = Vector3.Lerp(
+            horizontalVelocity,
+            Vector3.zero,
+            Time.fixedDeltaTime * 12f
+        );
+
+        if (horizontalVelocity.magnitude < 0.2f)
+        {
+            horizontalVelocity = Vector3.zero;
+        }
+
+        rb.linearVelocity = new Vector3(
+            horizontalVelocity.x,
+            rb.linearVelocity.y,
+            horizontalVelocity.z
+        );
     }
 
     private void Movement()
@@ -377,6 +456,23 @@ public class PlayerMovement : MonoBehaviour
 
         //Counteract sliding and sloppy movement
         CounterMovement(x, y, mag);
+
+        // Stop small unwanted sliding when player is not pressing movement keys
+        if (grounded && !jumping && !crouching && !sliding)
+        {
+            bool noMovementInput = Mathf.Abs(x) < 0.01f && Mathf.Abs(y) < 0.01f;
+
+            if (noMovementInput)
+            {
+                Vector3 horizontalVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+
+                if (horizontalVelocity.magnitude < 2f)
+                {
+                    rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
+                }
+            }
+        }
+
 
         //If holding jump && ready to jump, then jump
         if (readyToJump && jumping) Jump();
@@ -572,6 +668,31 @@ public class PlayerMovement : MonoBehaviour
     private void StopGrounded()
     {
         grounded = false;
+    }
+    public bool IsGunAiming()
+    {
+        return gunAiming;
+    }
+    private void UpdateGunAimCollider()
+    {
+        if (playerCollider == null) return;
+
+        // Do not fight crouch/slide collider changes
+        if (crouching || sliding) return;
+
+        Vector3 targetCenter = originalColliderCenter;
+
+        // When gun is equipped and player is aiming, move collider center up
+        if (isGunEquipped && gunAiming)
+        {
+            targetCenter = originalColliderCenter + new Vector3(0f, gunAimColliderYOffset, 0f);
+        }
+
+        playerCollider.center = Vector3.Lerp(
+            playerCollider.center,
+            targetCenter,
+            Time.deltaTime * aimColliderLerpSpeed
+        );
     }
 
 }
