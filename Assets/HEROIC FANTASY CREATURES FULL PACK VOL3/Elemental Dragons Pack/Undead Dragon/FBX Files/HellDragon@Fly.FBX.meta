@@ -1,0 +1,1003 @@
+fileFormatVersion: 2
+guid: 9c265dffe0a13ef428e2b5eb97073789
+AssetOrigin:
+  serializedVersion: 1
+  productId: 117306
+  packageName: ELEMENTAL DRAGONS PACK
+  packageVersion: 1.22
+  assetPath: Assets/HEROIC FANTASY CREATURES FULL PACK VOL3/Elemental Dragons Pack/Undead
+    Dragon/FBX Files/HellDragon@Fly.FBX
+  uploadId: 669989
+ModelImporter:
+  serializedVersion: 24200
+  internalIDToNameTable:
+  - first:
+      1: 100000
+    second: Dummy002
+  - first:
+      1: 100002
+    second: //RootNode
+  - first:
+      1: 100004
+    second: HellDragon_
+  - first:
+      1: 100006
+    second: HellDragon_ Head
+  - first:
+      1: 100008
+    second: HellDragon_ L Calf
+  - first:
+      1: 100010
+    second: HellDragon_ L Clavicle
+  - first:
+      1: 100012
+    second: HellDragon_ L Finger0
+  - first:
+      1: 100014
+    second: HellDragon_ L Finger01
+  - first:
+      1: 100016
+    second: HellDragon_ L Finger1
+  - first:
+      1: 100018
+    second: HellDragon_ L Finger11
+  - first:
+      1: 100020
+    second: HellDragon_ L Finger2
+  - first:
+      1: 100022
+    second: HellDragon_ L Finger21
+  - first:
+      1: 100024
+    second: HellDragon_ L Finger3
+  - first:
+      1: 100026
+    second: HellDragon_ L Finger31
+  - first:
+      1: 100028
+    second: HellDragon_ L Foot
+  - first:
+      1: 100030
+    second: HellDragon_ L Forearm
+  - first:
+      1: 100032
+    second: HellDragon_ L Hand
+  - first:
+      1: 100034
+    second: HellDragon_ L HorseLink
+  - first:
+      1: 100036
+    second: HellDragon_ L Thigh
+  - first:
+      1: 100038
+    second: HellDragon_ L Toe0
+  - first:
+      1: 100040
+    second: HellDragon_ L Toe01
+  - first:
+      1: 100042
+    second: HellDragon_ L Toe1
+  - first:
+      1: 100044
+    second: HellDragon_ L Toe11
+  - first:
+      1: 100046
+    second: HellDragon_ L Toe2
+  - first:
+      1: 100048
+    second: HellDragon_ L Toe21
+  - first:
+      1: 100050
+    second: HellDragon_ L Toe3
+  - first:
+      1: 100052
+    second: HellDragon_ L Toe31
+  - first:
+      1: 100054
+    second: HellDragon_ L UpperArm
+  - first:
+      1: 100056
+    second: HellDragon_ Neck
+  - first:
+      1: 100058
+    second: HellDragon_ Neck1
+  - first:
+      1: 100060
+    second: HellDragon_ Pelvis
+  - first:
+      1: 100062
+    second: HellDragon_ Ponytail1
+  - first:
+      1: 100064
+    second: HellDragon_ R Calf
+  - first:
+      1: 100066
+    second: HellDragon_ R Clavicle
+  - first:
+      1: 100068
+    second: HellDragon_ R Finger0
+  - first:
+      1: 100070
+    second: HellDragon_ R Finger01
+  - first:
+      1: 100072
+    second: HellDragon_ R Finger1
+  - first:
+      1: 100074
+    second: HellDragon_ R Finger11
+  - first:
+      1: 100076
+    second: HellDragon_ R Finger2
+  - first:
+      1: 100078
+    second: HellDragon_ R Finger21
+  - first:
+      1: 100080
+    second: HellDragon_ R Finger3
+  - first:
+      1: 100082
+    second: HellDragon_ R Finger31
+  - first:
+      1: 100084
+    second: HellDragon_ R Foot
+  - first:
+      1: 100086
+    second: HellDragon_ R Forearm
+  - first:
+      1: 100088
+    second: HellDragon_ R Hand
+  - first:
+      1: 100090
+    second: HellDragon_ R HorseLink
+  - first:
+      1: 100092
+    second: HellDragon_ R Thigh
+  - first:
+      1: 100094
+    second: HellDragon_ R Toe0
+  - first:
+      1: 100096
+    second: HellDragon_ R Toe01
+  - first:
+      1: 100098
+    second: HellDragon_ R Toe1
+  - first:
+      1: 100100
+    second: HellDragon_ R Toe11
+  - first:
+      1: 100102
+    second: HellDragon_ R Toe2
+  - first:
+      1: 100104
+    second: HellDragon_ R Toe21
+  - first:
+      1: 100106
+    second: HellDragon_ R Toe3
+  - first:
+      1: 100108
+    second: HellDragon_ R Toe31
+  - first:
+      1: 100110
+    second: HellDragon_ R UpperArm
+  - first:
+      1: 100112
+    second: HellDragon_ Spine
+  - first:
+      1: 100114
+    second: HellDragon_ Spine1
+  - first:
+      1: 100116
+    second: HellDragon_ Tail
+  - first:
+      1: 100118
+    second: HellDragon_ Tail1
+  - first:
+      1: 100120
+    second: HellDragon_ Tail10
+  - first:
+      1: 100122
+    second: HellDragon_ Tail2
+  - first:
+      1: 100124
+    second: HellDragon_ Tail3
+  - first:
+      1: 100126
+    second: HellDragon_ Tail4
+  - first:
+      1: 100128
+    second: HellDragon_ Tail5
+  - first:
+      1: 100130
+    second: HellDragon_ Tail6
+  - first:
+      1: 100132
+    second: HellDragon_ Tail7
+  - first:
+      1: 100134
+    second: HellDragon_ Tail8
+  - first:
+      1: 100136
+    second: HellDragon_ Tail9
+  - first:
+      1: 100138
+    second: HellDragon_WingL_Arm
+  - first:
+      1: 100140
+    second: HellDragon_WingL_FingerA_1
+  - first:
+      1: 100142
+    second: HellDragon_WingL_FingerA_2
+  - first:
+      1: 100144
+    second: HellDragon_WingL_FingerA_3
+  - first:
+      1: 100146
+    second: HellDragon_WingL_FingerB_1
+  - first:
+      1: 100148
+    second: HellDragon_WingL_FingerB_2
+  - first:
+      1: 100150
+    second: HellDragon_WingL_FingerB_3
+  - first:
+      1: 100152
+    second: HellDragon_WingL_FingerC_1
+  - first:
+      1: 100154
+    second: HellDragon_WingL_FingerC_2
+  - first:
+      1: 100156
+    second: HellDragon_WingL_FingerC_3
+  - first:
+      1: 100158
+    second: HellDragon_WingL_ForeArm
+  - first:
+      1: 100160
+    second: HellDragon_WingL_Hand
+  - first:
+      1: 100162
+    second: HellDragon_WingR_Arm
+  - first:
+      1: 100164
+    second: HellDragon_WingR_FingerA_1
+  - first:
+      1: 100166
+    second: HellDragon_WingR_FingerA_2
+  - first:
+      1: 100168
+    second: HellDragon_WingR_FingerA_3
+  - first:
+      1: 100170
+    second: HellDragon_WingR_FingerB_1
+  - first:
+      1: 100172
+    second: HellDragon_WingR_FingerB_2
+  - first:
+      1: 100174
+    second: HellDragon_WingR_FingerB_3
+  - first:
+      1: 100176
+    second: HellDragon_WingR_FingerC_1
+  - first:
+      1: 100178
+    second: HellDragon_WingR_FingerC_2
+  - first:
+      1: 100180
+    second: HellDragon_WingR_FingerC_3
+  - first:
+      1: 100182
+    second: HellDragon_WingR_ForeArm
+  - first:
+      1: 100184
+    second: HellDragon_WingR_Hand
+  - first:
+      1: 100186
+    second: IK Chain002
+  - first:
+      1: 100188
+    second: root
+  - first:
+      4: 400000
+    second: Dummy002
+  - first:
+      4: 400002
+    second: //RootNode
+  - first:
+      4: 400004
+    second: HellDragon_
+  - first:
+      4: 400006
+    second: HellDragon_ Head
+  - first:
+      4: 400008
+    second: HellDragon_ L Calf
+  - first:
+      4: 400010
+    second: HellDragon_ L Clavicle
+  - first:
+      4: 400012
+    second: HellDragon_ L Finger0
+  - first:
+      4: 400014
+    second: HellDragon_ L Finger01
+  - first:
+      4: 400016
+    second: HellDragon_ L Finger1
+  - first:
+      4: 400018
+    second: HellDragon_ L Finger11
+  - first:
+      4: 400020
+    second: HellDragon_ L Finger2
+  - first:
+      4: 400022
+    second: HellDragon_ L Finger21
+  - first:
+      4: 400024
+    second: HellDragon_ L Finger3
+  - first:
+      4: 400026
+    second: HellDragon_ L Finger31
+  - first:
+      4: 400028
+    second: HellDragon_ L Foot
+  - first:
+      4: 400030
+    second: HellDragon_ L Forearm
+  - first:
+      4: 400032
+    second: HellDragon_ L Hand
+  - first:
+      4: 400034
+    second: HellDragon_ L HorseLink
+  - first:
+      4: 400036
+    second: HellDragon_ L Thigh
+  - first:
+      4: 400038
+    second: HellDragon_ L Toe0
+  - first:
+      4: 400040
+    second: HellDragon_ L Toe01
+  - first:
+      4: 400042
+    second: HellDragon_ L Toe1
+  - first:
+      4: 400044
+    second: HellDragon_ L Toe11
+  - first:
+      4: 400046
+    second: HellDragon_ L Toe2
+  - first:
+      4: 400048
+    second: HellDragon_ L Toe21
+  - first:
+      4: 400050
+    second: HellDragon_ L Toe3
+  - first:
+      4: 400052
+    second: HellDragon_ L Toe31
+  - first:
+      4: 400054
+    second: HellDragon_ L UpperArm
+  - first:
+      4: 400056
+    second: HellDragon_ Neck
+  - first:
+      4: 400058
+    second: HellDragon_ Neck1
+  - first:
+      4: 400060
+    second: HellDragon_ Pelvis
+  - first:
+      4: 400062
+    second: HellDragon_ Ponytail1
+  - first:
+      4: 400064
+    second: HellDragon_ R Calf
+  - first:
+      4: 400066
+    second: HellDragon_ R Clavicle
+  - first:
+      4: 400068
+    second: HellDragon_ R Finger0
+  - first:
+      4: 400070
+    second: HellDragon_ R Finger01
+  - first:
+      4: 400072
+    second: HellDragon_ R Finger1
+  - first:
+      4: 400074
+    second: HellDragon_ R Finger11
+  - first:
+      4: 400076
+    second: HellDragon_ R Finger2
+  - first:
+      4: 400078
+    second: HellDragon_ R Finger21
+  - first:
+      4: 400080
+    second: HellDragon_ R Finger3
+  - first:
+      4: 400082
+    second: HellDragon_ R Finger31
+  - first:
+      4: 400084
+    second: HellDragon_ R Foot
+  - first:
+      4: 400086
+    second: HellDragon_ R Forearm
+  - first:
+      4: 400088
+    second: HellDragon_ R Hand
+  - first:
+      4: 400090
+    second: HellDragon_ R HorseLink
+  - first:
+      4: 400092
+    second: HellDragon_ R Thigh
+  - first:
+      4: 400094
+    second: HellDragon_ R Toe0
+  - first:
+      4: 400096
+    second: HellDragon_ R Toe01
+  - first:
+      4: 400098
+    second: HellDragon_ R Toe1
+  - first:
+      4: 400100
+    second: HellDragon_ R Toe11
+  - first:
+      4: 400102
+    second: HellDragon_ R Toe2
+  - first:
+      4: 400104
+    second: HellDragon_ R Toe21
+  - first:
+      4: 400106
+    second: HellDragon_ R Toe3
+  - first:
+      4: 400108
+    second: HellDragon_ R Toe31
+  - first:
+      4: 400110
+    second: HellDragon_ R UpperArm
+  - first:
+      4: 400112
+    second: HellDragon_ Spine
+  - first:
+      4: 400114
+    second: HellDragon_ Spine1
+  - first:
+      4: 400116
+    second: HellDragon_ Tail
+  - first:
+      4: 400118
+    second: HellDragon_ Tail1
+  - first:
+      4: 400120
+    second: HellDragon_ Tail10
+  - first:
+      4: 400122
+    second: HellDragon_ Tail2
+  - first:
+      4: 400124
+    second: HellDragon_ Tail3
+  - first:
+      4: 400126
+    second: HellDragon_ Tail4
+  - first:
+      4: 400128
+    second: HellDragon_ Tail5
+  - first:
+      4: 400130
+    second: HellDragon_ Tail6
+  - first:
+      4: 400132
+    second: HellDragon_ Tail7
+  - first:
+      4: 400134
+    second: HellDragon_ Tail8
+  - first:
+      4: 400136
+    second: HellDragon_ Tail9
+  - first:
+      4: 400138
+    second: HellDragon_WingL_Arm
+  - first:
+      4: 400140
+    second: HellDragon_WingL_FingerA_1
+  - first:
+      4: 400142
+    second: HellDragon_WingL_FingerA_2
+  - first:
+      4: 400144
+    second: HellDragon_WingL_FingerA_3
+  - first:
+      4: 400146
+    second: HellDragon_WingL_FingerB_1
+  - first:
+      4: 400148
+    second: HellDragon_WingL_FingerB_2
+  - first:
+      4: 400150
+    second: HellDragon_WingL_FingerB_3
+  - first:
+      4: 400152
+    second: HellDragon_WingL_FingerC_1
+  - first:
+      4: 400154
+    second: HellDragon_WingL_FingerC_2
+  - first:
+      4: 400156
+    second: HellDragon_WingL_FingerC_3
+  - first:
+      4: 400158
+    second: HellDragon_WingL_ForeArm
+  - first:
+      4: 400160
+    second: HellDragon_WingL_Hand
+  - first:
+      4: 400162
+    second: HellDragon_WingR_Arm
+  - first:
+      4: 400164
+    second: HellDragon_WingR_FingerA_1
+  - first:
+      4: 400166
+    second: HellDragon_WingR_FingerA_2
+  - first:
+      4: 400168
+    second: HellDragon_WingR_FingerA_3
+  - first:
+      4: 400170
+    second: HellDragon_WingR_FingerB_1
+  - first:
+      4: 400172
+    second: HellDragon_WingR_FingerB_2
+  - first:
+      4: 400174
+    second: HellDragon_WingR_FingerB_3
+  - first:
+      4: 400176
+    second: HellDragon_WingR_FingerC_1
+  - first:
+      4: 400178
+    second: HellDragon_WingR_FingerC_2
+  - first:
+      4: 400180
+    second: HellDragon_WingR_FingerC_3
+  - first:
+      4: 400182
+    second: HellDragon_WingR_ForeArm
+  - first:
+      4: 400184
+    second: HellDragon_WingR_Hand
+  - first:
+      4: 400186
+    second: IK Chain002
+  - first:
+      4: 400188
+    second: root
+  - first:
+      74: 7400000
+    second: Fly
+  - first:
+      95: 9500000
+    second: //RootNode
+  externalObjects: {}
+  materials:
+    materialImportMode: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 0
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    removeConstantScaleCurves: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 0
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Fly
+      takeName: Take 001
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 24
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 1
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 1
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: root
+        weight: 1
+      - path: root/HellDragon_
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ L Thigh
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ L Thigh/HellDragon_
+          L Calf
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ L Thigh/HellDragon_
+          L Calf/HellDragon_ L HorseLink
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ L Thigh/HellDragon_
+          L Calf/HellDragon_ L HorseLink/HellDragon_ L Foot
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ L Thigh/HellDragon_
+          L Calf/HellDragon_ L HorseLink/HellDragon_ L Foot/HellDragon_ L Toe0
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ L Thigh/HellDragon_
+          L Calf/HellDragon_ L HorseLink/HellDragon_ L Foot/HellDragon_ L Toe0/HellDragon_
+          L Toe01
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ L Thigh/HellDragon_
+          L Calf/HellDragon_ L HorseLink/HellDragon_ L Foot/HellDragon_ L Toe1
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ L Thigh/HellDragon_
+          L Calf/HellDragon_ L HorseLink/HellDragon_ L Foot/HellDragon_ L Toe1/HellDragon_
+          L Toe11
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ L Thigh/HellDragon_
+          L Calf/HellDragon_ L HorseLink/HellDragon_ L Foot/HellDragon_ L Toe2
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ L Thigh/HellDragon_
+          L Calf/HellDragon_ L HorseLink/HellDragon_ L Foot/HellDragon_ L Toe2/HellDragon_
+          L Toe21
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ L Thigh/HellDragon_
+          L Calf/HellDragon_ L HorseLink/HellDragon_ L Foot/HellDragon_ L Toe3
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ L Thigh/HellDragon_
+          L Calf/HellDragon_ L HorseLink/HellDragon_ L Foot/HellDragon_ L Toe3/HellDragon_
+          L Toe31
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ R Thigh
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ R Thigh/HellDragon_
+          R Calf
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ R Thigh/HellDragon_
+          R Calf/HellDragon_ R HorseLink
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ R Thigh/HellDragon_
+          R Calf/HellDragon_ R HorseLink/HellDragon_ R Foot
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ R Thigh/HellDragon_
+          R Calf/HellDragon_ R HorseLink/HellDragon_ R Foot/HellDragon_ R Toe0
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ R Thigh/HellDragon_
+          R Calf/HellDragon_ R HorseLink/HellDragon_ R Foot/HellDragon_ R Toe0/HellDragon_
+          R Toe01
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ R Thigh/HellDragon_
+          R Calf/HellDragon_ R HorseLink/HellDragon_ R Foot/HellDragon_ R Toe1
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ R Thigh/HellDragon_
+          R Calf/HellDragon_ R HorseLink/HellDragon_ R Foot/HellDragon_ R Toe1/HellDragon_
+          R Toe11
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ R Thigh/HellDragon_
+          R Calf/HellDragon_ R HorseLink/HellDragon_ R Foot/HellDragon_ R Toe2
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ R Thigh/HellDragon_
+          R Calf/HellDragon_ R HorseLink/HellDragon_ R Foot/HellDragon_ R Toe2/HellDragon_
+          R Toe21
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ R Thigh/HellDragon_
+          R Calf/HellDragon_ R HorseLink/HellDragon_ R Foot/HellDragon_ R Toe3
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ R Thigh/HellDragon_
+          R Calf/HellDragon_ R HorseLink/HellDragon_ R Foot/HellDragon_ R Toe3/HellDragon_
+          R Toe31
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/Dummy002
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/Dummy002/IK
+          Chain002
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_
+          L Clavicle
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_
+          L Clavicle/HellDragon_ L UpperArm
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_
+          L Clavicle/HellDragon_ L UpperArm/HellDragon_ L Forearm
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_
+          L Clavicle/HellDragon_ L UpperArm/HellDragon_ L Forearm/HellDragon_ L Hand
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_
+          L Clavicle/HellDragon_ L UpperArm/HellDragon_ L Forearm/HellDragon_ L Hand/HellDragon_
+          L Finger0
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_
+          L Clavicle/HellDragon_ L UpperArm/HellDragon_ L Forearm/HellDragon_ L Hand/HellDragon_
+          L Finger0/HellDragon_ L Finger01
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_
+          L Clavicle/HellDragon_ L UpperArm/HellDragon_ L Forearm/HellDragon_ L Hand/HellDragon_
+          L Finger1
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_
+          L Clavicle/HellDragon_ L UpperArm/HellDragon_ L Forearm/HellDragon_ L Hand/HellDragon_
+          L Finger1/HellDragon_ L Finger11
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_
+          L Clavicle/HellDragon_ L UpperArm/HellDragon_ L Forearm/HellDragon_ L Hand/HellDragon_
+          L Finger2
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_
+          L Clavicle/HellDragon_ L UpperArm/HellDragon_ L Forearm/HellDragon_ L Hand/HellDragon_
+          L Finger2/HellDragon_ L Finger21
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_
+          L Clavicle/HellDragon_ L UpperArm/HellDragon_ L Forearm/HellDragon_ L Hand/HellDragon_
+          L Finger3
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_
+          L Clavicle/HellDragon_ L UpperArm/HellDragon_ L Forearm/HellDragon_ L Hand/HellDragon_
+          L Finger3/HellDragon_ L Finger31
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_
+          Neck
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_
+          Neck/HellDragon_ Neck1
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_
+          Neck/HellDragon_ Neck1/HellDragon_ Head
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_
+          Neck/HellDragon_ Neck1/HellDragon_ Head/HellDragon_ Ponytail1
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_
+          R Clavicle
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_
+          R Clavicle/HellDragon_ R UpperArm
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_
+          R Clavicle/HellDragon_ R UpperArm/HellDragon_ R Forearm
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_
+          R Clavicle/HellDragon_ R UpperArm/HellDragon_ R Forearm/HellDragon_ R Hand
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_
+          R Clavicle/HellDragon_ R UpperArm/HellDragon_ R Forearm/HellDragon_ R Hand/HellDragon_
+          R Finger0
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_
+          R Clavicle/HellDragon_ R UpperArm/HellDragon_ R Forearm/HellDragon_ R Hand/HellDragon_
+          R Finger0/HellDragon_ R Finger01
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_
+          R Clavicle/HellDragon_ R UpperArm/HellDragon_ R Forearm/HellDragon_ R Hand/HellDragon_
+          R Finger1
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_
+          R Clavicle/HellDragon_ R UpperArm/HellDragon_ R Forearm/HellDragon_ R Hand/HellDragon_
+          R Finger1/HellDragon_ R Finger11
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_
+          R Clavicle/HellDragon_ R UpperArm/HellDragon_ R Forearm/HellDragon_ R Hand/HellDragon_
+          R Finger2
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_
+          R Clavicle/HellDragon_ R UpperArm/HellDragon_ R Forearm/HellDragon_ R Hand/HellDragon_
+          R Finger2/HellDragon_ R Finger21
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_
+          R Clavicle/HellDragon_ R UpperArm/HellDragon_ R Forearm/HellDragon_ R Hand/HellDragon_
+          R Finger3
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_
+          R Clavicle/HellDragon_ R UpperArm/HellDragon_ R Forearm/HellDragon_ R Hand/HellDragon_
+          R Finger3/HellDragon_ R Finger31
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_WingL_Arm
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_WingL_Arm/HellDragon_WingL_ForeArm
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_WingL_Arm/HellDragon_WingL_ForeArm/HellDragon_WingL_Hand
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_WingL_Arm/HellDragon_WingL_ForeArm/HellDragon_WingL_Hand/HellDragon_WingL_FingerA_1
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_WingL_Arm/HellDragon_WingL_ForeArm/HellDragon_WingL_Hand/HellDragon_WingL_FingerA_1/HellDragon_WingL_FingerA_2
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_WingL_Arm/HellDragon_WingL_ForeArm/HellDragon_WingL_Hand/HellDragon_WingL_FingerA_1/HellDragon_WingL_FingerA_2/HellDragon_WingL_FingerA_3
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_WingL_Arm/HellDragon_WingL_ForeArm/HellDragon_WingL_Hand/HellDragon_WingL_FingerB_1
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_WingL_Arm/HellDragon_WingL_ForeArm/HellDragon_WingL_Hand/HellDragon_WingL_FingerB_1/HellDragon_WingL_FingerB_2
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_WingL_Arm/HellDragon_WingL_ForeArm/HellDragon_WingL_Hand/HellDragon_WingL_FingerB_1/HellDragon_WingL_FingerB_2/HellDragon_WingL_FingerB_3
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_WingL_Arm/HellDragon_WingL_ForeArm/HellDragon_WingL_Hand/HellDragon_WingL_FingerC_1
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_WingL_Arm/HellDragon_WingL_ForeArm/HellDragon_WingL_Hand/HellDragon_WingL_FingerC_1/HellDragon_WingL_FingerC_2
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_WingL_Arm/HellDragon_WingL_ForeArm/HellDragon_WingL_Hand/HellDragon_WingL_FingerC_1/HellDragon_WingL_FingerC_2/HellDragon_WingL_FingerC_3
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_WingR_Arm
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_WingR_Arm/HellDragon_WingR_ForeArm
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_WingR_Arm/HellDragon_WingR_ForeArm/HellDragon_WingR_Hand
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_WingR_Arm/HellDragon_WingR_ForeArm/HellDragon_WingR_Hand/HellDragon_WingR_FingerA_1
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_WingR_Arm/HellDragon_WingR_ForeArm/HellDragon_WingR_Hand/HellDragon_WingR_FingerA_1/HellDragon_WingR_FingerA_2
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_WingR_Arm/HellDragon_WingR_ForeArm/HellDragon_WingR_Hand/HellDragon_WingR_FingerA_1/HellDragon_WingR_FingerA_2/HellDragon_WingR_FingerA_3
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_WingR_Arm/HellDragon_WingR_ForeArm/HellDragon_WingR_Hand/HellDragon_WingR_FingerB_1
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_WingR_Arm/HellDragon_WingR_ForeArm/HellDragon_WingR_Hand/HellDragon_WingR_FingerB_1/HellDragon_WingR_FingerB_2
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_WingR_Arm/HellDragon_WingR_ForeArm/HellDragon_WingR_Hand/HellDragon_WingR_FingerB_1/HellDragon_WingR_FingerB_2/HellDragon_WingR_FingerB_3
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_WingR_Arm/HellDragon_WingR_ForeArm/HellDragon_WingR_Hand/HellDragon_WingR_FingerC_1
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_WingR_Arm/HellDragon_WingR_ForeArm/HellDragon_WingR_Hand/HellDragon_WingR_FingerC_1/HellDragon_WingR_FingerC_2
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Spine/HellDragon_ Spine1/HellDragon_WingR_Arm/HellDragon_WingR_ForeArm/HellDragon_WingR_Hand/HellDragon_WingR_FingerC_1/HellDragon_WingR_FingerC_2/HellDragon_WingR_FingerC_3
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Tail
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Tail/HellDragon_ Tail1
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Tail/HellDragon_ Tail1/HellDragon_
+          Tail2
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Tail/HellDragon_ Tail1/HellDragon_
+          Tail2/HellDragon_ Tail3
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Tail/HellDragon_ Tail1/HellDragon_
+          Tail2/HellDragon_ Tail3/HellDragon_ Tail4
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Tail/HellDragon_ Tail1/HellDragon_
+          Tail2/HellDragon_ Tail3/HellDragon_ Tail4/HellDragon_ Tail5
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Tail/HellDragon_ Tail1/HellDragon_
+          Tail2/HellDragon_ Tail3/HellDragon_ Tail4/HellDragon_ Tail5/HellDragon_
+          Tail6
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Tail/HellDragon_ Tail1/HellDragon_
+          Tail2/HellDragon_ Tail3/HellDragon_ Tail4/HellDragon_ Tail5/HellDragon_
+          Tail6/HellDragon_ Tail7
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Tail/HellDragon_ Tail1/HellDragon_
+          Tail2/HellDragon_ Tail3/HellDragon_ Tail4/HellDragon_ Tail5/HellDragon_
+          Tail6/HellDragon_ Tail7/HellDragon_ Tail8
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Tail/HellDragon_ Tail1/HellDragon_
+          Tail2/HellDragon_ Tail3/HellDragon_ Tail4/HellDragon_ Tail5/HellDragon_
+          Tail6/HellDragon_ Tail7/HellDragon_ Tail8/HellDragon_ Tail9
+        weight: 1
+      - path: root/HellDragon_/HellDragon_ Pelvis/HellDragon_ Tail/HellDragon_ Tail1/HellDragon_
+          Tail2/HellDragon_ Tail3/HellDragon_ Tail4/HellDragon_ Tail5/HellDragon_
+          Tail6/HellDragon_ Tail7/HellDragon_ Tail8/HellDragon_ Tail9/HellDragon_
+          Tail10
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
+    importPhysicalCameras: 0
+    importVisibility: 0
+    importBlendShapes: 1
+    importCameras: 0
+    importLights: 0
+    nodeNameCollisionStrategy: 0
+    fileIdsGeneration: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    keepQuads: 0
+    weldVertices: 1
+    bakeAxisConversion: 0
+    preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    optimizeBones: 1
+    generateMeshLods: 0
+    meshLodGenerationFlags: 0
+    maximumMeshLod: -1
+    meshOptimizationFlags: -1
+    indexFormat: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVMarginMethod: 0
+    secondaryUVMinLightmapResolution: 40
+    secondaryUVMinObjectScale: 1
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    strictVertexDataChecks: 0
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 0
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 1
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  referencedClips: []
+  importAnimation: 1
+  humanDescription:
+    serializedVersion: 3
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    globalScale: 1
+    rootMotionBoneName: root
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {fileID: 9000000, guid: ca1a8205ac07b314bb3d4d663a223803, type: 3}
+  autoGenerateAvatarMappingIfUnspecified: 1
+  animationType: 2
+  humanoidOversampling: 1
+  avatarSetup: 2
+  addHumanoidExtraRootOnlyWhenUsingAvatar: 0
+  importBlendShapeDeformPercent: 0
+  remapMaterialsIfMaterialImportModeIsNone: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
