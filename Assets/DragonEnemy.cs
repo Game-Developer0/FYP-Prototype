@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class DragonEnemy : MonoBehaviour
 {
@@ -39,6 +40,16 @@ public class DragonEnemy : MonoBehaviour
     [Range(0f, 1f)]
     public float chanceToFlyAgainAfterFall = 0.5f;
 
+    [Header("Falling Ground Check")]
+    public LayerMask groundLayer;
+    public float fallingGroundRayDistance = 5f;
+    public float minimumFallAnimationTime = 1.2f;
+
+    private float fallStartedTime = 0f;
+    private float skyDeathStartedTime = 0f;
+    public float fallGroundCheckHeight = 1.5f;
+
+
     private float nextCombatModeChangeTime = 0f;
     private bool isRecoveringFromFall = false;
     private float fallRecoverEndTime = 0f;
@@ -75,6 +86,7 @@ public class DragonEnemy : MonoBehaviour
     public float skyAttackRange = 24f;
     public float attackCooldown = 3f;
     public int biteDamage = 20;
+
     [Range(0f, 1f)]
     public float closeRangeBiteChance = 0.5f;
 
@@ -97,6 +109,8 @@ public class DragonEnemy : MonoBehaviour
     public int hitsToDie = 8;
     public int fallAfterHits = 4;
     public float destroyAfterDeath = 7f;
+
+    private bool hasAlreadyFallenFromSky = false;
 
     [Header("Hit Reaction")]
     public float groundHitStunDuration = 0.8f;
@@ -122,6 +136,20 @@ public class DragonEnemy : MonoBehaviour
     public string getHit1TriggerName = "GetHit1";
     public string flyGetHitTriggerName = "FlyGetHit";
     public string fallFromHitTriggerName = "FallFromHit";
+    public string deathHitGroundTriggerName = "DeathHitGround";
+
+    [Header("Animation State Names")]
+    public string groundIdleStateName = "IdleBreathe";
+    public string groundDeathStateName = "Death";
+    public string skyDeathStartStateName = "FlyGetHitToFalling";
+    public string skyFallingStateName = "Falling";
+    public string deathHitGroundStateName = "DeathHitTheGround";
+
+    [Header("Sky Death")]
+    public float skyDeathGroundCheckHeight = 1.5f;
+
+    private bool isSkyDeath = false;
+    private bool skyDeathHitGround = false;
 
     private Vector3 zoneCenterPosition;
     private Vector3 currentSkyPatrolPoint;
@@ -157,6 +185,25 @@ public class DragonEnemy : MonoBehaviour
 
     private PlayerHealth playerHealth;
 
+    [Header("Mouth Aim")]
+    public bool aimMouthAtPlayer = true;
+    public float mouthAimSpeed = 25f;
+    public Vector3 mouthTargetOffset = new Vector3(0f, 1.2f, 0f);
+
+    [Header("Spread Acid Breath")]
+    public ParticleSystem spreadAcidParticle;
+    public Transform spreadAcidPoint;
+
+    public float spreadAcidBreathDuration = 2f;
+    public int spreadAcidDamage = 8;
+    public float spreadAcidDamageRange = 16f;
+    public float spreadAcidAngle = 55f;
+    public float spreadAcidDamageInterval = 0.4f;
+
+    public LayerMask spreadAcidBlockLayers;
+
+    private Coroutine spreadAcidRoutine;
+    private float nextSpreadAcidDamageTime = 0f;
     void Start()
     {
         if (rb == null)
@@ -183,18 +230,15 @@ public class DragonEnemy : MonoBehaviour
         {
             rb.freezeRotation = true;
             rb.useGravity = !startInSky;
+            rb.isKinematic = false;
         }
 
         isFlying = startInSky;
 
         if (isFlying)
-        {
             ChooseNewSkyPatrolPoint();
-        }
         else
-        {
             ChooseNewGroundPatrolPoint();
-        }
 
         SetNextCombatModeChangeTime();
         nextPassiveChangeTime = Time.time + Random.Range(passiveWaitMin, passiveWaitMax);
@@ -204,11 +248,11 @@ public class DragonEnemy : MonoBehaviour
 
     void Update()
     {
-        if (isDead)
-        {
-            UpdateAnimatorBools();
+        if (isSkyDeath)
             return;
-        }
+
+        if (isDead)
+            return;
 
         if (playerTarget == null)
         {
@@ -226,6 +270,7 @@ public class DragonEnemy : MonoBehaviour
             UpdateAnimatorBools();
             return;
         }
+
         if (isGroundHitStunned)
         {
             HandleGroundHitStun();
@@ -236,13 +281,9 @@ public class DragonEnemy : MonoBehaviour
         ResetMovementRequests();
 
         if (hasDetectedPlayer)
-        {
             CombatBehaviour();
-        }
         else
-        {
             PassiveBehaviour();
-        }
 
         UpdateAnimatorBools();
     }
@@ -251,17 +292,19 @@ public class DragonEnemy : MonoBehaviour
     {
         if (rb == null) return;
 
-        if (isDead) return;
-        if (isGroundHitStunned)
+        if (isSkyDeath)
         {
-            if (rb != null)
-            {
-                rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
-            }
-
+            HandleSkyDeathFalling();
             return;
         }
 
+        if (isDead) return;
+
+        if (isGroundHitStunned)
+        {
+            rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
+            return;
+        }
 
         if (isTakingOff)
         {
@@ -326,13 +369,9 @@ public class DragonEnemy : MonoBehaviour
     void PassiveBehaviour()
     {
         if (isFlying)
-        {
             SkyPatrol();
-        }
         else
-        {
             GroundPassive();
-        }
     }
 
     void CombatBehaviour()
@@ -340,13 +379,9 @@ public class DragonEnemy : MonoBehaviour
         HandleCombatModeSwitching();
 
         if (isFlying)
-        {
             SkyCombat();
-        }
         else
-        {
             GroundCombat();
-        }
     }
 
     void HandleCombatModeSwitching()
@@ -388,13 +423,9 @@ public class DragonEnemy : MonoBehaviour
     void SetNextCombatModeChangeTime()
     {
         if (isFlying)
-        {
             nextCombatModeChangeTime = Time.time + Random.Range(skyCombatMinTime, skyCombatMaxTime);
-        }
         else
-        {
             nextCombatModeChangeTime = Time.time + Random.Range(groundCombatMinTime, groundCombatMaxTime);
-        }
     }
 
     void GroundPassive()
@@ -478,6 +509,7 @@ public class DragonEnemy : MonoBehaviour
             animRunning = true;
         }
     }
+
     void TryRandomCloseGroundAttack()
     {
         if (Time.time < nextAttackTime) return;
@@ -495,7 +527,7 @@ public class DragonEnemy : MonoBehaviour
 
             if (!useAnimationEventsForProjectiles)
             {
-                ShootAcidFromAnimation();
+                StartSpreadAcidBreathFromAnimation();
             }
         }
         else
@@ -510,6 +542,7 @@ public class DragonEnemy : MonoBehaviour
 
         nextAttackTime = Time.time + attackCooldown;
     }
+
     void TryRandomMediumGroundAttack()
     {
         if (Time.time < nextAttackTime) return;
@@ -520,7 +553,7 @@ public class DragonEnemy : MonoBehaviour
 
             if (!useAnimationEventsForProjectiles)
             {
-                ShootAcidFromAnimation();
+                StartSpreadAcidBreathFromAnimation();
             }
         }
         else
@@ -535,6 +568,7 @@ public class DragonEnemy : MonoBehaviour
 
         nextAttackTime = Time.time + attackCooldown;
     }
+
     void TryGroundSpitAcidAttack()
     {
         if (Time.time < nextAttackTime) return;
@@ -542,22 +576,7 @@ public class DragonEnemy : MonoBehaviour
         SetTriggerIfExists(spitAcidTriggerName);
 
         if (!useAnimationEventsForProjectiles)
-        {
             ShootFireballFromAnimation();
-        }
-
-        nextAttackTime = Time.time + attackCooldown;
-    }
-    void TryGroundSpreadAcidAttack()
-    {
-        if (Time.time < nextAttackTime) return;
-
-        SetTriggerIfExists(spreadAcidBreathTriggerName);
-
-        if (!useAnimationEventsForProjectiles)
-        {
-            ShootAcidFromAnimation();
-        }
 
         nextAttackTime = Time.time + attackCooldown;
     }
@@ -610,6 +629,7 @@ public class DragonEnemy : MonoBehaviour
             animGliding = false;
         }
     }
+  
 
     void StartTakeOff()
     {
@@ -628,8 +648,10 @@ public class DragonEnemy : MonoBehaviour
 
         if (rb != null)
         {
+            rb.isKinematic = false;
             rb.useGravity = false;
             rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
             rb.AddForce(Vector3.up * takeOffForce, ForceMode.VelocityChange);
         }
 
@@ -706,21 +728,58 @@ public class DragonEnemy : MonoBehaviour
         if (!isFlying) return;
         if (isFalling) return;
 
+        hasAlreadyFallenFromSky = true;
+        fallStartedTime = Time.time;
+
         isFalling = true;
+        isLanding = false;
+        isTakingOff = false;
+        isRecoveringFromFall = false;
+        isFlying = true;
+
         wantsFlyMove = false;
+        wantsGroundMove = false;
         wantsHover = false;
+
+        animWalking = false;
+        animRunning = false;
+        animGliding = false;
 
         if (rb != null)
         {
+            rb.isKinematic = false;
             rb.useGravity = true;
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
         }
 
+        SetBoolIfExists(isFlyingBoolName, true);
+        SetBoolIfExists(isFallingBoolName, true);
+        SetBoolIfExists(isDeadBoolName, false);
+
+        ResetAllDragonTriggers();
+
         SetTriggerIfExists(fallFromHitTriggerName);
+
+        if (animator != null && !string.IsNullOrEmpty(skyDeathStartStateName))
+        {
+            animator.CrossFadeInFixedTime(skyDeathStartStateName, 0.05f);
+        }
     }
 
     void HandleFallingMovement()
     {
-        if (transform.position.y <= GetZoneCenter().y + 1.5f)
+        SetBoolIfExists(isFlyingBoolName, true);
+        SetBoolIfExists(isFallingBoolName, true);
+        SetBoolIfExists(isDeadBoolName, false);
+
+        // Give FlyGetHitToFalling and Falling time to play before checking ground.
+        if (Time.time < fallStartedTime + minimumFallAnimationTime)
+        {
+            return;
+        }
+
+        if (IsDragonCloseToGround(fallingGroundRayDistance))
         {
             isFalling = false;
             isFlying = false;
@@ -730,6 +789,7 @@ public class DragonEnemy : MonoBehaviour
             if (rb != null)
             {
                 rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
                 rb.useGravity = true;
             }
 
@@ -737,10 +797,28 @@ public class DragonEnemy : MonoBehaviour
             animRunning = false;
             animGliding = false;
 
+            SetBoolIfExists(isFlyingBoolName, false);
+            SetBoolIfExists(isFallingBoolName, false);
+            SetBoolIfExists(isDeadBoolName, false);
+
             ChooseNewGroundPatrolPoint();
+
+            if (animator != null && !string.IsNullOrEmpty(groundIdleStateName))
+            {
+                animator.CrossFadeInFixedTime(groundIdleStateName, 0.1f);
+            }
+        }
+    }
+    bool IsDragonCloseToGround(float rayDistance)
+    {
+        Vector3 rayStart = transform.position + Vector3.up * 1f;
+
+        if (Physics.Raycast(rayStart, Vector3.down, out RaycastHit hit, rayDistance, groundLayer, QueryTriggerInteraction.Ignore))
+        {
+            return true;
         }
 
-        UpdateAnimatorBools();
+        return false;
     }
 
     void HandleFallRecovery()
@@ -763,40 +841,6 @@ public class DragonEnemy : MonoBehaviour
         {
             SetNextCombatModeChangeTime();
         }
-    }
-
-    void TryBiteAttack()
-    {
-        if (Time.time < nextAttackTime) return;
-
-        SetTriggerIfExists(biteAttackTriggerName);
-        DamagePlayerByBite();
-
-        nextAttackTime = Time.time + attackCooldown;
-    }
-
-    void TrySkyAttack()
-    {
-        if (Time.time < nextAttackTime) return;
-
-        bool useSpreadBreath = Random.value > 0.5f;
-
-        if (useSpreadBreath)
-        {
-            SetTriggerIfExists(spreadAcidBreathTriggerName);
-
-            if (!useAnimationEventsForProjectiles)
-                ShootAcidFromAnimation();
-        }
-        else
-        {
-            SetTriggerIfExists(spitAcidTriggerName);
-
-            if (!useAnimationEventsForProjectiles)
-                ShootFireballFromAnimation();
-        }
-
-        nextAttackTime = Time.time + attackCooldown;
     }
 
     void DamagePlayerByBite()
@@ -825,10 +869,175 @@ public class DragonEnemy : MonoBehaviour
     {
         ShootProjectile(fireballPrefab);
     }
+    public void StartSpreadAcidBreathFromAnimation()
+    {
+        if (spreadAcidRoutine != null)
+        {
+            StopCoroutine(spreadAcidRoutine);
+        }
 
+        spreadAcidRoutine = StartCoroutine(SpreadAcidBreathRoutine());
+    }
+    public void StopSpreadAcidBreathFromAnimation()
+    {
+        if (spreadAcidRoutine != null)
+        {
+            StopCoroutine(spreadAcidRoutine);
+            spreadAcidRoutine = null;
+        }
+
+        if (spreadAcidParticle != null)
+        {
+            spreadAcidParticle.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+        }
+    }
+
+    IEnumerator SpreadAcidBreathRoutine()
+    {
+        Transform acidOrigin = spreadAcidPoint;
+
+        if (acidOrigin == null)
+            acidOrigin = firePoint;
+
+        if (acidOrigin == null)
+            acidOrigin = transform;
+
+        AimMouthPointAtPlayer(acidOrigin, true);
+
+        if (spreadAcidParticle != null)
+        {
+            spreadAcidParticle.Play();
+        }
+
+        float endTime = Time.time + spreadAcidBreathDuration;
+        nextSpreadAcidDamageTime = 0f;
+
+        while (Time.time < endTime)
+        {
+            if (playerTarget != null)
+            {
+                FaceTarget(playerTarget.position);
+                AimMouthPointAtPlayer(acidOrigin, false);
+            }
+
+            if (Time.time >= nextSpreadAcidDamageTime)
+            {
+                DamagePlayerWithSpreadAcid();
+                nextSpreadAcidDamageTime = Time.time + spreadAcidDamageInterval;
+            }
+
+            yield return null;
+        }
+
+        if (spreadAcidParticle != null)
+        {
+            spreadAcidParticle.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+        }
+
+        spreadAcidRoutine = null;
+    }
+    void AimMouthPointAtPlayer(Transform mouthPoint, bool instant)
+    {
+        if (!aimMouthAtPlayer) return;
+        if (mouthPoint == null) return;
+        if (playerTarget == null) return;
+
+        Vector3 targetPoint = playerTarget.position + mouthTargetOffset;
+        Vector3 direction = targetPoint - mouthPoint.position;
+
+        if (direction == Vector3.zero) return;
+
+        Quaternion targetRotation = Quaternion.LookRotation(direction.normalized);
+
+        if (instant)
+        {
+            mouthPoint.rotation = targetRotation;
+        }
+        else
+        {
+            mouthPoint.rotation = Quaternion.Slerp(
+                mouthPoint.rotation,
+                targetRotation,
+                Time.deltaTime * mouthAimSpeed
+            );
+        }
+    }
+    void DamagePlayerWithSpreadAcid()
+    {
+        if (playerTarget == null) return;
+
+        Transform acidOrigin = spreadAcidPoint;
+
+        if (acidOrigin == null)
+            acidOrigin = firePoint;
+
+        if (acidOrigin == null)
+            acidOrigin = transform;
+
+        Vector3 targetPoint = playerTarget.position + Vector3.up * 1.2f;
+        Vector3 directionToPlayer = targetPoint - acidOrigin.position;
+
+        float distanceToPlayer = directionToPlayer.magnitude;
+
+        if (distanceToPlayer > spreadAcidDamageRange)
+            return;
+
+        float angleToPlayer = Vector3.Angle(acidOrigin.forward, directionToPlayer.normalized);
+
+        if (angleToPlayer > spreadAcidAngle * 0.5f)
+            return;
+
+        // Optional: stop acid damage if wall/ground is between dragon and player
+        if (spreadAcidBlockLayers.value != 0)
+        {
+            if (Physics.Raycast(acidOrigin.position, directionToPlayer.normalized, out RaycastHit hit, distanceToPlayer, spreadAcidBlockLayers, QueryTriggerInteraction.Ignore))
+            {
+                return;
+            }
+        }
+
+        if (playerHealth == null)
+            playerHealth = playerTarget.GetComponent<PlayerHealth>();
+
+        if (playerHealth == null)
+        {
+            Debug.LogWarning("PlayerHealth script missing on Player.");
+            return;
+        }
+
+        playerHealth.TakeDamage(spreadAcidDamage);
+        Debug.Log(gameObject.name + " spread acid hit player: " + spreadAcidDamage);
+    }
     public void ShootAcidFromAnimation()
     {
         ShootProjectile(acidBallPrefab);
+    }
+    void TrySkyAttack()
+    {
+        if (Time.time < nextAttackTime) return;
+
+        bool useSpreadBreath = Random.value > 0.5f;
+
+        if (useSpreadBreath)
+        {
+            SetTriggerIfExists(spreadAcidBreathTriggerName);
+
+            if (!useAnimationEventsForProjectiles)
+            {
+                StartSpreadAcidBreathFromAnimation();
+            }
+        }
+        else
+        {
+            SetTriggerIfExists(spitAcidTriggerName);
+
+            if (!useAnimationEventsForProjectiles)
+            {
+                ShootFireballFromAnimation();
+            }
+        }
+
+        nextAttackTime = Time.time + attackCooldown;
     }
 
     void ShootProjectile(GameObject projectilePrefab)
@@ -837,16 +1046,21 @@ public class DragonEnemy : MonoBehaviour
         if (firePoint == null) return;
         if (playerTarget == null) return;
 
-        GameObject projectile = Instantiate(projectilePrefab, firePoint.position, firePoint.rotation);
+        Vector3 targetPoint = playerTarget.position + mouthTargetOffset;
+        Vector3 direction = targetPoint - firePoint.position;
+
+        if (direction == Vector3.zero) return;
+
+        direction.Normalize();
+
+        Quaternion spawnRotation = Quaternion.LookRotation(direction);
+
+        GameObject projectile = Instantiate(projectilePrefab, firePoint.position, spawnRotation);
 
         Rigidbody projectileRb = projectile.GetComponent<Rigidbody>();
 
         if (projectileRb != null)
         {
-            Vector3 targetPoint = playerTarget.position + Vector3.up * 1.2f;
-            Vector3 direction = targetPoint - firePoint.position;
-            direction.Normalize();
-
             projectileRb.linearVelocity = direction * projectileSpeed;
         }
     }
@@ -999,13 +1213,17 @@ public class DragonEnemy : MonoBehaviour
 
         if (arrowHits >= hitsToDie)
         {
-            Die();
+            if (isFlying || isFalling || isTakingOff || isLanding)
+                StartSkyDeath();
+            else
+                StartGroundDeath();
+
             return;
         }
 
-        if (isFlying)
+        if (isFlying || isFalling)
         {
-            if (fallAfterHits > 0 && arrowHits >= fallAfterHits)
+            if (fallAfterHits > 0 && arrowHits >= fallAfterHits && !hasAlreadyFallenFromSky)
             {
                 StartFallingFromHit();
             }
@@ -1013,12 +1231,13 @@ public class DragonEnemy : MonoBehaviour
             {
                 SetTriggerIfExists(flyGetHitTriggerName);
             }
+
+            return;
         }
-        else
-        {
-            StartGroundHitReaction();
-        }
+
+        StartGroundHitReaction();
     }
+
     void StartGroundHitReaction()
     {
         isGroundHitStunned = true;
@@ -1041,6 +1260,8 @@ public class DragonEnemy : MonoBehaviour
         SetBoolIfExists(isRunningBoolName, false);
         SetBoolIfExists(isGlidingBoolName, false);
 
+        ResetAllDragonTriggers();
+
         SetTriggerIfExists(getHit1TriggerName);
 
         if (animator != null && !string.IsNullOrEmpty(getHit1StateName))
@@ -1048,6 +1269,7 @@ public class DragonEnemy : MonoBehaviour
             animator.CrossFadeInFixedTime(getHit1StateName, 0.05f);
         }
     }
+
     void HandleGroundHitStun()
     {
         animWalking = false;
@@ -1066,11 +1288,21 @@ public class DragonEnemy : MonoBehaviour
         }
     }
 
-
-
-    void Die()
+    void StartGroundDeath()
     {
+        if (isDead) return;
+
         isDead = true;
+        isSkyDeath = false;
+        skyDeathHitGround = false;
+
+        hasDetectedPlayer = false;
+        isTakingOff = false;
+        isLanding = false;
+        isFalling = false;
+        isRecoveringFromFall = false;
+        isGroundHitStunned = false;
+        isFlying = false;
 
         wantsFlyMove = false;
         wantsGroundMove = false;
@@ -1082,17 +1314,170 @@ public class DragonEnemy : MonoBehaviour
 
         if (rb != null)
         {
-            rb.useGravity = true;
             rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            rb.useGravity = true;
+            rb.isKinematic = true;
         }
 
+        SetBoolIfExists(isWalkingBoolName, false);
+        SetBoolIfExists(isRunningBoolName, false);
+        SetBoolIfExists(isGlidingBoolName, false);
+        SetBoolIfExists(isFallingBoolName, false);
+        SetBoolIfExists(isFlyingBoolName, false);
+
+        ResetAllDragonTriggers();
+
         SetBoolIfExists(isDeadBoolName, true);
+
+        if (animator != null && !string.IsNullOrEmpty(groundDeathStateName))
+        {
+            animator.CrossFadeInFixedTime(groundDeathStateName, 0.05f);
+        }
 
         Destroy(gameObject, destroyAfterDeath);
     }
 
+    void StartSkyDeath()
+    {
+        if (isSkyDeath) return;
+
+        isDead = true;
+        isSkyDeath = true;
+        skyDeathHitGround = false;
+        skyDeathStartedTime = Time.time;
+
+        hasDetectedPlayer = false;
+        isTakingOff = false;
+        isLanding = false;
+        isFalling = true;
+        isRecoveringFromFall = false;
+        isGroundHitStunned = false;
+        isFlying = true;
+
+        wantsFlyMove = false;
+        wantsGroundMove = false;
+        wantsHover = false;
+
+        animWalking = false;
+        animRunning = false;
+        animGliding = false;
+
+        if (rb != null)
+        {
+            rb.isKinematic = false;
+            rb.useGravity = true;
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
+
+        SetBoolIfExists(isWalkingBoolName, false);
+        SetBoolIfExists(isRunningBoolName, false);
+        SetBoolIfExists(isGlidingBoolName, false);
+        SetBoolIfExists(isFlyingBoolName, true);
+        SetBoolIfExists(isFallingBoolName, true);
+
+        // Keep IsDead false during sky death so ground Death does not interrupt.
+        SetBoolIfExists(isDeadBoolName, false);
+
+        ResetAllDragonTriggers();
+
+        SetTriggerIfExists(fallFromHitTriggerName);
+
+        if (animator != null && !string.IsNullOrEmpty(skyDeathStartStateName))
+        {
+            animator.CrossFadeInFixedTime(skyDeathStartStateName, 0.05f);
+        }
+    }
+
+    void HandleSkyDeathFalling()
+    {
+        if (skyDeathHitGround) return;
+
+        SetBoolIfExists(isFlyingBoolName, true);
+        SetBoolIfExists(isFallingBoolName, true);
+
+        // Keep false so Any State -> Death does not interrupt sky death.
+        SetBoolIfExists(isDeadBoolName, false);
+
+        // Give FlyGetHitToFalling and Falling time to play before checking ground.
+        if (Time.time < skyDeathStartedTime + minimumFallAnimationTime)
+        {
+            return;
+        }
+
+        if (IsDragonCloseToGround(fallingGroundRayDistance))
+        {
+            skyDeathHitGround = true;
+
+            isFlying = false;
+            isFalling = false;
+
+            if (rb != null)
+            {
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+                rb.useGravity = true;
+                rb.isKinematic = true;
+            }
+
+            SetBoolIfExists(isFlyingBoolName, false);
+            SetBoolIfExists(isFallingBoolName, false);
+            SetBoolIfExists(isDeadBoolName, false);
+
+            ResetAllDragonTriggers();
+
+            SetTriggerIfExists(deathHitGroundTriggerName);
+
+            if (animator != null && !string.IsNullOrEmpty(deathHitGroundStateName))
+            {
+                animator.CrossFadeInFixedTime(deathHitGroundStateName, 0.05f);
+            }
+
+            Destroy(gameObject, destroyAfterDeath);
+        }
+    }
+
+    void ResetAllDragonTriggers()
+    {
+        if (animator == null) return;
+
+        ResetTriggerIfExists(takeOffTriggerName);
+        ResetTriggerIfExists(landTriggerName);
+        ResetTriggerIfExists(biteAttackTriggerName);
+        ResetTriggerIfExists(spitAcidTriggerName);
+        ResetTriggerIfExists(spreadAcidBreathTriggerName);
+        ResetTriggerIfExists(getHit1TriggerName);
+        ResetTriggerIfExists(flyGetHitTriggerName);
+        ResetTriggerIfExists(fallFromHitTriggerName);
+        ResetTriggerIfExists(deathHitGroundTriggerName);
+    }
+
+    void ResetTriggerIfExists(string parameterName)
+    {
+        if (animator == null) return;
+        if (string.IsNullOrEmpty(parameterName)) return;
+
+        foreach (AnimatorControllerParameter parameter in animator.parameters)
+        {
+            if (parameter.name == parameterName && parameter.type == AnimatorControllerParameterType.Trigger)
+            {
+                animator.ResetTrigger(parameterName);
+                return;
+            }
+        }
+    }
+
     void UpdateAnimatorBools()
     {
+        if (isSkyDeath)
+        {
+            SetBoolIfExists(isFlyingBoolName, true);
+            SetBoolIfExists(isFallingBoolName, true);
+            SetBoolIfExists(isDeadBoolName, false);
+            return;
+        }
+
         SetBoolIfExists(isFlyingBoolName, isFlying);
         SetBoolIfExists(isWalkingBoolName, animWalking);
         SetBoolIfExists(isRunningBoolName, animRunning);

@@ -1,228 +1,623 @@
 fileFormatVersion: 2
 guid: b1bc6303904697e43829873428846a82
-timeCreated: 1523041038
-licenseType: Store
+AssetOrigin:
+  serializedVersion: 1
+  productId: 117306
+  packageName: ELEMENTAL DRAGONS PACK
+  packageVersion: 1.22
+  assetPath: Assets/HEROIC FANTASY CREATURES FULL PACK VOL3/Elemental Dragons Pack/Undead
+    Dragon/FBX Files/HellDragon@FlyStationarySpreadAcidBreath.FBX
+  uploadId: 669989
 ModelImporter:
-  serializedVersion: 19
-  fileIDToRecycleName:
-    100000: Dummy002
-    100002: //RootNode
-    100004: HellDragon_
-    100006: HellDragon_ Head
-    100008: HellDragon_ L Calf
-    100010: HellDragon_ L Clavicle
-    100012: HellDragon_ L Finger0
-    100014: HellDragon_ L Finger01
-    100016: HellDragon_ L Finger1
-    100018: HellDragon_ L Finger11
-    100020: HellDragon_ L Finger2
-    100022: HellDragon_ L Finger21
-    100024: HellDragon_ L Finger3
-    100026: HellDragon_ L Finger31
-    100028: HellDragon_ L Foot
-    100030: HellDragon_ L Forearm
-    100032: HellDragon_ L Hand
-    100034: HellDragon_ L HorseLink
-    100036: HellDragon_ L Thigh
-    100038: HellDragon_ L Toe0
-    100040: HellDragon_ L Toe01
-    100042: HellDragon_ L Toe1
-    100044: HellDragon_ L Toe11
-    100046: HellDragon_ L Toe2
-    100048: HellDragon_ L Toe21
-    100050: HellDragon_ L Toe3
-    100052: HellDragon_ L Toe31
-    100054: HellDragon_ L UpperArm
-    100056: HellDragon_ Neck
-    100058: HellDragon_ Neck1
-    100060: HellDragon_ Pelvis
-    100062: HellDragon_ Ponytail1
-    100064: HellDragon_ R Calf
-    100066: HellDragon_ R Clavicle
-    100068: HellDragon_ R Finger0
-    100070: HellDragon_ R Finger01
-    100072: HellDragon_ R Finger1
-    100074: HellDragon_ R Finger11
-    100076: HellDragon_ R Finger2
-    100078: HellDragon_ R Finger21
-    100080: HellDragon_ R Finger3
-    100082: HellDragon_ R Finger31
-    100084: HellDragon_ R Foot
-    100086: HellDragon_ R Forearm
-    100088: HellDragon_ R Hand
-    100090: HellDragon_ R HorseLink
-    100092: HellDragon_ R Thigh
-    100094: HellDragon_ R Toe0
-    100096: HellDragon_ R Toe01
-    100098: HellDragon_ R Toe1
-    100100: HellDragon_ R Toe11
-    100102: HellDragon_ R Toe2
-    100104: HellDragon_ R Toe21
-    100106: HellDragon_ R Toe3
-    100108: HellDragon_ R Toe31
-    100110: HellDragon_ R UpperArm
-    100112: HellDragon_ Spine
-    100114: HellDragon_ Spine1
-    100116: HellDragon_ Tail
-    100118: HellDragon_ Tail1
-    100120: HellDragon_ Tail10
-    100122: HellDragon_ Tail2
-    100124: HellDragon_ Tail3
-    100126: HellDragon_ Tail4
-    100128: HellDragon_ Tail5
-    100130: HellDragon_ Tail6
-    100132: HellDragon_ Tail7
-    100134: HellDragon_ Tail8
-    100136: HellDragon_ Tail9
-    100138: HellDragon_WingL_Arm
-    100140: HellDragon_WingL_FingerA_1
-    100142: HellDragon_WingL_FingerA_2
-    100144: HellDragon_WingL_FingerA_3
-    100146: HellDragon_WingL_FingerB_1
-    100148: HellDragon_WingL_FingerB_2
-    100150: HellDragon_WingL_FingerB_3
-    100152: HellDragon_WingL_FingerC_1
-    100154: HellDragon_WingL_FingerC_2
-    100156: HellDragon_WingL_FingerC_3
-    100158: HellDragon_WingL_ForeArm
-    100160: HellDragon_WingL_Hand
-    100162: HellDragon_WingR_Arm
-    100164: HellDragon_WingR_FingerA_1
-    100166: HellDragon_WingR_FingerA_2
-    100168: HellDragon_WingR_FingerA_3
-    100170: HellDragon_WingR_FingerB_1
-    100172: HellDragon_WingR_FingerB_2
-    100174: HellDragon_WingR_FingerB_3
-    100176: HellDragon_WingR_FingerC_1
-    100178: HellDragon_WingR_FingerC_2
-    100180: HellDragon_WingR_FingerC_3
-    100182: HellDragon_WingR_ForeArm
-    100184: HellDragon_WingR_Hand
-    100186: IK Chain002
-    100188: root
-    400000: Dummy002
-    400002: //RootNode
-    400004: HellDragon_
-    400006: HellDragon_ Head
-    400008: HellDragon_ L Calf
-    400010: HellDragon_ L Clavicle
-    400012: HellDragon_ L Finger0
-    400014: HellDragon_ L Finger01
-    400016: HellDragon_ L Finger1
-    400018: HellDragon_ L Finger11
-    400020: HellDragon_ L Finger2
-    400022: HellDragon_ L Finger21
-    400024: HellDragon_ L Finger3
-    400026: HellDragon_ L Finger31
-    400028: HellDragon_ L Foot
-    400030: HellDragon_ L Forearm
-    400032: HellDragon_ L Hand
-    400034: HellDragon_ L HorseLink
-    400036: HellDragon_ L Thigh
-    400038: HellDragon_ L Toe0
-    400040: HellDragon_ L Toe01
-    400042: HellDragon_ L Toe1
-    400044: HellDragon_ L Toe11
-    400046: HellDragon_ L Toe2
-    400048: HellDragon_ L Toe21
-    400050: HellDragon_ L Toe3
-    400052: HellDragon_ L Toe31
-    400054: HellDragon_ L UpperArm
-    400056: HellDragon_ Neck
-    400058: HellDragon_ Neck1
-    400060: HellDragon_ Pelvis
-    400062: HellDragon_ Ponytail1
-    400064: HellDragon_ R Calf
-    400066: HellDragon_ R Clavicle
-    400068: HellDragon_ R Finger0
-    400070: HellDragon_ R Finger01
-    400072: HellDragon_ R Finger1
-    400074: HellDragon_ R Finger11
-    400076: HellDragon_ R Finger2
-    400078: HellDragon_ R Finger21
-    400080: HellDragon_ R Finger3
-    400082: HellDragon_ R Finger31
-    400084: HellDragon_ R Foot
-    400086: HellDragon_ R Forearm
-    400088: HellDragon_ R Hand
-    400090: HellDragon_ R HorseLink
-    400092: HellDragon_ R Thigh
-    400094: HellDragon_ R Toe0
-    400096: HellDragon_ R Toe01
-    400098: HellDragon_ R Toe1
-    400100: HellDragon_ R Toe11
-    400102: HellDragon_ R Toe2
-    400104: HellDragon_ R Toe21
-    400106: HellDragon_ R Toe3
-    400108: HellDragon_ R Toe31
-    400110: HellDragon_ R UpperArm
-    400112: HellDragon_ Spine
-    400114: HellDragon_ Spine1
-    400116: HellDragon_ Tail
-    400118: HellDragon_ Tail1
-    400120: HellDragon_ Tail10
-    400122: HellDragon_ Tail2
-    400124: HellDragon_ Tail3
-    400126: HellDragon_ Tail4
-    400128: HellDragon_ Tail5
-    400130: HellDragon_ Tail6
-    400132: HellDragon_ Tail7
-    400134: HellDragon_ Tail8
-    400136: HellDragon_ Tail9
-    400138: HellDragon_WingL_Arm
-    400140: HellDragon_WingL_FingerA_1
-    400142: HellDragon_WingL_FingerA_2
-    400144: HellDragon_WingL_FingerA_3
-    400146: HellDragon_WingL_FingerB_1
-    400148: HellDragon_WingL_FingerB_2
-    400150: HellDragon_WingL_FingerB_3
-    400152: HellDragon_WingL_FingerC_1
-    400154: HellDragon_WingL_FingerC_2
-    400156: HellDragon_WingL_FingerC_3
-    400158: HellDragon_WingL_ForeArm
-    400160: HellDragon_WingL_Hand
-    400162: HellDragon_WingR_Arm
-    400164: HellDragon_WingR_FingerA_1
-    400166: HellDragon_WingR_FingerA_2
-    400168: HellDragon_WingR_FingerA_3
-    400170: HellDragon_WingR_FingerB_1
-    400172: HellDragon_WingR_FingerB_2
-    400174: HellDragon_WingR_FingerB_3
-    400176: HellDragon_WingR_FingerC_1
-    400178: HellDragon_WingR_FingerC_2
-    400180: HellDragon_WingR_FingerC_3
-    400182: HellDragon_WingR_ForeArm
-    400184: HellDragon_WingR_Hand
-    400186: IK Chain002
-    400188: root
-    7400000: FlyStationarySpreadAcidBreath
-    9500000: //RootNode
+  serializedVersion: 24200
+  internalIDToNameTable:
+  - first:
+      1: 100000
+    second: Dummy002
+  - first:
+      1: 100002
+    second: //RootNode
+  - first:
+      1: 100004
+    second: HellDragon_
+  - first:
+      1: 100006
+    second: HellDragon_ Head
+  - first:
+      1: 100008
+    second: HellDragon_ L Calf
+  - first:
+      1: 100010
+    second: HellDragon_ L Clavicle
+  - first:
+      1: 100012
+    second: HellDragon_ L Finger0
+  - first:
+      1: 100014
+    second: HellDragon_ L Finger01
+  - first:
+      1: 100016
+    second: HellDragon_ L Finger1
+  - first:
+      1: 100018
+    second: HellDragon_ L Finger11
+  - first:
+      1: 100020
+    second: HellDragon_ L Finger2
+  - first:
+      1: 100022
+    second: HellDragon_ L Finger21
+  - first:
+      1: 100024
+    second: HellDragon_ L Finger3
+  - first:
+      1: 100026
+    second: HellDragon_ L Finger31
+  - first:
+      1: 100028
+    second: HellDragon_ L Foot
+  - first:
+      1: 100030
+    second: HellDragon_ L Forearm
+  - first:
+      1: 100032
+    second: HellDragon_ L Hand
+  - first:
+      1: 100034
+    second: HellDragon_ L HorseLink
+  - first:
+      1: 100036
+    second: HellDragon_ L Thigh
+  - first:
+      1: 100038
+    second: HellDragon_ L Toe0
+  - first:
+      1: 100040
+    second: HellDragon_ L Toe01
+  - first:
+      1: 100042
+    second: HellDragon_ L Toe1
+  - first:
+      1: 100044
+    second: HellDragon_ L Toe11
+  - first:
+      1: 100046
+    second: HellDragon_ L Toe2
+  - first:
+      1: 100048
+    second: HellDragon_ L Toe21
+  - first:
+      1: 100050
+    second: HellDragon_ L Toe3
+  - first:
+      1: 100052
+    second: HellDragon_ L Toe31
+  - first:
+      1: 100054
+    second: HellDragon_ L UpperArm
+  - first:
+      1: 100056
+    second: HellDragon_ Neck
+  - first:
+      1: 100058
+    second: HellDragon_ Neck1
+  - first:
+      1: 100060
+    second: HellDragon_ Pelvis
+  - first:
+      1: 100062
+    second: HellDragon_ Ponytail1
+  - first:
+      1: 100064
+    second: HellDragon_ R Calf
+  - first:
+      1: 100066
+    second: HellDragon_ R Clavicle
+  - first:
+      1: 100068
+    second: HellDragon_ R Finger0
+  - first:
+      1: 100070
+    second: HellDragon_ R Finger01
+  - first:
+      1: 100072
+    second: HellDragon_ R Finger1
+  - first:
+      1: 100074
+    second: HellDragon_ R Finger11
+  - first:
+      1: 100076
+    second: HellDragon_ R Finger2
+  - first:
+      1: 100078
+    second: HellDragon_ R Finger21
+  - first:
+      1: 100080
+    second: HellDragon_ R Finger3
+  - first:
+      1: 100082
+    second: HellDragon_ R Finger31
+  - first:
+      1: 100084
+    second: HellDragon_ R Foot
+  - first:
+      1: 100086
+    second: HellDragon_ R Forearm
+  - first:
+      1: 100088
+    second: HellDragon_ R Hand
+  - first:
+      1: 100090
+    second: HellDragon_ R HorseLink
+  - first:
+      1: 100092
+    second: HellDragon_ R Thigh
+  - first:
+      1: 100094
+    second: HellDragon_ R Toe0
+  - first:
+      1: 100096
+    second: HellDragon_ R Toe01
+  - first:
+      1: 100098
+    second: HellDragon_ R Toe1
+  - first:
+      1: 100100
+    second: HellDragon_ R Toe11
+  - first:
+      1: 100102
+    second: HellDragon_ R Toe2
+  - first:
+      1: 100104
+    second: HellDragon_ R Toe21
+  - first:
+      1: 100106
+    second: HellDragon_ R Toe3
+  - first:
+      1: 100108
+    second: HellDragon_ R Toe31
+  - first:
+      1: 100110
+    second: HellDragon_ R UpperArm
+  - first:
+      1: 100112
+    second: HellDragon_ Spine
+  - first:
+      1: 100114
+    second: HellDragon_ Spine1
+  - first:
+      1: 100116
+    second: HellDragon_ Tail
+  - first:
+      1: 100118
+    second: HellDragon_ Tail1
+  - first:
+      1: 100120
+    second: HellDragon_ Tail10
+  - first:
+      1: 100122
+    second: HellDragon_ Tail2
+  - first:
+      1: 100124
+    second: HellDragon_ Tail3
+  - first:
+      1: 100126
+    second: HellDragon_ Tail4
+  - first:
+      1: 100128
+    second: HellDragon_ Tail5
+  - first:
+      1: 100130
+    second: HellDragon_ Tail6
+  - first:
+      1: 100132
+    second: HellDragon_ Tail7
+  - first:
+      1: 100134
+    second: HellDragon_ Tail8
+  - first:
+      1: 100136
+    second: HellDragon_ Tail9
+  - first:
+      1: 100138
+    second: HellDragon_WingL_Arm
+  - first:
+      1: 100140
+    second: HellDragon_WingL_FingerA_1
+  - first:
+      1: 100142
+    second: HellDragon_WingL_FingerA_2
+  - first:
+      1: 100144
+    second: HellDragon_WingL_FingerA_3
+  - first:
+      1: 100146
+    second: HellDragon_WingL_FingerB_1
+  - first:
+      1: 100148
+    second: HellDragon_WingL_FingerB_2
+  - first:
+      1: 100150
+    second: HellDragon_WingL_FingerB_3
+  - first:
+      1: 100152
+    second: HellDragon_WingL_FingerC_1
+  - first:
+      1: 100154
+    second: HellDragon_WingL_FingerC_2
+  - first:
+      1: 100156
+    second: HellDragon_WingL_FingerC_3
+  - first:
+      1: 100158
+    second: HellDragon_WingL_ForeArm
+  - first:
+      1: 100160
+    second: HellDragon_WingL_Hand
+  - first:
+      1: 100162
+    second: HellDragon_WingR_Arm
+  - first:
+      1: 100164
+    second: HellDragon_WingR_FingerA_1
+  - first:
+      1: 100166
+    second: HellDragon_WingR_FingerA_2
+  - first:
+      1: 100168
+    second: HellDragon_WingR_FingerA_3
+  - first:
+      1: 100170
+    second: HellDragon_WingR_FingerB_1
+  - first:
+      1: 100172
+    second: HellDragon_WingR_FingerB_2
+  - first:
+      1: 100174
+    second: HellDragon_WingR_FingerB_3
+  - first:
+      1: 100176
+    second: HellDragon_WingR_FingerC_1
+  - first:
+      1: 100178
+    second: HellDragon_WingR_FingerC_2
+  - first:
+      1: 100180
+    second: HellDragon_WingR_FingerC_3
+  - first:
+      1: 100182
+    second: HellDragon_WingR_ForeArm
+  - first:
+      1: 100184
+    second: HellDragon_WingR_Hand
+  - first:
+      1: 100186
+    second: IK Chain002
+  - first:
+      1: 100188
+    second: root
+  - first:
+      4: 400000
+    second: Dummy002
+  - first:
+      4: 400002
+    second: //RootNode
+  - first:
+      4: 400004
+    second: HellDragon_
+  - first:
+      4: 400006
+    second: HellDragon_ Head
+  - first:
+      4: 400008
+    second: HellDragon_ L Calf
+  - first:
+      4: 400010
+    second: HellDragon_ L Clavicle
+  - first:
+      4: 400012
+    second: HellDragon_ L Finger0
+  - first:
+      4: 400014
+    second: HellDragon_ L Finger01
+  - first:
+      4: 400016
+    second: HellDragon_ L Finger1
+  - first:
+      4: 400018
+    second: HellDragon_ L Finger11
+  - first:
+      4: 400020
+    second: HellDragon_ L Finger2
+  - first:
+      4: 400022
+    second: HellDragon_ L Finger21
+  - first:
+      4: 400024
+    second: HellDragon_ L Finger3
+  - first:
+      4: 400026
+    second: HellDragon_ L Finger31
+  - first:
+      4: 400028
+    second: HellDragon_ L Foot
+  - first:
+      4: 400030
+    second: HellDragon_ L Forearm
+  - first:
+      4: 400032
+    second: HellDragon_ L Hand
+  - first:
+      4: 400034
+    second: HellDragon_ L HorseLink
+  - first:
+      4: 400036
+    second: HellDragon_ L Thigh
+  - first:
+      4: 400038
+    second: HellDragon_ L Toe0
+  - first:
+      4: 400040
+    second: HellDragon_ L Toe01
+  - first:
+      4: 400042
+    second: HellDragon_ L Toe1
+  - first:
+      4: 400044
+    second: HellDragon_ L Toe11
+  - first:
+      4: 400046
+    second: HellDragon_ L Toe2
+  - first:
+      4: 400048
+    second: HellDragon_ L Toe21
+  - first:
+      4: 400050
+    second: HellDragon_ L Toe3
+  - first:
+      4: 400052
+    second: HellDragon_ L Toe31
+  - first:
+      4: 400054
+    second: HellDragon_ L UpperArm
+  - first:
+      4: 400056
+    second: HellDragon_ Neck
+  - first:
+      4: 400058
+    second: HellDragon_ Neck1
+  - first:
+      4: 400060
+    second: HellDragon_ Pelvis
+  - first:
+      4: 400062
+    second: HellDragon_ Ponytail1
+  - first:
+      4: 400064
+    second: HellDragon_ R Calf
+  - first:
+      4: 400066
+    second: HellDragon_ R Clavicle
+  - first:
+      4: 400068
+    second: HellDragon_ R Finger0
+  - first:
+      4: 400070
+    second: HellDragon_ R Finger01
+  - first:
+      4: 400072
+    second: HellDragon_ R Finger1
+  - first:
+      4: 400074
+    second: HellDragon_ R Finger11
+  - first:
+      4: 400076
+    second: HellDragon_ R Finger2
+  - first:
+      4: 400078
+    second: HellDragon_ R Finger21
+  - first:
+      4: 400080
+    second: HellDragon_ R Finger3
+  - first:
+      4: 400082
+    second: HellDragon_ R Finger31
+  - first:
+      4: 400084
+    second: HellDragon_ R Foot
+  - first:
+      4: 400086
+    second: HellDragon_ R Forearm
+  - first:
+      4: 400088
+    second: HellDragon_ R Hand
+  - first:
+      4: 400090
+    second: HellDragon_ R HorseLink
+  - first:
+      4: 400092
+    second: HellDragon_ R Thigh
+  - first:
+      4: 400094
+    second: HellDragon_ R Toe0
+  - first:
+      4: 400096
+    second: HellDragon_ R Toe01
+  - first:
+      4: 400098
+    second: HellDragon_ R Toe1
+  - first:
+      4: 400100
+    second: HellDragon_ R Toe11
+  - first:
+      4: 400102
+    second: HellDragon_ R Toe2
+  - first:
+      4: 400104
+    second: HellDragon_ R Toe21
+  - first:
+      4: 400106
+    second: HellDragon_ R Toe3
+  - first:
+      4: 400108
+    second: HellDragon_ R Toe31
+  - first:
+      4: 400110
+    second: HellDragon_ R UpperArm
+  - first:
+      4: 400112
+    second: HellDragon_ Spine
+  - first:
+      4: 400114
+    second: HellDragon_ Spine1
+  - first:
+      4: 400116
+    second: HellDragon_ Tail
+  - first:
+      4: 400118
+    second: HellDragon_ Tail1
+  - first:
+      4: 400120
+    second: HellDragon_ Tail10
+  - first:
+      4: 400122
+    second: HellDragon_ Tail2
+  - first:
+      4: 400124
+    second: HellDragon_ Tail3
+  - first:
+      4: 400126
+    second: HellDragon_ Tail4
+  - first:
+      4: 400128
+    second: HellDragon_ Tail5
+  - first:
+      4: 400130
+    second: HellDragon_ Tail6
+  - first:
+      4: 400132
+    second: HellDragon_ Tail7
+  - first:
+      4: 400134
+    second: HellDragon_ Tail8
+  - first:
+      4: 400136
+    second: HellDragon_ Tail9
+  - first:
+      4: 400138
+    second: HellDragon_WingL_Arm
+  - first:
+      4: 400140
+    second: HellDragon_WingL_FingerA_1
+  - first:
+      4: 400142
+    second: HellDragon_WingL_FingerA_2
+  - first:
+      4: 400144
+    second: HellDragon_WingL_FingerA_3
+  - first:
+      4: 400146
+    second: HellDragon_WingL_FingerB_1
+  - first:
+      4: 400148
+    second: HellDragon_WingL_FingerB_2
+  - first:
+      4: 400150
+    second: HellDragon_WingL_FingerB_3
+  - first:
+      4: 400152
+    second: HellDragon_WingL_FingerC_1
+  - first:
+      4: 400154
+    second: HellDragon_WingL_FingerC_2
+  - first:
+      4: 400156
+    second: HellDragon_WingL_FingerC_3
+  - first:
+      4: 400158
+    second: HellDragon_WingL_ForeArm
+  - first:
+      4: 400160
+    second: HellDragon_WingL_Hand
+  - first:
+      4: 400162
+    second: HellDragon_WingR_Arm
+  - first:
+      4: 400164
+    second: HellDragon_WingR_FingerA_1
+  - first:
+      4: 400166
+    second: HellDragon_WingR_FingerA_2
+  - first:
+      4: 400168
+    second: HellDragon_WingR_FingerA_3
+  - first:
+      4: 400170
+    second: HellDragon_WingR_FingerB_1
+  - first:
+      4: 400172
+    second: HellDragon_WingR_FingerB_2
+  - first:
+      4: 400174
+    second: HellDragon_WingR_FingerB_3
+  - first:
+      4: 400176
+    second: HellDragon_WingR_FingerC_1
+  - first:
+      4: 400178
+    second: HellDragon_WingR_FingerC_2
+  - first:
+      4: 400180
+    second: HellDragon_WingR_FingerC_3
+  - first:
+      4: 400182
+    second: HellDragon_WingR_ForeArm
+  - first:
+      4: 400184
+    second: HellDragon_WingR_Hand
+  - first:
+      4: 400186
+    second: IK Chain002
+  - first:
+      4: 400188
+    second: root
+  - first:
+      74: 7400000
+    second: FlyStationarySpreadAcidBreath
+  - first:
+      95: 9500000
+    second: //RootNode
+  externalObjects: {}
   materials:
-    importMaterials: 1
+    materialImportMode: 1
     materialName: 0
     materialSearch: 1
+    materialLocation: 0
   animations:
     legacyGenerateAnimations: 4
     bakeSimulation: 0
     resampleCurves: 1
     optimizeGameObjects: 0
+    removeConstantScaleCurves: 0
     motionNodeName: 
-    rigImportErrors: 
-    rigImportWarnings: 
     animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
     animationCompression: 0
     animationRotationError: 0.5
     animationPositionError: 0.5
     animationScaleError: 0.5
     animationWrapMode: 0
     extraExposedTransformPaths: []
+    extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
       name: FlyStationarySpreadAcidBreath
       takeName: Take 001
+      internalID: 0
       firstFrame: 0
       lastFrame: 96
       wrapMode: 0
@@ -243,7 +638,21 @@ ModelImporter:
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
-      events: []
+      events:
+      - time: 0.07835821
+        functionName: StartSpreadAcidBreathFromAnimation
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.92910445
+        functionName: StopSpreadAcidBreathFromAnimation
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
       transformMask:
       - path: 
         weight: 1
@@ -534,26 +943,52 @@ ModelImporter:
     globalScale: 1
     meshCompression: 0
     addColliders: 0
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
+    importPhysicalCameras: 0
+    importVisibility: 0
     importBlendShapes: 1
+    importCameras: 0
+    importLights: 0
+    nodeNameCollisionStrategy: 0
+    fileIdsGeneration: 1
     swapUVChannels: 0
     generateSecondaryUV: 0
     useFileUnits: 1
-    optimizeMeshForGPU: 1
     keepQuads: 0
     weldVertices: 1
+    bakeAxisConversion: 0
+    preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    optimizeBones: 1
+    generateMeshLods: 0
+    meshLodGenerationFlags: 0
+    maximumMeshLod: -1
+    meshOptimizationFlags: -1
+    indexFormat: 1
     secondaryUVAngleDistortion: 8
     secondaryUVAreaDistortion: 15.000001
     secondaryUVHardAngle: 88
+    secondaryUVMarginMethod: 0
+    secondaryUVMinLightmapResolution: 40
+    secondaryUVMinObjectScale: 1
     secondaryUVPackMargin: 4
     useFileScale: 1
+    strictVertexDataChecks: 0
   tangentSpace:
     normalSmoothAngle: 60
     normalImportMode: 0
     tangentImportMode: 3
+    normalCalculationMode: 0
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 1
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  referencedClips: []
   importAnimation: 1
-  copyAvatar: 1
   humanDescription:
-    serializedVersion: 2
+    serializedVersion: 3
     human: []
     skeleton: []
     armTwist: 0.5
@@ -563,24 +998,20 @@ ModelImporter:
     armStretch: 0.05
     legStretch: 0.05
     feetSpacing: 0
+    globalScale: 1
     rootMotionBoneName: root
-    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
     hasTranslationDoF: 0
     hasExtraRoot: 0
     skeletonHasParents: 1
-  lastHumanDescriptionAvatarSource: {fileID: 9000000, guid: ca1a8205ac07b314bb3d4d663a223803,
-    type: 3}
+  lastHumanDescriptionAvatarSource: {fileID: 9000000, guid: ca1a8205ac07b314bb3d4d663a223803, type: 3}
+  autoGenerateAvatarMappingIfUnspecified: 1
   animationType: 2
   humanoidOversampling: 1
+  avatarSetup: 2
+  addHumanoidExtraRootOnlyWhenUsingAvatar: 0
+  importBlendShapeDeformPercent: 0
+  remapMaterialsIfMaterialImportModeIsNone: 1
   additionalBone: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 117306
-  packageName: ELEMENTAL DRAGONS PACK
-  packageVersion: 1.22
-  assetPath: Assets/HEROIC FANTASY CREATURES FULL PACK VOL3/Elemental Dragons Pack/Undead
-    Dragon/FBX Files/HellDragon@FlyStationarySpreadAcidBreath.FBX
-  uploadId: 669989
