@@ -3,7 +3,6 @@ using UnityEngine.AI;
 
 public class Enemy : MonoBehaviour
 {
-
     [Header("Target")]
     public Transform playerTarget;
 
@@ -76,6 +75,28 @@ public class Enemy : MonoBehaviour
     public int hitsToDie = 2;
     private bool isDead = false;
     public float destroyObjectTime = 4f;
+
+    [Header("Blood Effects")]
+    public GameObject[] hitBloodPrefabs;
+    public GameObject[] deathBloodPrefabs;
+
+    public float hitBloodDestroyTime = 3f;
+    public float deathBloodDestroyTime = 5f;
+
+    public Vector3 hitBloodScale = Vector3.one;
+    public Vector3 deathBloodScale = Vector3.one;
+
+    public int deathBloodAmount = 8;
+    public float deathBloodSpawnRadius = 1.5f;
+
+    public Transform[] deathBloodPoints;
+
+    [Header("Blood Decal")]
+    public GameObject groundBloodDecalPrefab;
+    public float groundBloodDecalDestroyTime = 30f;
+    public Vector3 groundBloodDecalScale = Vector3.one;
+    public LayerMask bloodGroundLayer;
+    public float bloodDecalRayDistance = 10f;
 
     void Start()
     {
@@ -433,7 +454,23 @@ public class Enemy : MonoBehaviour
 
         if (other.CompareTag("Arrow"))
         {
-            ArrowHit(other.gameObject);
+            Vector3 hitPoint = other.ClosestPoint(transform.position);
+
+            if (hitPoint == transform.position)
+            {
+                hitPoint = other.transform.position;
+            }
+
+            Vector3 hitDirection = other.transform.forward;
+
+            if (other.attachedRigidbody != null && other.attachedRigidbody.linearVelocity.sqrMagnitude > 0.1f)
+            {
+                hitDirection = other.attachedRigidbody.linearVelocity.normalized;
+            }
+
+            Vector3 hitNormal = -hitDirection;
+
+            ArrowHit(other.gameObject, hitPoint, hitNormal);
         }
     }
 
@@ -443,15 +480,26 @@ public class Enemy : MonoBehaviour
 
         if (collision.collider.CompareTag("Arrow"))
         {
-            ArrowHit(collision.gameObject);
+            Vector3 hitPoint = transform.position;
+            Vector3 hitNormal = -collision.collider.transform.forward;
+
+            if (collision.contactCount > 0)
+            {
+                hitPoint = collision.contacts[0].point;
+                hitNormal = collision.contacts[0].normal;
+            }
+
+            ArrowHit(collision.gameObject, hitPoint, hitNormal);
         }
     }
 
-    void ArrowHit(GameObject arrow)
+    void ArrowHit(GameObject arrow, Vector3 hitPoint, Vector3 hitNormal)
     {
         if (isDead) return;
 
         arrowHits++;
+
+        SpawnHitBlood(hitPoint, hitNormal);
 
         Destroy(arrow);
 
@@ -474,6 +522,117 @@ public class Enemy : MonoBehaviour
         }
 
         SetTriggerIfExists(hitTriggerName);
+    }
+
+    void SpawnHitBlood(Vector3 hitPoint, Vector3 hitNormal)
+    {
+        GameObject bloodPrefab = GetRandomPrefab(hitBloodPrefabs);
+
+        if (bloodPrefab != null)
+        {
+            if (hitNormal == Vector3.zero)
+            {
+                hitNormal = -transform.forward;
+            }
+
+            Quaternion bloodRotation = Quaternion.LookRotation(hitNormal);
+
+            GameObject blood = Instantiate(bloodPrefab, hitPoint, bloodRotation);
+            blood.transform.localScale = hitBloodScale;
+
+            Destroy(blood, hitBloodDestroyTime);
+        }
+
+        SpawnGroundBloodDecal(hitPoint);
+    }
+
+    void SpawnDeathBlood()
+    {
+        for (int i = 0; i < deathBloodAmount; i++)
+        {
+            GameObject bloodPrefab = GetRandomPrefab(deathBloodPrefabs);
+
+            if (bloodPrefab == null)
+            {
+                bloodPrefab = GetRandomPrefab(hitBloodPrefabs);
+            }
+
+            if (bloodPrefab == null)
+            {
+                return;
+            }
+
+            Vector3 spawnPosition;
+            Quaternion spawnRotation;
+
+            if (deathBloodPoints != null && deathBloodPoints.Length > 0)
+            {
+                Transform randomPoint = deathBloodPoints[Random.Range(0, deathBloodPoints.Length)];
+
+                if (randomPoint == null)
+                {
+                    continue;
+                }
+
+                spawnPosition = randomPoint.position;
+                spawnRotation = randomPoint.rotation;
+            }
+            else
+            {
+                Vector3 randomOffset = Random.insideUnitSphere * deathBloodSpawnRadius;
+                randomOffset.y = Mathf.Abs(randomOffset.y);
+
+                spawnPosition = transform.position + randomOffset;
+                spawnRotation = Random.rotation;
+            }
+
+            GameObject blood = Instantiate(bloodPrefab, spawnPosition, spawnRotation);
+            blood.transform.localScale = deathBloodScale;
+
+            Destroy(blood, deathBloodDestroyTime);
+
+            SpawnGroundBloodDecal(spawnPosition);
+        }
+    }
+
+    void SpawnGroundBloodDecal(Vector3 startPoint)
+    {
+        if (groundBloodDecalPrefab == null) return;
+
+        Vector3 rayStart = startPoint + Vector3.up * 1f;
+
+        bool hitGround;
+
+        RaycastHit hit;
+
+        if (bloodGroundLayer.value == 0)
+        {
+            hitGround = Physics.Raycast(rayStart, Vector3.down, out hit, bloodDecalRayDistance, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+        }
+        else
+        {
+            hitGround = Physics.Raycast(rayStart, Vector3.down, out hit, bloodDecalRayDistance, bloodGroundLayer, QueryTriggerInteraction.Ignore);
+        }
+
+        if (!hitGround) return;
+
+        Quaternion decalRotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
+        decalRotation *= Quaternion.Euler(0f, Random.Range(0f, 360f), 0f);
+
+        Vector3 decalPosition = hit.point + hit.normal * 0.02f;
+
+        GameObject decal = Instantiate(groundBloodDecalPrefab, decalPosition, decalRotation);
+        decal.transform.localScale = groundBloodDecalScale;
+
+        Destroy(decal, groundBloodDecalDestroyTime);
+    }
+
+    GameObject GetRandomPrefab(GameObject[] prefabs)
+    {
+        if (prefabs == null) return null;
+        if (prefabs.Length == 0) return null;
+
+        return prefabs[Random.Range(0, prefabs.Length)];
     }
 
     void StartKnockDown()
@@ -540,6 +699,8 @@ public class Enemy : MonoBehaviour
             agent.isStopped = true;
             agent.ResetPath();
         }
+
+        SpawnDeathBlood();
 
         SetBoolIfExists("Death", true);
 

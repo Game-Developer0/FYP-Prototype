@@ -61,6 +61,8 @@ public class PlayerMovement : MonoBehaviour
 
     public float walkMaxSpeed = 12f;
     public float sprintMaxSpeed = 20f;
+    [Header("External Slow Effect")]
+    [SerializeField] private float externalSpeedMultiplier = 1f;
 
     public bool grounded;
     public LayerMask whatIsGround;
@@ -311,13 +313,9 @@ public class PlayerMovement : MonoBehaviour
     {
         if (!animator) return;
 
-        // Jump animation
         animator.SetBool("Jump", !grounded);
-
-        // Set crouch bool
         animator.SetBool("Crouch", crouching);
 
-        // Enable root motion only when crouching
         animator.applyRootMotion = crouching;
 
         if (grounded)
@@ -327,13 +325,16 @@ public class PlayerMovement : MonoBehaviour
                 animator.SetFloat("X_Crouch", x, 0.1f, Time.deltaTime);
                 animator.SetFloat("Y_Crouch", y, 0.1f, Time.deltaTime);
 
-                // Disable normal blend movement while crouching
                 animator.SetFloat("X_Velocity", 0f);
                 animator.SetFloat("Y_Velocity", 0f);
             }
             else
             {
                 float multiplier = (x != 0 || y != 0) ? (sprinting ? 6f : 2f) : 0f;
+
+                // Slow animation blend values when player is slowed
+                multiplier *= externalSpeedMultiplier;
+
                 animator.SetFloat("X_Velocity", x * multiplier, 0.1f, Time.deltaTime);
                 animator.SetFloat("Y_Velocity", y * multiplier, 0.1f, Time.deltaTime);
 
@@ -444,17 +445,19 @@ public class PlayerMovement : MonoBehaviour
     {
         if (crouching)
         {
-            // Let Root Motion handle movement
+            // Let Root Motion handle crouch movement
             return;
         }
-        //Extra gravity
+
+        // Extra gravity
         rb.AddForce(Vector3.down * Time.deltaTime * 10);
 
-        //Find actual velocity relative to where player is looking
+        // Find actual velocity relative to where player is looking
         Vector2 mag = FindVelRelativeToLook();
-        float xMag = mag.x, yMag = mag.y;
+        float xMag = mag.x;
+        float yMag = mag.y;
 
-        //Counteract sliding and sloppy movement
+        // Counteract sliding and sloppy movement
         CounterMovement(x, y, mag);
 
         // Stop small unwanted sliding when player is not pressing movement keys
@@ -473,11 +476,13 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
+        // If holding jump and ready to jump, then jump
+        if (readyToJump && jumping)
+        {
+            Jump();
+        }
 
-        //If holding jump && ready to jump, then jump
-        if (readyToJump && jumping) Jump();
-
-        //Set max speed
+        // Set max speed
         float currentMoveSpeed;
         float currentMaxSpeed;
 
@@ -492,22 +497,26 @@ public class PlayerMovement : MonoBehaviour
             currentMaxSpeed = walkMaxSpeed;
         }
 
+        // Apply external slow effect from ice/acid/fire breath
+        currentMoveSpeed *= externalSpeedMultiplier;
+        currentMaxSpeed *= externalSpeedMultiplier;
 
-        //If sliding down a ramp, add force down so player stays grounded and also builds speed
+        // If crouching down a ramp, add force down so player stays grounded
         if (crouching && grounded && readyToJump)
         {
             rb.AddForce(Vector3.down * Time.deltaTime * 3000);
             return;
         }
 
-        //If speed is larger than maxspeed, cancel out the input so you don't go over max speed
+        // If speed is larger than max speed, cancel input so player does not go over max speed
         if (x > 0 && xMag > currentMaxSpeed) x = 0;
         if (x < 0 && xMag < -currentMaxSpeed) x = 0;
         if (y > 0 && yMag > currentMaxSpeed) y = 0;
         if (y < 0 && yMag < -currentMaxSpeed) y = 0;
 
-        //Some multipliers
-        float multiplier = 1f, multiplierV = 1f;
+        // Some multipliers
+        float multiplier = 1f;
+        float multiplierV = 1f;
 
         // Movement in air
         if (!grounded)
@@ -515,18 +524,22 @@ public class PlayerMovement : MonoBehaviour
             multiplier = 0.5f;
             multiplierV = 0.5f;
         }
+
         if (sliding)
         {
-            rb.AddForce(orientation.forward * slideForce * Time.deltaTime);
-            return; // Skip normal movement while sliding
+            rb.AddForce(orientation.forward * slideForce * Time.deltaTime * externalSpeedMultiplier);
+            return;
         }
-        // Movement while sliding
-        if (grounded && crouching) multiplierV = 0f;
 
-        //Apply forces to move player
+        // Movement while crouching
+        if (grounded && crouching)
+        {
+            multiplierV = 0f;
+        }
+
+        // Apply forces to move player
         rb.AddForce(orientation.transform.forward * y * currentMoveSpeed * Time.deltaTime * multiplier * multiplierV);
         rb.AddForce(orientation.transform.right * x * currentMoveSpeed * Time.deltaTime * multiplier);
-
     }
 
     private void Jump()
@@ -575,33 +588,34 @@ public class PlayerMovement : MonoBehaviour
     private void CounterMovement(float x, float y, Vector2 mag)
     {
         float currentMaxSpeed = sprinting ? sprintMaxSpeed : walkMaxSpeed;
+        currentMaxSpeed *= externalSpeedMultiplier;
+
         if (!grounded || jumping) return;
 
-        //Slow down sliding
+        // Slow down sliding
         if (crouching)
         {
             rb.AddForce(currentMaxSpeed * Time.deltaTime * -rb.linearVelocity.normalized * slideCounterMovement);
             return;
         }
 
-        //Counter movement
+        // Counter movement
         if (Math.Abs(mag.x) > threshold && Math.Abs(x) < 0.05f || (mag.x < -threshold && x > 0) || (mag.x > threshold && x < 0))
         {
             rb.AddForce(currentMaxSpeed * orientation.transform.right * Time.deltaTime * -mag.x * counterMovement);
         }
+
         if (Math.Abs(mag.y) > threshold && Math.Abs(y) < 0.05f || (mag.y < -threshold && y > 0) || (mag.y > threshold && y < 0))
         {
             rb.AddForce(currentMaxSpeed * orientation.transform.forward * Time.deltaTime * -mag.y * counterMovement);
         }
 
-        //Limit diagonal running. This will also cause a full stop if sliding fast and un-crouching, so not optimal.
-
-
+        // Limit diagonal running
         if (new Vector2(rb.linearVelocity.x, rb.linearVelocity.z).magnitude > currentMaxSpeed)
         {
-            float fallspeed = rb.linearVelocity.y;
+            float fallSpeed = rb.linearVelocity.y;
             Vector3 n = rb.linearVelocity.normalized * currentMaxSpeed;
-            rb.linearVelocity = new Vector3(n.x, fallspeed, n.z);
+            rb.linearVelocity = new Vector3(n.x, fallSpeed, n.z);
         }
     }
 
@@ -693,6 +707,10 @@ public class PlayerMovement : MonoBehaviour
             targetCenter,
             Time.deltaTime * aimColliderLerpSpeed
         );
+    }
+    public void SetExternalSpeedMultiplier(float multiplier)
+    {
+        externalSpeedMultiplier = Mathf.Clamp(multiplier, 0.1f, 1f);
     }
 
 }

@@ -96,9 +96,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectileDamage
   damage: 15
+  damageEffectType: 1
+  screenEffectDuration: 0.6
+  applySlowOnHit: 0
+  slowMultiplier: 0.6
+  slowDuration: 1.5
   lifeTime: 5
   ignoreCollisionTime: 0.15
-  hitEffectPrefab: {fileID: 0}
+  hitEffectPrefab: {fileID: 4782603780973126738}
   destroyOnHit: 1
   destroyHitEffectAfter: 3
   useAreaDamage: 0

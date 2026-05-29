@@ -3,6 +3,7 @@ using System.Collections;
 
 public class DragonEnemy : MonoBehaviour
 {
+
     [Header("Target")]
     public Transform playerTarget;
 
@@ -15,8 +16,30 @@ public class DragonEnemy : MonoBehaviour
     public float detectionRange = 45f;
     public float losePlayerRange = 75f;
 
+    [Header("Blood Effects")]
+    public GameObject[] hitBloodPrefabs;
+    public GameObject[] deathBloodPrefabs;
+
+    public float hitBloodDestroyTime = 3f;
+    public float deathBloodDestroyTime = 5f;
+
+    public Vector3 hitBloodScale = Vector3.one;
+    public Vector3 deathBloodScale = Vector3.one;
+
+    public int deathBloodAmount = 8;
+    public float deathBloodSpawnRadius = 2f;
+
+    public Transform[] deathBloodPoints;
+    [Header("Blood Decal")]
+    public GameObject groundBloodDecalPrefab;
+    public float groundBloodDecalDestroyTime = 30f;
+    public Vector3 groundBloodDecalScale = Vector3.one;
+    public LayerMask bloodGroundLayer;
+    public float bloodDecalRayDistance = 10f;
+
     [Header("Start Setting")]
     public bool startInSky = false;
+    public Transform ownerRoot;
 
     [Header("Combat Mode Switching")]
     public bool canUseGroundCombat = true;
@@ -168,7 +191,7 @@ public class DragonEnemy : MonoBehaviour
 
     private bool animWalking = false;
     private bool animRunning = false;
-    private bool animGliding = false;
+    public bool animGliding = false;
 
     private Vector3 flyMoveTarget;
     private float currentFlySpeed;
@@ -204,6 +227,55 @@ public class DragonEnemy : MonoBehaviour
 
     private Coroutine spreadAcidRoutine;
     private float nextSpreadAcidDamageTime = 0f;
+
+    [Header("Breath Player Effect")]
+    public PlayerHealth.DamageEffectType breathEffectType = PlayerHealth.DamageEffectType.Acid;
+    public float breathScreenEffectDuration = 0.7f;
+
+    public bool breathSlowsPlayer = true;
+    public float breathSlowMultiplier = 0.55f;
+    public float breathSlowDuration = 1f;
+
+    [Header("Spread Acid Player Hit Effect")]
+    public GameObject spreadAcidHitEffectPrefab;
+    public Transform playerAcidHitPoint;
+    public float spreadAcidHitEffectDestroyTime = 1.5f;
+    public Vector3 spreadAcidHitEffectScale = Vector3.one;
+
+    [Header("Spread Acid Damage Timing")]
+    public bool autoCalculateSpreadAcidHitDelay = true;
+    public float spreadAcidParticleVisualSpeed = 20f;
+    public float manualSpreadAcidFirstDamageDelay = 0.6f;
+    public float minSpreadAcidFirstDamageDelay = 0.15f;
+    public float maxSpreadAcidFirstDamageDelay = 1.2f;
+
+    [Header("Dragon Audio")]
+    public AudioSource acidBreathAudioSource;
+    public AudioClip spreadAcidBreathClip;
+
+    public AudioSource fireballAudioSource;
+    public AudioClip fireballShootClip;
+
+    public AudioSource wingAudioSource;
+    public AudioClip wingFlyingClip;
+
+    public AudioSource footstepAudioSource;
+    public AudioClip footstepLoopClip;
+
+    public AudioSource hitAudioSource;
+    public AudioClip dragonHitClip;
+
+    [Header("Wing Audio Settings")]
+    public float wingAudioStopDelay = 0.35f;
+
+    [Header("Dragon Audio Area")]
+    public bool onlyPlayAudioInsideDragonArea = true;
+
+    [Tooltip("If this is 0, script will use detectionRange as the audio area.")]
+    public float customAudioAreaRange = 0f;
+
+    private float wingAudioShouldStopTime = 0f;
+    private float footstepAudioShouldStopTime = 0f;
     void Start()
     {
         if (rb == null)
@@ -232,6 +304,8 @@ public class DragonEnemy : MonoBehaviour
             rb.useGravity = !startInSky;
             rb.isKinematic = false;
         }
+
+        SetupDragonAudio();
 
         isFlying = startInSky;
 
@@ -629,7 +703,7 @@ public class DragonEnemy : MonoBehaviour
             animGliding = false;
         }
     }
-  
+
 
     void StartTakeOff()
     {
@@ -646,6 +720,15 @@ public class DragonEnemy : MonoBehaviour
         animRunning = false;
         animGliding = false;
 
+        // Stop footstep audio immediately when dragon starts flying
+        if (footstepAudioSource != null && footstepAudioSource.isPlaying)
+        {
+            footstepAudioSource.Stop();
+        }
+
+        // Start wing audio immediately, not after takeoff finishes
+        StartWingAudioNow();
+
         if (rb != null)
         {
             rb.isKinematic = false;
@@ -656,6 +739,27 @@ public class DragonEnemy : MonoBehaviour
         }
 
         SetTriggerIfExists(takeOffTriggerName);
+
+        UpdateAnimatorBools();
+    }
+    void StartWingAudioNow()
+    {
+        if (wingAudioSource == null) return;
+
+        bool playerCanHearDragon = IsPlayerInsideDragonAudioArea();
+
+        wingAudioSource.mute = !playerCanHearDragon;
+        wingAudioSource.loop = true;
+
+        if (wingFlyingClip != null && wingAudioSource.clip != wingFlyingClip)
+        {
+            wingAudioSource.clip = wingFlyingClip;
+        }
+
+        if (!wingAudioSource.isPlaying)
+        {
+            wingAudioSource.Play();
+        }
     }
 
     void HandleTakeOffMovement()
@@ -695,6 +799,13 @@ public class DragonEnemy : MonoBehaviour
         wantsFlyMove = false;
         wantsHover = false;
 
+        animWalking = false;
+        animRunning = false;
+        animGliding = false;
+
+        // Stop flying audio as soon as dragon starts landing
+        StopWingAudioNow();
+
         SetTriggerIfExists(landTriggerName);
     }
 
@@ -704,16 +815,29 @@ public class DragonEnemy : MonoBehaviour
 
         FlyToward(landingPoint, landingSpeed);
 
+        // Make sure flying audio stays stopped during landing
+        StopWingAudioNow();
+
         if (Vector3.Distance(transform.position, landingPoint) <= 1.5f)
         {
             isLanding = false;
             isFlying = false;
+
+            wantsFlyMove = false;
+            wantsHover = false;
+
+            animWalking = false;
+            animRunning = false;
+            animGliding = false;
 
             if (rb != null)
             {
                 rb.useGravity = true;
                 rb.linearVelocity = Vector3.zero;
             }
+
+            // Stop again when dragon fully reaches ground
+            StopWingAudioNow();
 
             ChooseNewGroundPatrolPoint();
             SetNextCombatModeChangeTime();
@@ -867,10 +991,33 @@ public class DragonEnemy : MonoBehaviour
 
     public void ShootFireballFromAnimation()
     {
+        PlayFireballShootAudio();
         ShootProjectile(fireballPrefab);
+    }
+    void PlayFireballShootAudio()
+    {
+        if (fireballAudioSource == null) return;
+
+        if (!IsPlayerInsideDragonAudioArea())
+            return;
+
+        fireballAudioSource.loop = false;
+        fireballAudioSource.mute = false;
+
+        if (fireballShootClip != null)
+        {
+            fireballAudioSource.PlayOneShot(fireballShootClip);
+        }
+        else if (fireballAudioSource.clip != null)
+        {
+            fireballAudioSource.Stop();
+            fireballAudioSource.Play();
+        }
     }
     public void StartSpreadAcidBreathFromAnimation()
     {
+        PlaySpreadAcidBreathAudio();
+
         if (spreadAcidRoutine != null)
         {
             StopCoroutine(spreadAcidRoutine);
@@ -890,6 +1037,270 @@ public class DragonEnemy : MonoBehaviour
         {
             spreadAcidParticle.Stop(true, ParticleSystemStopBehavior.StopEmitting);
         }
+
+        if (acidBreathAudioSource != null)
+        {
+            acidBreathAudioSource.Stop();
+        }
+    }
+    void SetupDragonAudio()
+    {
+        bool playerCanHearDragon = IsPlayerInsideDragonAudioArea();
+
+        if (acidBreathAudioSource != null)
+        {
+            acidBreathAudioSource.playOnAwake = false;
+            acidBreathAudioSource.loop = false;
+            acidBreathAudioSource.mute = !playerCanHearDragon;
+        }
+
+        if (fireballAudioSource != null)
+        {
+            fireballAudioSource.playOnAwake = false;
+            fireballAudioSource.loop = false;
+            fireballAudioSource.mute = !playerCanHearDragon;
+        }
+
+        if (wingAudioSource != null)
+        {
+            wingAudioSource.playOnAwake = false;
+            wingAudioSource.loop = true;
+            wingAudioSource.mute = !playerCanHearDragon;
+
+            if (wingFlyingClip != null)
+                wingAudioSource.clip = wingFlyingClip;
+
+            wingAudioSource.Stop();
+        }
+
+        if (footstepAudioSource != null)
+        {
+            footstepAudioSource.playOnAwake = false;
+            footstepAudioSource.loop = true;
+            footstepAudioSource.mute = !playerCanHearDragon;
+
+            if (footstepLoopClip != null)
+                footstepAudioSource.clip = footstepLoopClip;
+
+            footstepAudioSource.Stop();
+        }
+
+        if (hitAudioSource != null)
+        {
+            hitAudioSource.playOnAwake = false;
+            hitAudioSource.loop = false;
+            hitAudioSource.mute = !playerCanHearDragon;
+        }
+    }
+
+    void PlayDragonHitAudio()
+    {
+        if (hitAudioSource == null) return;
+
+        if (!IsPlayerInsideDragonAudioArea())
+            return;
+
+        hitAudioSource.loop = false;
+        hitAudioSource.mute = false;
+
+        if (dragonHitClip != null)
+        {
+            hitAudioSource.PlayOneShot(dragonHitClip);
+        }
+        else if (hitAudioSource.clip != null)
+        {
+            hitAudioSource.Stop();
+            hitAudioSource.Play();
+        }
+    }
+    void PlaySpreadAcidBreathAudio()
+    {
+        if (acidBreathAudioSource == null) return;
+
+        acidBreathAudioSource.loop = false;
+        acidBreathAudioSource.mute = !IsPlayerInsideDragonAudioArea();
+
+        if (spreadAcidBreathClip != null)
+        {
+            acidBreathAudioSource.PlayOneShot(spreadAcidBreathClip);
+        }
+        else if (acidBreathAudioSource.clip != null)
+        {
+            acidBreathAudioSource.Stop();
+            acidBreathAudioSource.Play();
+        }
+    }
+    bool IsPlayerInsideDragonAudioArea()
+    {
+        if (!onlyPlayAudioInsideDragonArea)
+            return true;
+
+        if (playerTarget == null)
+            return false;
+
+        float audioRange = customAudioAreaRange > 0f ? customAudioAreaRange : detectionRange;
+
+        float distanceFromDragonToPlayer = Vector3.Distance(transform.position, playerTarget.position);
+
+        return distanceFromDragonToPlayer <= audioRange;
+    }
+    void UpdateWingAudio()
+    {
+        if (wingAudioSource == null) return;
+
+        bool playerCanHearDragon = IsPlayerInsideDragonAudioArea();
+
+        wingAudioSource.mute = !playerCanHearDragon;
+
+        if (wingFlyingClip != null && wingAudioSource.clip != wingFlyingClip)
+        {
+            wingAudioSource.clip = wingFlyingClip;
+        }
+
+        wingAudioSource.loop = true;
+
+        bool dragonShouldHaveWingAudio =
+            !isDead &&
+            !isSkyDeath &&
+            !isFalling &&
+            !isLanding &&
+            !isRecoveringFromFall &&
+            (isFlying || isTakingOff);
+
+        if (dragonShouldHaveWingAudio)
+        {
+            if (!wingAudioSource.isPlaying)
+            {
+                wingAudioSource.Play();
+            }
+        }
+        else
+        {
+            StopWingAudioNow();
+        }
+    }
+    void UpdateFootstepAudio()
+    {
+        if (footstepAudioSource == null) return;
+
+        bool playerCanHearDragon = IsPlayerInsideDragonAudioArea();
+
+        footstepAudioSource.mute = !playerCanHearDragon;
+
+        if (footstepLoopClip != null && footstepAudioSource.clip != footstepLoopClip)
+        {
+            footstepAudioSource.clip = footstepLoopClip;
+        }
+
+        footstepAudioSource.loop = true;
+
+        bool dragonShouldHaveFootstepAudio =
+            !isDead &&
+            !isSkyDeath &&
+            !isFlying &&
+            !isTakingOff &&
+            !isLanding &&
+            !isFalling &&
+            !isRecoveringFromFall &&
+            !isGroundHitStunned &&
+            (animWalking || animRunning);
+
+        if (dragonShouldHaveFootstepAudio)
+        {
+            footstepAudioShouldStopTime = Time.time + 0.15f;
+
+            if (!footstepAudioSource.isPlaying)
+            {
+                footstepAudioSource.Play();
+            }
+
+            if (animRunning)
+                footstepAudioSource.pitch = 1.15f;
+            else
+                footstepAudioSource.pitch = 1f;
+        }
+        else
+        {
+            if (Time.time >= footstepAudioShouldStopTime)
+            {
+                if (footstepAudioSource.isPlaying)
+                {
+                    footstepAudioSource.Stop();
+                }
+            }
+        }
+    }
+    void UpdateDragonAudioAreaMute()
+    {
+        bool playerCanHearDragon = IsPlayerInsideDragonAudioArea();
+
+        if (wingAudioSource != null)
+            wingAudioSource.mute = !playerCanHearDragon;
+
+        if (acidBreathAudioSource != null)
+            acidBreathAudioSource.mute = !playerCanHearDragon;
+
+        if (fireballAudioSource != null)
+            fireballAudioSource.mute = !playerCanHearDragon;
+
+        if (footstepAudioSource != null)
+            footstepAudioSource.mute = !playerCanHearDragon;
+
+        if (hitAudioSource != null)
+            hitAudioSource.mute = !playerCanHearDragon;
+    }
+    void StopAllDragonAudio()
+    {
+        if (wingAudioSource != null)
+        {
+            wingAudioSource.mute = false;
+            wingAudioSource.Stop();
+        }
+
+        if (acidBreathAudioSource != null)
+        {
+            acidBreathAudioSource.mute = false;
+            acidBreathAudioSource.Stop();
+        }
+
+        if (fireballAudioSource != null)
+        {
+            fireballAudioSource.mute = false;
+            fireballAudioSource.Stop();
+        }
+
+        if (footstepAudioSource != null)
+        {
+            footstepAudioSource.mute = false;
+            footstepAudioSource.Stop();
+        }
+    }
+    float GetSpreadAcidFirstDamageDelay(Transform acidOrigin)
+    {
+        if (!autoCalculateSpreadAcidHitDelay)
+            return manualSpreadAcidFirstDamageDelay;
+
+        if (acidOrigin == null)
+            return manualSpreadAcidFirstDamageDelay;
+
+        if (playerTarget == null)
+            return manualSpreadAcidFirstDamageDelay;
+
+        if (spreadAcidParticleVisualSpeed <= 0.1f)
+            return manualSpreadAcidFirstDamageDelay;
+
+        Vector3 targetPoint = playerTarget.position + Vector3.up * 1.2f;
+        float distanceToPlayer = Vector3.Distance(acidOrigin.position, targetPoint);
+
+        float calculatedDelay = distanceToPlayer / spreadAcidParticleVisualSpeed;
+
+        calculatedDelay = Mathf.Clamp(
+            calculatedDelay,
+            minSpreadAcidFirstDamageDelay,
+            maxSpreadAcidFirstDamageDelay
+        );
+
+        return calculatedDelay;
     }
 
     IEnumerator SpreadAcidBreathRoutine()
@@ -903,14 +1314,23 @@ public class DragonEnemy : MonoBehaviour
             acidOrigin = transform;
 
         AimMouthPointAtPlayer(acidOrigin, true);
+        UpdateSpreadAcidParticleVisual(acidOrigin, true);
 
         if (spreadAcidParticle != null)
         {
-            spreadAcidParticle.Play();
+            spreadAcidParticle.Clear(true);
+            spreadAcidParticle.Play(true);
         }
 
         float endTime = Time.time + spreadAcidBreathDuration;
-        nextSpreadAcidDamageTime = 0f;
+
+        float firstDamageDelay = GetSpreadAcidFirstDamageDelay(acidOrigin);
+
+        // This is the important fix.
+        // Damage will not start instantly anymore.
+        nextSpreadAcidDamageTime = Time.time + firstDamageDelay;
+
+        Debug.Log("Spread Acid first damage delay: " + firstDamageDelay);
 
         while (Time.time < endTime)
         {
@@ -918,6 +1338,7 @@ public class DragonEnemy : MonoBehaviour
             {
                 FaceTarget(playerTarget.position);
                 AimMouthPointAtPlayer(acidOrigin, false);
+                UpdateSpreadAcidParticleVisual(acidOrigin, false);
             }
 
             if (Time.time >= nextSpreadAcidDamageTime)
@@ -980,18 +1401,58 @@ public class DragonEnemy : MonoBehaviour
         float distanceToPlayer = directionToPlayer.magnitude;
 
         if (distanceToPlayer > spreadAcidDamageRange)
+        {
+            Debug.Log("Spread Acid missed: Player is too far.");
             return;
+        }
 
-        float angleToPlayer = Vector3.Angle(acidOrigin.forward, directionToPlayer.normalized);
+        Vector3 directionToPlayerNormalized = directionToPlayer.normalized;
 
-        if (angleToPlayer > spreadAcidAngle * 0.5f)
-            return;
+        Vector3 breathForward = transform.forward;
 
-        // Optional: stop acid damage if wall/ground is between dragon and player
+        if (!isFlying)
+        {
+            breathForward.y = 0f;
+
+            Vector3 flatDirectionToPlayer = directionToPlayerNormalized;
+            flatDirectionToPlayer.y = 0f;
+
+            if (breathForward.sqrMagnitude > 0.01f && flatDirectionToPlayer.sqrMagnitude > 0.01f)
+            {
+                breathForward.Normalize();
+                flatDirectionToPlayer.Normalize();
+
+                float flatAngle = Vector3.Angle(breathForward, flatDirectionToPlayer);
+
+                if (flatAngle > spreadAcidAngle * 0.5f)
+                {
+                    Debug.Log("Spread Acid missed: Player is outside acid angle. Angle = " + flatAngle);
+                    return;
+                }
+            }
+        }
+        else
+        {
+            float angleToPlayer = Vector3.Angle(breathForward, directionToPlayerNormalized);
+
+            if (angleToPlayer > spreadAcidAngle * 0.5f)
+            {
+                Debug.Log("Spread Acid missed: Player is outside acid angle. Angle = " + angleToPlayer);
+                return;
+            }
+        }
+
         if (spreadAcidBlockLayers.value != 0)
         {
-            if (Physics.Raycast(acidOrigin.position, directionToPlayer.normalized, out RaycastHit hit, distanceToPlayer, spreadAcidBlockLayers, QueryTriggerInteraction.Ignore))
+            if (Physics.Raycast(
+                acidOrigin.position,
+                directionToPlayerNormalized,
+                out RaycastHit hit,
+                distanceToPlayer,
+                spreadAcidBlockLayers,
+                QueryTriggerInteraction.Ignore))
             {
+                Debug.Log("Spread Acid blocked by: " + hit.collider.name);
                 return;
             }
         }
@@ -1005,8 +1466,75 @@ public class DragonEnemy : MonoBehaviour
             return;
         }
 
-        playerHealth.TakeDamage(spreadAcidDamage);
-        Debug.Log(gameObject.name + " spread acid hit player: " + spreadAcidDamage);
+        playerHealth.TakeDamageWithEffect(
+            spreadAcidDamage,
+            breathEffectType,
+            breathScreenEffectDuration,
+            breathSlowsPlayer,
+            breathSlowMultiplier,
+            breathSlowDuration
+        );
+
+        SpawnSpreadAcidHitEffect();
+
+        Debug.Log(gameObject.name + " spread acid damaged player: " + spreadAcidDamage);
+    }
+    void UpdateSpreadAcidParticleVisual(Transform acidOrigin, bool instant)
+    {
+        if (spreadAcidParticle == null) return;
+        if (acidOrigin == null) return;
+        if (playerTarget == null) return;
+
+        Transform particleTransform = spreadAcidParticle.transform;
+
+        particleTransform.position = acidOrigin.position;
+
+        Vector3 targetPoint = playerTarget.position + Vector3.up * 1.2f;
+        Vector3 direction = targetPoint - particleTransform.position;
+
+        if (direction == Vector3.zero) return;
+
+        Quaternion targetRotation = Quaternion.LookRotation(direction.normalized);
+
+        if (instant)
+        {
+            particleTransform.rotation = targetRotation;
+        }
+        else
+        {
+            particleTransform.rotation = Quaternion.Slerp(
+                particleTransform.rotation,
+                targetRotation,
+                Time.deltaTime * mouthAimSpeed
+            );
+        }
+    }
+    void SpawnSpreadAcidHitEffect()
+    {
+        if (spreadAcidHitEffectPrefab == null) return;
+        if (playerTarget == null) return;
+
+        Vector3 spawnPosition;
+
+        if (playerAcidHitPoint != null)
+            spawnPosition = playerAcidHitPoint.position;
+        else
+            spawnPosition = playerTarget.position + Vector3.up * 1.2f;
+
+        Quaternion spawnRotation = Quaternion.LookRotation(transform.forward);
+
+        GameObject hitEffect = Instantiate(
+            spreadAcidHitEffectPrefab,
+            spawnPosition,
+            spawnRotation
+        );
+
+        hitEffect.transform.localScale = spreadAcidHitEffectScale;
+
+        // Make effect follow the player while it is playing
+        hitEffect.transform.SetParent(playerTarget);
+
+        Destroy(hitEffect, spreadAcidHitEffectDestroyTime);
     }
     public void ShootAcidFromAnimation()
     {
@@ -1046,7 +1574,7 @@ public class DragonEnemy : MonoBehaviour
         if (firePoint == null) return;
         if (playerTarget == null) return;
 
-        Vector3 targetPoint = playerTarget.position + mouthTargetOffset;
+        Vector3 targetPoint = playerTarget.position + Vector3.up * 1.2f;
         Vector3 direction = targetPoint - firePoint.position;
 
         if (direction == Vector3.zero) return;
@@ -1056,6 +1584,15 @@ public class DragonEnemy : MonoBehaviour
         Quaternion spawnRotation = Quaternion.LookRotation(direction);
 
         GameObject projectile = Instantiate(projectilePrefab, firePoint.position, spawnRotation);
+
+        ProjectileDamage projectileDamage = projectile.GetComponent<ProjectileDamage>();
+
+        if (projectileDamage == null)
+        {
+            projectileDamage = projectile.GetComponentInChildren<ProjectileDamage>();
+        }
+
+
 
         Rigidbody projectileRb = projectile.GetComponent<Rigidbody>();
 
@@ -1187,7 +1724,23 @@ public class DragonEnemy : MonoBehaviour
 
         if (other.CompareTag("Arrow"))
         {
-            ArrowHit(other.gameObject);
+            Vector3 hitPoint = other.ClosestPoint(transform.position);
+
+            if (hitPoint == transform.position)
+            {
+                hitPoint = other.transform.position;
+            }
+
+            Vector3 hitDirection = other.transform.forward;
+
+            if (other.attachedRigidbody != null && other.attachedRigidbody.linearVelocity.sqrMagnitude > 0.1f)
+            {
+                hitDirection = other.attachedRigidbody.linearVelocity.normalized;
+            }
+
+            Vector3 hitNormal = -hitDirection;
+
+            ArrowHit(other.gameObject, hitPoint, hitNormal);
         }
     }
 
@@ -1197,15 +1750,28 @@ public class DragonEnemy : MonoBehaviour
 
         if (collision.collider.CompareTag("Arrow"))
         {
-            ArrowHit(collision.gameObject);
+            Vector3 hitPoint = transform.position;
+            Vector3 hitNormal = -collision.collider.transform.forward;
+
+            if (collision.contactCount > 0)
+            {
+                hitPoint = collision.contacts[0].point;
+                hitNormal = collision.contacts[0].normal;
+            }
+
+            ArrowHit(collision.gameObject, hitPoint, hitNormal);
         }
     }
 
-    void ArrowHit(GameObject arrow)
+    void ArrowHit(GameObject arrow, Vector3 hitPoint, Vector3 hitNormal)
     {
         if (isDead) return;
 
+        PlayDragonHitAudio();
+
         arrowHits++;
+
+        SpawnHitBlood(hitPoint, hitNormal);
 
         Destroy(arrow);
 
@@ -1237,7 +1803,98 @@ public class DragonEnemy : MonoBehaviour
 
         StartGroundHitReaction();
     }
+    void SpawnHitBlood(Vector3 hitPoint, Vector3 hitNormal)
+    {
+        GameObject bloodPrefab = GetRandomPrefab(hitBloodPrefabs);
 
+        if (bloodPrefab != null)
+        {
+            Quaternion bloodRotation = Quaternion.LookRotation(hitNormal);
+
+            GameObject blood = Instantiate(bloodPrefab, hitPoint, bloodRotation);
+            blood.transform.localScale = hitBloodScale;
+
+            Destroy(blood, hitBloodDestroyTime);
+        }
+
+        SpawnGroundBloodDecal(hitPoint);
+    }
+    void SpawnGroundBloodDecal(Vector3 startPoint)
+    {
+        if (groundBloodDecalPrefab == null) return;
+
+        Vector3 rayStart = startPoint + Vector3.up * 1f;
+
+        if (Physics.Raycast(rayStart, Vector3.down, out RaycastHit hit, bloodDecalRayDistance, bloodGroundLayer, QueryTriggerInteraction.Ignore))
+        {
+            Quaternion decalRotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
+
+            Vector3 decalPosition = hit.point + hit.normal * 0.02f;
+
+            GameObject decal = Instantiate(groundBloodDecalPrefab, decalPosition, decalRotation);
+
+            decal.transform.localScale = groundBloodDecalScale;
+
+            Destroy(decal, groundBloodDecalDestroyTime);
+        }
+    }
+    void SpawnDeathBlood()
+    {
+        for (int i = 0; i < deathBloodAmount; i++)
+        {
+            GameObject bloodPrefab = GetRandomPrefab(deathBloodPrefabs);
+
+            if (bloodPrefab == null)
+            {
+                bloodPrefab = GetRandomPrefab(hitBloodPrefabs);
+            }
+
+            if (bloodPrefab == null)
+            {
+                return;
+            }
+
+            Vector3 spawnPosition;
+            Quaternion spawnRotation;
+
+            if (deathBloodPoints != null && deathBloodPoints.Length > 0)
+            {
+                Transform randomPoint = deathBloodPoints[Random.Range(0, deathBloodPoints.Length)];
+
+                if (randomPoint == null)
+                {
+                    continue;
+                }
+
+                spawnPosition = randomPoint.position;
+                spawnRotation = randomPoint.rotation;
+            }
+            else
+            {
+                Vector3 randomOffset = Random.insideUnitSphere * deathBloodSpawnRadius;
+                randomOffset.y = Mathf.Abs(randomOffset.y);
+
+                spawnPosition = transform.position + randomOffset;
+                spawnRotation = Random.rotation;
+            }
+
+            GameObject blood = Instantiate(bloodPrefab, spawnPosition, spawnRotation);
+            blood.transform.localScale = deathBloodScale;
+
+            Destroy(blood, deathBloodDestroyTime);
+
+            SpawnGroundBloodDecal(spawnPosition);
+        }
+    }
+    GameObject GetRandomPrefab(GameObject[] prefabs)
+    {
+        if (prefabs == null) return null;
+        if (prefabs.Length == 0) return null;
+
+        GameObject selectedPrefab = prefabs[Random.Range(0, prefabs.Length)];
+
+        return selectedPrefab;
+    }
     void StartGroundHitReaction()
     {
         isGroundHitStunned = true;
@@ -1261,6 +1918,7 @@ public class DragonEnemy : MonoBehaviour
         SetBoolIfExists(isGlidingBoolName, false);
 
         ResetAllDragonTriggers();
+        SpawnDeathBlood();
 
         SetTriggerIfExists(getHit1TriggerName);
 
@@ -1291,6 +1949,8 @@ public class DragonEnemy : MonoBehaviour
     void StartGroundDeath()
     {
         if (isDead) return;
+
+        StopAllDragonAudio();
 
         isDead = true;
         isSkyDeath = false;
@@ -1341,6 +2001,8 @@ public class DragonEnemy : MonoBehaviour
     void StartSkyDeath()
     {
         if (isSkyDeath) return;
+
+        StopAllDragonAudio();
 
         isDead = true;
         isSkyDeath = true;
@@ -1426,6 +2088,7 @@ public class DragonEnemy : MonoBehaviour
             SetBoolIfExists(isDeadBoolName, false);
 
             ResetAllDragonTriggers();
+            SpawnDeathBlood();
 
             SetTriggerIfExists(deathHitGroundTriggerName);
 
@@ -1437,7 +2100,18 @@ public class DragonEnemy : MonoBehaviour
             Destroy(gameObject, destroyAfterDeath);
         }
     }
+    void StopWingAudioNow()
+    {
+        wingAudioShouldStopTime = 0f;
 
+        if (wingAudioSource != null)
+        {
+            if (wingAudioSource.isPlaying)
+            {
+                wingAudioSource.Stop();
+            }
+        }
+    }
     void ResetAllDragonTriggers()
     {
         if (animator == null) return;
@@ -1470,11 +2144,16 @@ public class DragonEnemy : MonoBehaviour
 
     void UpdateAnimatorBools()
     {
+        UpdateDragonAudioAreaMute();
+
         if (isSkyDeath)
         {
             SetBoolIfExists(isFlyingBoolName, true);
             SetBoolIfExists(isFallingBoolName, true);
             SetBoolIfExists(isDeadBoolName, false);
+
+            UpdateWingAudio();
+            UpdateFootstepAudio();
             return;
         }
 
@@ -1484,6 +2163,9 @@ public class DragonEnemy : MonoBehaviour
         SetBoolIfExists(isGlidingBoolName, animGliding);
         SetBoolIfExists(isFallingBoolName, isFalling);
         SetBoolIfExists(isDeadBoolName, isDead);
+
+        UpdateWingAudio();
+        UpdateFootstepAudio();
     }
 
     bool SetBoolIfExists(string parameterName, bool value)

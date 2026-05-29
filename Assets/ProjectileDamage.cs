@@ -5,13 +5,22 @@ public class ProjectileDamage : MonoBehaviour
     [Header("Damage")]
     public int damage = 15;
 
+    [Header("Damage Effect")]
+    public PlayerHealth.DamageEffectType damageEffectType = PlayerHealth.DamageEffectType.None;
+    public float screenEffectDuration = 0.7f;
+
+    [Header("Slow Effect")]
+    public bool applySlowOnHit = false;
+    public float slowMultiplier = 0.6f;
+    public float slowDuration = 1.5f;
+
     [Header("Projectile Life")]
-    public float lifeTime = 5f;
+    public float lifeTime = 3f;
     public float ignoreCollisionTime = 0.15f;
 
     [Header("Impact Effect")]
     public GameObject hitEffectPrefab;
-    public bool destroyOnHit = true;
+    public bool destroyOnHit = false;
     public float destroyHitEffectAfter = 3f;
 
     [Header("Optional Area Damage")]
@@ -25,12 +34,43 @@ public class ProjectileDamage : MonoBehaviour
     private void Start()
     {
         spawnTime = Time.time;
+
+        // Projectile always disappears after 3 seconds.
         Destroy(gameObject, lifeTime);
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        HandleHit(other, other.ClosestPoint(transform.position));
+        Vector3 hitPoint = transform.position;
+
+        if (other != null)
+        {
+            if (CanUseClosestPoint(other))
+            {
+                hitPoint = other.ClosestPoint(transform.position);
+            }
+            else
+            {
+                hitPoint = transform.position;
+            }
+        }
+
+        HandleHit(other, hitPoint);
+    }
+    private bool CanUseClosestPoint(Collider collider)
+    {
+        if (collider == null) return false;
+
+        if (collider is BoxCollider) return true;
+        if (collider is SphereCollider) return true;
+        if (collider is CapsuleCollider) return true;
+
+        MeshCollider meshCollider = collider as MeshCollider;
+
+        if (meshCollider != null && meshCollider.convex)
+            return true;
+
+        return false;
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -49,10 +89,10 @@ public class ProjectileDamage : MonoBehaviour
     {
         if (hasHit) return;
 
-        // Prevent projectile from instantly hitting the dragon mouth/body when spawned.
         if (Time.time < spawnTime + ignoreCollisionTime) return;
 
-        // Ignore other projectiles/arrows.
+        if (other == null) return;
+
         if (other.CompareTag("Arrow")) return;
 
         hasHit = true;
@@ -68,6 +108,8 @@ public class ProjectileDamage : MonoBehaviour
 
         SpawnHitEffect(hitPoint);
 
+        // We do NOT destroy instantly now.
+        // The ball will disappear after Life Time.
         if (destroyOnHit)
         {
             Destroy(gameObject);
@@ -85,14 +127,27 @@ public class ProjectileDamage : MonoBehaviour
 
         if (playerHealth != null)
         {
-            playerHealth.TakeDamage(damage);
+            playerHealth.TakeDamageWithEffect(
+                damage,
+                damageEffectType,
+                screenEffectDuration,
+                applySlowOnHit,
+                slowMultiplier,
+                slowDuration
+            );
+
             Debug.Log(gameObject.name + " damaged player: " + damage);
         }
     }
 
     private void DoAreaDamage(Vector3 center)
     {
-        Collider[] hits = Physics.OverlapSphere(center, areaRadius, damageLayers, QueryTriggerInteraction.Ignore);
+        Collider[] hits = Physics.OverlapSphere(
+            center,
+            areaRadius,
+            damageLayers,
+            QueryTriggerInteraction.Ignore
+        );
 
         foreach (Collider hit in hits)
         {
@@ -105,7 +160,15 @@ public class ProjectileDamage : MonoBehaviour
 
             if (playerHealth != null)
             {
-                playerHealth.TakeDamage(damage);
+                playerHealth.TakeDamageWithEffect(
+                    damage,
+                    damageEffectType,
+                    screenEffectDuration,
+                    applySlowOnHit,
+                    slowMultiplier,
+                    slowDuration
+                );
+
                 Debug.Log(gameObject.name + " area damaged player: " + damage);
                 return;
             }
