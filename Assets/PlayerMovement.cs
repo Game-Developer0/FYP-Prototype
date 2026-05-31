@@ -3,10 +3,8 @@ using System;
 using UnityEngine;
 using System.Collections;
 
-
 public class PlayerMovement : MonoBehaviour
 {
-
     [Header("Gun Aim Collider Fix")]
     public float gunAimColliderYOffset = 0.90f;
     public float aimColliderLerpSpeed = 12f;
@@ -19,7 +17,6 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Aiming Rigs")]
     public Rig bowAimingRig;
-
     public Rig gunAimingRig;
     public float rigLerpSpeed = 10f;
 
@@ -30,7 +27,7 @@ public class PlayerMovement : MonoBehaviour
     Animator animator;
 
     [Header("Camera")]
-    public Transform cameraRoot;   // Empty GameObject following head/chest bone
+    public Transform cameraRoot;
     public Transform playerCam;
 
     public float mouseSensitivity = 50f;
@@ -39,28 +36,25 @@ public class PlayerMovement : MonoBehaviour
 
     private float xRotation;
 
-    //Assingables
     [Header("Arrow")]
     public GameObject HandArrow;
 
     public Transform orientation;
 
-    //Other
     private Rigidbody rb;
 
-    //Rotation and look
     private float yRotation;
     private float yRotInput;
     private float sensitivity = 50f;
     private float sensMultiplier = 1f;
 
-    //Movement
     [Header("Movement Speeds")]
     public float walkMoveSpeed = 350f;
     public float sprintMoveSpeed = 5500f;
 
     public float walkMaxSpeed = 12f;
     public float sprintMaxSpeed = 20f;
+
     [Header("External Slow Effect")]
     [SerializeField] private float externalSpeedMultiplier = 1f;
 
@@ -71,29 +65,66 @@ public class PlayerMovement : MonoBehaviour
     private float threshold = 0.01f;
     public float maxSlopeAngle = 35f;
 
-    //Crouch & Slide
     private Vector3 crouchScale = new Vector3(1, 0.5f, 1);
     private Vector3 playerScale;
     public float slideForce = 400;
     public float slideCounterMovement = 0.2f;
 
-    //Jumping
     private bool readyToJump = true;
     private float jumpCooldown = 0.25f;
     public float jumpForce = 550f;
 
-    //Input
     float x, y;
     bool jumping, sprinting, crouching;
 
-    //Sliding
     private Vector3 normalVector = Vector3.up;
     private Vector3 wallNormalVector;
 
-    //CapsuleCollider
     private CapsuleCollider playerCollider;
     private float originalColliderHeight;
     private Vector3 originalColliderCenter;
+
+    [Header("Footstep Sounds")]
+    public AudioSource footstepAudioSource;
+
+    [Tooltip("Add your 3 grass footstep sounds here.")]
+    public AudioClip[] grassFootstepClips;
+
+    [Tooltip("Add your wood footstep sounds here.")]
+    public AudioClip[] woodFootstepClips;
+
+    [Tooltip("Objects with this tag will play wood footstep sound.")]
+    public string woodSurfaceTag = "Wood";
+
+    [Tooltip("Soft walking volume.")]
+    [Range(0f, 1f)]
+    public float walkFootstepVolume = 0.35f;
+
+    [Tooltip("Loud running volume.")]
+    [Range(0f, 1f)]
+    public float runFootstepVolume = 0.75f;
+
+    [Tooltip("Walking pitch variation.")]
+    public Vector2 walkPitchRange = new Vector2(0.95f, 1.05f);
+
+    [Tooltip("Running pitch variation.")]
+    public Vector2 runPitchRange = new Vector2(1.05f, 1.15f);
+
+    [Tooltip("Ray distance used to check the ground surface.")]
+    public float footstepRayDistance = 1.6f;
+
+    [Tooltip("Small protection so duplicate animation events do not play many sounds at once.")]
+    public float minFootstepInterval = 0.08f;
+
+    [Tooltip("0 = 2D sound, 1 = full 3D sound.")]
+    [Range(0f, 1f)]
+    public float footstepSpatialBlend = 0.4f;
+
+    private float nextAllowedFootstepTime;
+    private AudioClip lastGrassFootstepClip;
+    private AudioClip lastWoodFootstepClip;
+
+    private bool sliding = false;
 
     void Awake()
     {
@@ -103,6 +134,8 @@ public class PlayerMovement : MonoBehaviour
         playerCollider = GetComponent<CapsuleCollider>();
         originalColliderHeight = playerCollider.height;
         originalColliderCenter = playerCollider.center;
+
+        SetupFootstepAudioSource();
     }
 
     void Start()
@@ -112,13 +145,12 @@ public class PlayerMovement : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         animator.applyRootMotion = false;
-
     }
+
     void HandArrowActive()
     {
         HandArrow.gameObject.SetActive(true);
     }
-
 
     private void FixedUpdate()
     {
@@ -140,6 +172,7 @@ public class PlayerMovement : MonoBehaviour
         UpdateGunAimCollider();
         Animate();
     }
+
     private void UpdateAimRig()
     {
         float bowTargetWeight = (!isGunEquipped && bowAiming) ? 1f : 0f;
@@ -163,6 +196,7 @@ public class PlayerMovement : MonoBehaviour
             );
         }
     }
+
     public void EquipBow()
     {
         isGunEquipped = false;
@@ -200,13 +234,14 @@ public class PlayerMovement : MonoBehaviour
             bowAimingRig.weight = 0f;
         }
     }
+
     private void LateUpdate()
     {
         if (!cameraRoot) return;
 
-        // Camera follows animated root (head / spine)
         playerCam.position = cameraRoot.position;
     }
+
     public void ExitAim()
     {
         bowAiming = false;
@@ -233,9 +268,6 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Find user input. Should put this in its own class but im lazy
-    /// </summary>
     private void MyInput()
     {
         x = Input.GetAxisRaw("Horizontal");
@@ -253,7 +285,6 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            // Bow aim = hold right click
             if (!isGunEquipped)
             {
                 bowAiming = Input.GetMouseButton(1);
@@ -262,7 +293,6 @@ public class PlayerMovement : MonoBehaviour
                 animator.SetBool("aim", bowAiming);
             }
 
-            // Gun aim = toggle right click
             if (isGunEquipped)
             {
                 bowAiming = false;
@@ -276,8 +306,6 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
-        
-        // Left mouse = shoot only if this click is NOT used for grapple
         if (Input.GetMouseButtonDown(0))
         {
             bool clickWillGrapple = grapplingGun != null && grapplingGun.CanStartGrapple();
@@ -288,7 +316,6 @@ public class PlayerMovement : MonoBehaviour
                 animator.SetTrigger("shoot");
             }
         }
-
 
         if (sprinting && Input.GetKeyDown(KeyCode.LeftControl) && grounded)
         {
@@ -307,7 +334,6 @@ public class PlayerMovement : MonoBehaviour
 
         crouching = controlHeld && !sprinting;
     }
-
 
     private void Animate()
     {
@@ -332,7 +358,6 @@ public class PlayerMovement : MonoBehaviour
             {
                 float multiplier = (x != 0 || y != 0) ? (sprinting ? 6f : 2f) : 0f;
 
-                // Slow animation blend values when player is slowed
                 multiplier *= externalSpeedMultiplier;
 
                 animator.SetFloat("X_Velocity", x * multiplier, 0.1f, Time.deltaTime);
@@ -351,22 +376,12 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-
-
-    private bool sliding = false;
-
     private void StartSlide()
     {
         sliding = true;
 
-        // Set Running parameter for slide animation
         animator.SetBool("Running", true);
 
-        // Shrink collider if needed
-        //playerCollider.height = originalColliderHeight * 0.5f;
-        //playerCollider.center = originalColliderCenter * 0.5f;
-
-        // Apply forward force
         rb.AddForce(orientation.forward * slideForce);
     }
 
@@ -376,15 +391,10 @@ public class PlayerMovement : MonoBehaviour
         sliding = false;
 
         animator.SetBool("Running", false);
-
-        // Restore collider
-       // playerCollider.height = originalColliderHeight;
-       // playerCollider.center = originalColliderCenter;
     }
 
     private void StartCrouch()
     {
-        // Do NOT set sliding = true here
         animator.SetBool("Running", false);
 
         playerCollider.height = originalColliderHeight * 0.5f;
@@ -406,6 +416,7 @@ public class PlayerMovement : MonoBehaviour
         pos.y += (originalColliderHeight - playerCollider.height) / 2f;
         transform.position = pos;
     }
+
     private void StopGroundSliding()
     {
         if (!grounded) return;
@@ -445,22 +456,17 @@ public class PlayerMovement : MonoBehaviour
     {
         if (crouching)
         {
-            // Let Root Motion handle crouch movement
             return;
         }
 
-        // Extra gravity
         rb.AddForce(Vector3.down * Time.deltaTime * 10);
 
-        // Find actual velocity relative to where player is looking
         Vector2 mag = FindVelRelativeToLook();
         float xMag = mag.x;
         float yMag = mag.y;
 
-        // Counteract sliding and sloppy movement
         CounterMovement(x, y, mag);
 
-        // Stop small unwanted sliding when player is not pressing movement keys
         if (grounded && !jumping && !crouching && !sliding)
         {
             bool noMovementInput = Mathf.Abs(x) < 0.01f && Mathf.Abs(y) < 0.01f;
@@ -476,13 +482,11 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
-        // If holding jump and ready to jump, then jump
         if (readyToJump && jumping)
         {
             Jump();
         }
 
-        // Set max speed
         float currentMoveSpeed;
         float currentMaxSpeed;
 
@@ -497,28 +501,23 @@ public class PlayerMovement : MonoBehaviour
             currentMaxSpeed = walkMaxSpeed;
         }
 
-        // Apply external slow effect from ice/acid/fire breath
         currentMoveSpeed *= externalSpeedMultiplier;
         currentMaxSpeed *= externalSpeedMultiplier;
 
-        // If crouching down a ramp, add force down so player stays grounded
         if (crouching && grounded && readyToJump)
         {
             rb.AddForce(Vector3.down * Time.deltaTime * 3000);
             return;
         }
 
-        // If speed is larger than max speed, cancel input so player does not go over max speed
         if (x > 0 && xMag > currentMaxSpeed) x = 0;
         if (x < 0 && xMag < -currentMaxSpeed) x = 0;
         if (y > 0 && yMag > currentMaxSpeed) y = 0;
         if (y < 0 && yMag < -currentMaxSpeed) y = 0;
 
-        // Some multipliers
         float multiplier = 1f;
         float multiplierV = 1f;
 
-        // Movement in air
         if (!grounded)
         {
             multiplier = 0.5f;
@@ -531,13 +530,11 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        // Movement while crouching
         if (grounded && crouching)
         {
             multiplierV = 0f;
         }
 
-        // Apply forces to move player
         rb.AddForce(orientation.transform.forward * y * currentMoveSpeed * Time.deltaTime * multiplier * multiplierV);
         rb.AddForce(orientation.transform.right * x * currentMoveSpeed * Time.deltaTime * multiplier);
     }
@@ -548,11 +545,9 @@ public class PlayerMovement : MonoBehaviour
         {
             readyToJump = false;
 
-            //Add jump forces
             rb.AddForce(Vector2.up * jumpForce * 1.5f);
             rb.AddForce(normalVector * jumpForce * 0.5f);
 
-            //If jumping while falling, reset y velocity.
             Vector3 vel = rb.linearVelocity;
             if (rb.linearVelocity.y < 0.5f)
                 rb.linearVelocity = new Vector3(vel.x, 0, vel.z);
@@ -573,17 +568,13 @@ public class PlayerMovement : MonoBehaviour
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
 
-        // Horizontal rotation (player body)
         yRotInput = mouseX;
 
-        // Vertical rotation (camera only)
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, upperLimit, bottomLimit);
 
         playerCam.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
     }
-
-
 
     private void CounterMovement(float x, float y, Vector2 mag)
     {
@@ -592,14 +583,12 @@ public class PlayerMovement : MonoBehaviour
 
         if (!grounded || jumping) return;
 
-        // Slow down sliding
         if (crouching)
         {
             rb.AddForce(currentMaxSpeed * Time.deltaTime * -rb.linearVelocity.normalized * slideCounterMovement);
             return;
         }
 
-        // Counter movement
         if (Math.Abs(mag.x) > threshold && Math.Abs(x) < 0.05f || (mag.x < -threshold && x > 0) || (mag.x > threshold && x < 0))
         {
             rb.AddForce(currentMaxSpeed * orientation.transform.right * Time.deltaTime * -mag.x * counterMovement);
@@ -610,7 +599,6 @@ public class PlayerMovement : MonoBehaviour
             rb.AddForce(currentMaxSpeed * orientation.transform.forward * Time.deltaTime * -mag.y * counterMovement);
         }
 
-        // Limit diagonal running
         if (new Vector2(rb.linearVelocity.x, rb.linearVelocity.z).magnitude > currentMaxSpeed)
         {
             float fallSpeed = rb.linearVelocity.y;
@@ -619,11 +607,6 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Find the velocity relative to where the player is looking
-    /// Useful for vectors calculations regarding movement and limiting movement
-    /// </summary>
-    /// <returns></returns>
     public Vector2 FindVelRelativeToLook()
     {
         float lookAngle = orientation.transform.eulerAngles.y;
@@ -647,20 +630,15 @@ public class PlayerMovement : MonoBehaviour
 
     private bool cancellingGrounded;
 
-    /// <summary>
-    /// Handle ground detection
-    /// </summary>
     private void OnCollisionStay(Collision other)
     {
-        //Make sure we are only checking for walkable layers
         int layer = other.gameObject.layer;
         if (whatIsGround != (whatIsGround | (1 << layer))) return;
 
-        //Iterate through every collision in a physics update
         for (int i = 0; i < other.contactCount; i++)
         {
             Vector3 normal = other.contacts[i].normal;
-            //FLOOR
+
             if (IsFloor(normal))
             {
                 grounded = true;
@@ -670,7 +648,6 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
-        //Invoke ground/wall cancel, since we can't check normals with CollisionExit
         float delay = 3f;
         if (!cancellingGrounded)
         {
@@ -683,20 +660,20 @@ public class PlayerMovement : MonoBehaviour
     {
         grounded = false;
     }
+
     public bool IsGunAiming()
     {
         return gunAiming;
     }
+
     private void UpdateGunAimCollider()
     {
         if (playerCollider == null) return;
 
-        // Do not fight crouch/slide collider changes
         if (crouching || sliding) return;
 
         Vector3 targetCenter = originalColliderCenter;
 
-        // When gun is equipped and player is aiming, move collider center up
         if (isGunEquipped && gunAiming)
         {
             targetCenter = originalColliderCenter + new Vector3(0f, gunAimColliderYOffset, 0f);
@@ -708,9 +685,176 @@ public class PlayerMovement : MonoBehaviour
             Time.deltaTime * aimColliderLerpSpeed
         );
     }
+
     public void SetExternalSpeedMultiplier(float multiplier)
     {
         externalSpeedMultiplier = Mathf.Clamp(multiplier, 0.1f, 1f);
     }
 
+    private void SetupFootstepAudioSource()
+    {
+        if (footstepAudioSource == null)
+        {
+            footstepAudioSource = GetComponent<AudioSource>();
+        }
+
+        if (footstepAudioSource == null)
+        {
+            footstepAudioSource = gameObject.AddComponent<AudioSource>();
+        }
+
+        footstepAudioSource.playOnAwake = false;
+        footstepAudioSource.loop = false;
+        footstepAudioSource.spatialBlend = footstepSpatialBlend;
+    }
+
+    public void PlayFootstepSound()
+    {
+        if (Time.time < nextAllowedFootstepTime) return;
+
+        if (!CanPlayFootstepSound()) return;
+
+        if (footstepAudioSource == null)
+        {
+            SetupFootstepAudioSource();
+        }
+
+        AudioClip selectedClip = GetFootstepClip();
+
+        if (selectedClip == null) return;
+
+        bool isRunning = IsRunningForFootstep();
+
+        float volume = isRunning ? runFootstepVolume : walkFootstepVolume;
+
+        Vector2 pitchRange = isRunning ? runPitchRange : walkPitchRange;
+        footstepAudioSource.pitch = UnityEngine.Random.Range(pitchRange.x, pitchRange.y);
+
+        footstepAudioSource.PlayOneShot(selectedClip, volume);
+
+        nextAllowedFootstepTime = Time.time + minFootstepInterval;
+    }
+
+    private bool CanPlayFootstepSound()
+    {
+        if (!grounded) return false;
+        if (jumping) return false;
+        if (crouching) return false;
+        if (sliding) return false;
+
+        if (grapplingGun != null && grapplingGun.IsGrappling()) return false;
+
+        bool hasMovementInput = Mathf.Abs(x) > 0.01f || Mathf.Abs(y) > 0.01f;
+
+        Vector3 horizontalVelocity = new Vector3(
+            rb.linearVelocity.x,
+            0f,
+            rb.linearVelocity.z
+        );
+
+        bool isActuallyMoving = horizontalVelocity.magnitude > 0.25f;
+
+        return hasMovementInput && isActuallyMoving;
+    }
+
+    private bool IsRunningForFootstep()
+    {
+        bool hasMovementInput = Mathf.Abs(x) > 0.01f || Mathf.Abs(y) > 0.01f;
+
+        return sprinting && grounded && hasMovementInput && !crouching && !sliding;
+    }
+
+    private AudioClip GetFootstepClip()
+    {
+        if (IsStandingOnWood())
+        {
+            AudioClip woodClip = GetRandomWoodFootstepClip();
+
+            if (woodClip != null)
+            {
+                return woodClip;
+            }
+        }
+
+        return GetRandomGrassFootstepClip();
+    }
+
+    private AudioClip GetRandomGrassFootstepClip()
+    {
+        if (grassFootstepClips == null || grassFootstepClips.Length == 0)
+        {
+            return null;
+        }
+
+        if (grassFootstepClips.Length == 1)
+        {
+            return grassFootstepClips[0];
+        }
+
+        AudioClip selectedClip = null;
+
+        for (int i = 0; i < 10; i++)
+        {
+            selectedClip = grassFootstepClips[UnityEngine.Random.Range(0, grassFootstepClips.Length)];
+
+            if (selectedClip != null && selectedClip != lastGrassFootstepClip)
+            {
+                break;
+            }
+        }
+
+        if (selectedClip == null)
+        {
+            selectedClip = grassFootstepClips[0];
+        }
+
+        lastGrassFootstepClip = selectedClip;
+        return selectedClip;
+    }
+
+    private AudioClip GetRandomWoodFootstepClip()
+    {
+        if (woodFootstepClips == null || woodFootstepClips.Length == 0)
+        {
+            return null;
+        }
+
+        if (woodFootstepClips.Length == 1)
+        {
+            return woodFootstepClips[0];
+        }
+
+        AudioClip selectedClip = null;
+
+        for (int i = 0; i < 10; i++)
+        {
+            selectedClip = woodFootstepClips[UnityEngine.Random.Range(0, woodFootstepClips.Length)];
+
+            if (selectedClip != null && selectedClip != lastWoodFootstepClip)
+            {
+                break;
+            }
+        }
+
+        if (selectedClip == null)
+        {
+            selectedClip = woodFootstepClips[0];
+        }
+
+        lastWoodFootstepClip = selectedClip;
+        return selectedClip;
+    }
+    private bool IsStandingOnWood()
+    {
+        Vector3 rayOrigin = transform.position + Vector3.up * 0.2f;
+
+        RaycastHit hit;
+
+        if (Physics.Raycast(rayOrigin, Vector3.down, out hit, footstepRayDistance, whatIsGround, QueryTriggerInteraction.Ignore))
+        {
+            return hit.collider.CompareTag(woodSurfaceTag);
+        }
+
+        return false;
+    }
 }

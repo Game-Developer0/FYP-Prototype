@@ -10985,7 +10985,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 207495765307802987, guid: d44406dab2740014da59b1bbe0121c11, type: 3}
       propertyPath: ShapeModule.m_Scale.x
-      value: 3.9910038
+      value: 3.561261
       objectReference: {fileID: 0}
     - target: {fileID: 207495765307802987, guid: d44406dab2740014da59b1bbe0121c11, type: 3}
       propertyPath: ShapeModule.m_Scale.y
@@ -10993,7 +10993,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 207495765307802987, guid: d44406dab2740014da59b1bbe0121c11, type: 3}
       propertyPath: InitialModule.startSize.scalar
-      value: 3.9910038
+      value: 3.561261
       objectReference: {fileID: 0}
     - target: {fileID: 207495765307802987, guid: d44406dab2740014da59b1bbe0121c11, type: 3}
       propertyPath: InitialModule.startSizeY.scalar
@@ -61269,7 +61269,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   bloodDecalRayDistance: 10
-  startInSky: 0
+  startInSky: 1
   ownerRoot: {fileID: 0}
   canUseGroundCombat: 1
   canUseSkyCombat: 1
@@ -61379,9 +61379,35 @@ MonoBehaviour:
   fireballAudioSource: {fileID: 683429869}
   fireballShootClip: {fileID: 8300000, guid: 871960363f007b24b8cbb3d7cfa834d8, type: 3}
   wingAudioSource: {fileID: 1850879851}
-  wingFlyingClip: {fileID: 8300000, guid: 019ef16afb62205408b790d1ca838969, type: 3}
+  dragonWingFlyingClips:
+  - {fileID: 8300000, guid: 8e197631ed86be641ae8066774eeaac8, type: 3}
+  - {fileID: 8300000, guid: 9add89088d607cf4a860ea26caa9a1ae, type: 3}
+  - {fileID: 8300000, guid: d00879e3586909a429f0d0a8abc0d920, type: 3}
+  - {fileID: 8300000, guid: bd2e2d2713775664a8919135bebe6c4b, type: 3}
+  - {fileID: 8300000, guid: 432e959637b81fc4db257f722b1043ba, type: 3}
+  - {fileID: 8300000, guid: c05c00f720171ba4ca3fadf2659384a0, type: 3}
+  - {fileID: 8300000, guid: f0658914cdeb85848926ceb7c2335225, type: 3}
+  - {fileID: 8300000, guid: 84b9ab994f92e4a4b86cce998cb0a2a7, type: 3}
+  dragonWingFlyVolume: 0.9
+  dragonWingTakeOffVolume: 1
+  dragonWingFlyPitchRange: {x: 0.9, y: 1.08}
+  dragonWingTakeOffPitchRange: {x: 0.85, y: 1.02}
+  dragonMinWingSoundInterval: 0.15
+  dragonWingSpatialBlend: 1
   footstepAudioSource: {fileID: 1988175661}
-  footstepLoopClip: {fileID: 8300000, guid: 59536deae9712b34eb74dc3ba8d361be, type: 3}
+  dragonGrassFootstepClips:
+  - {fileID: 8300000, guid: d4d4030466b499944b2c27443a64edf1, type: 3}
+  - {fileID: 8300000, guid: b6e7bbd2927306b439bcea9c6c6873a5, type: 3}
+  - {fileID: 8300000, guid: 2720d06ceed6eb240934d6e1c57b5902, type: 3}
+  - {fileID: 8300000, guid: cf259415037443f418a05e684b238f84, type: 3}
+  - {fileID: 8300000, guid: dfb6226fc9d77834ba9e6b66b2dc6c74, type: 3}
+  - {fileID: 8300000, guid: e2035d024a4542940bd8015b4e48bcf7, type: 3}
+  dragonWalkFootstepVolume: 0.45
+  dragonRunFootstepVolume: 0.85
+  dragonWalkPitchRange: {x: 0.9, y: 1.05}
+  dragonRunPitchRange: {x: 1, y: 1.15}
+  dragonMinFootstepInterval: 0.12
+  dragonFootstepSpatialBlend: 1
   hitAudioSource: {fileID: 307544472}
   dragonHitClip: {fileID: 8300000, guid: be293d1f6aaa0ec45a5d4af5b58e770a, type: 3}
   wingAudioStopDelay: 80
@@ -64836,7 +64862,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 207495765307802987, guid: fa153554f25e47c498acd9158f20bb3e, type: 3}
       propertyPath: ShapeModule.m_Scale.x
-      value: 3.9910038
+      value: 3.561261
       objectReference: {fileID: 0}
     - target: {fileID: 207495765307802987, guid: fa153554f25e47c498acd9158f20bb3e, type: 3}
       propertyPath: ShapeModule.m_Scale.y
@@ -64844,7 +64870,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 207495765307802987, guid: fa153554f25e47c498acd9158f20bb3e, type: 3}
       propertyPath: InitialModule.startSize.scalar
-      value: 3.9910038
+      value: 3.561261
       objectReference: {fileID: 0}
     - target: {fileID: 207495765307802987, guid: fa153554f25e47c498acd9158f20bb3e, type: 3}
       propertyPath: InitialModule.startSizeY.scalar
@@ -131848,7 +131874,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 207495765307802987, guid: 1edf72fe00e036d44afb46254e61c945, type: 3}
       propertyPath: ShapeModule.m_Scale.x
-      value: 3.9910038
+      value: 3.561261
       objectReference: {fileID: 0}
     - target: {fileID: 207495765307802987, guid: 1edf72fe00e036d44afb46254e61c945, type: 3}
       propertyPath: ShapeModule.m_Scale.y
@@ -131856,7 +131882,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 207495765307802987, guid: 1edf72fe00e036d44afb46254e61c945, type: 3}
       propertyPath: InitialModule.startSize.scalar
-      value: 3.9910038
+      value: 3.561261
       objectReference: {fileID: 0}
     - target: {fileID: 207495765307802987, guid: 1edf72fe00e036d44afb46254e61c945, type: 3}
       propertyPath: InitialModule.startSizeY.scalar
@@ -144566,7 +144592,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 207495765307802987, guid: 13cebe6f35df58c4bb8765230b59990f, type: 3}
       propertyPath: ShapeModule.m_Scale.x
-      value: 3.9910038
+      value: 3.561261
       objectReference: {fileID: 0}
     - target: {fileID: 207495765307802987, guid: 13cebe6f35df58c4bb8765230b59990f, type: 3}
       propertyPath: ShapeModule.m_Scale.y
@@ -144574,7 +144600,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 207495765307802987, guid: 13cebe6f35df58c4bb8765230b59990f, type: 3}
       propertyPath: InitialModule.startSize.scalar
-      value: 3.9910038
+      value: 3.561261
       objectReference: {fileID: 0}
     - target: {fileID: 207495765307802987, guid: 13cebe6f35df58c4bb8765230b59990f, type: 3}
       propertyPath: InitialModule.startSizeY.scalar
@@ -157954,7 +157980,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 0.039
+  m_Volume: 1
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -170448,7 +170474,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
-  m_Volume: 0.035
+  m_Volume: 1
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -177106,7 +177132,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 207495765307802987, guid: 7297fe0a5e06fb644a731296af23d579, type: 3}
       propertyPath: ShapeModule.m_Scale.x
-      value: 3.9910038
+      value: 3.561261
       objectReference: {fileID: 0}
     - target: {fileID: 207495765307802987, guid: 7297fe0a5e06fb644a731296af23d579, type: 3}
       propertyPath: ShapeModule.m_Scale.y
@@ -177114,7 +177140,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 207495765307802987, guid: 7297fe0a5e06fb644a731296af23d579, type: 3}
       propertyPath: InitialModule.startSize.scalar
-      value: 3.9910038
+      value: 3.561261
       objectReference: {fileID: 0}
     - target: {fileID: 207495765307802987, guid: 7297fe0a5e06fb644a731296af23d579, type: 3}
       propertyPath: InitialModule.startSizeY.scalar
@@ -184943,6 +184969,7 @@ GameObject:
   - component: {fileID: 6329814078859628450}
   - component: {fileID: 6329814078859628452}
   - component: {fileID: 6329814078859628451}
+  - component: {fileID: 6329814078859628453}
   m_Layer: 0
   m_Name: Erika Archer With Bow Arrow
   m_TagString: Player
@@ -187642,6 +187669,22 @@ MonoBehaviour:
   slideForce: 400
   slideCounterMovement: 0.2
   jumpForce: 300
+  footstepAudioSource: {fileID: 6329814078859628453}
+  grassFootstepClips:
+  - {fileID: 8300000, guid: 87f48ddd45bedd44996f471c9db44622, type: 3}
+  - {fileID: 8300000, guid: d08af65b3e6d0e746938e84448638601, type: 3}
+  - {fileID: 8300000, guid: 9348db6cd5dbede438043fc2699f4326, type: 3}
+  woodFootstepClips:
+  - {fileID: 8300000, guid: e46ff1953175f20478f38690fc372022, type: 3}
+  - {fileID: 8300000, guid: b0b357e54ef22d74492739e535b0c683, type: 3}
+  woodSurfaceTag: Wood
+  walkFootstepVolume: 0.1
+  runFootstepVolume: 0.35
+  walkPitchRange: {x: 0.95, y: 1.05}
+  runPitchRange: {x: 1.05, y: 1.15}
+  footstepRayDistance: 1.6
+  minFootstepInterval: 0.08
+  footstepSpatialBlend: 0.4
 --- !u!114 &6329814078859628450
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -187697,6 +187740,103 @@ MonoBehaviour:
   disableScreenEffectObjectOnStop: 0
   clearParticlesOnStop: 1
   allowSlowEffect: 1
+--- !u!82 &6329814078859628453
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 753218405590126428}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0.4
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!4 &6369254399129495591
 Transform:
   m_ObjectHideFlags: 0
@@ -187740,6 +187880,7 @@ GameObject:
   - component: {fileID: 5789219332375694114}
   - component: {fileID: 6565299257704944026}
   - component: {fileID: 6565299257704944025}
+  - component: {fileID: 6565299257704944027}
   m_Layer: 0
   m_Name: GunHandPosition
   m_TagString: Untagged
@@ -187766,6 +187907,9 @@ MonoBehaviour:
   camera: {fileID: 330585546}
   player: {fileID: 87864768954373606}
   maxDistance: 100
+  useAimAssist: 1
+  aimAssistMaxAngle: 8
+  aimAssistDistanceWeight: 2
   maxDistanceMultiplier: 0.45
   minDistanceMultiplier: 0.15
   spring: 9
@@ -187775,6 +187919,11 @@ MonoBehaviour:
   windEffectRoot: {fileID: 2072878013}
   clearWindOnStop: 1
   windWarmupTime: 0.15
+  useGrappleSpeedSound: 1
+  grappleSpeedLoopClip: {fileID: 8300000, guid: 6965b88a518ef1841aa4f64f5ce08277, type: 3}
+  grappleSpeedAudioSource: {fileID: 6565299257704944027}
+  grappleSpeedVolume: 0.8
+  restartSpeedSoundOnGrapple: 1
 --- !u!120 &6565299257704944026
 LineRenderer:
   serializedVersion: 3
@@ -187885,6 +188034,103 @@ LineRenderer:
   m_UseWorldSpace: 1
   m_Loop: 0
   m_ApplyActiveColorSpace: 1
+--- !u!82 &6565299257704944027
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6565299257704944024}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!4 &6669537618106247118
 Transform:
   m_ObjectHideFlags: 0

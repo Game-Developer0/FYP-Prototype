@@ -257,10 +257,61 @@ public class DragonEnemy : MonoBehaviour
     public AudioClip fireballShootClip;
 
     public AudioSource wingAudioSource;
-    public AudioClip wingFlyingClip;
+
+    [Header("Dragon Wing Flying Sounds")]
+    [Tooltip("Add all dragon wing flap / flying sounds here.")]
+    public AudioClip[] dragonWingFlyingClips;
+
+    [Tooltip("Normal flying wing volume.")]
+    [Range(0f, 1f)]
+    public float dragonWingFlyVolume = 0.75f;
+
+    [Tooltip("Louder takeoff wing volume.")]
+    [Range(0f, 1f)]
+    public float dragonWingTakeOffVolume = 0.9f;
+
+    [Tooltip("Normal flying pitch variation.")]
+    public Vector2 dragonWingFlyPitchRange = new Vector2(0.9f, 1.08f);
+
+    [Tooltip("Takeoff pitch variation.")]
+    public Vector2 dragonWingTakeOffPitchRange = new Vector2(0.85f, 1.02f);
+
+    [Tooltip("Protection against duplicate wing animation events.")]
+    public float dragonMinWingSoundInterval = 0.15f;
+
+    [Tooltip("0 = 2D sound, 1 = full 3D sound.")]
+    [Range(0f, 1f)]
+    public float dragonWingSpatialBlend = 1f;
+
+    private float nextAllowedDragonWingSoundTime = 0f;
+    private AudioClip lastDragonWingClip;
 
     public AudioSource footstepAudioSource;
-    public AudioClip footstepLoopClip;
+
+    [Header("Dragon Footstep Sounds")]
+    [Tooltip("Add all dragon grass footstep sounds here.")]
+    public AudioClip[] dragonGrassFootstepClips;
+
+    [Tooltip("Soft walking volume.")]
+    [Range(0f, 1f)]
+    public float dragonWalkFootstepVolume = 0.45f;
+
+    [Tooltip("Loud running volume.")]
+    [Range(0f, 1f)]
+    public float dragonRunFootstepVolume = 0.85f;
+
+    public Vector2 dragonWalkPitchRange = new Vector2(0.9f, 1.05f);
+    public Vector2 dragonRunPitchRange = new Vector2(1.0f, 1.15f);
+
+    [Tooltip("Protection against duplicate animation events.")]
+    public float dragonMinFootstepInterval = 0.12f;
+
+    [Tooltip("0 = 2D sound, 1 = full 3D sound.")]
+    [Range(0f, 1f)]
+    public float dragonFootstepSpatialBlend = 1f;
+
+    private float nextAllowedDragonFootstepTime = 0f;
+    private AudioClip lastDragonFootstepClip;
 
     public AudioSource hitAudioSource;
     public AudioClip dragonHitClip;
@@ -744,22 +795,9 @@ public class DragonEnemy : MonoBehaviour
     }
     void StartWingAudioNow()
     {
-        if (wingAudioSource == null) return;
-
-        bool playerCanHearDragon = IsPlayerInsideDragonAudioArea();
-
-        wingAudioSource.mute = !playerCanHearDragon;
-        wingAudioSource.loop = true;
-
-        if (wingFlyingClip != null && wingAudioSource.clip != wingFlyingClip)
-        {
-            wingAudioSource.clip = wingFlyingClip;
-        }
-
-        if (!wingAudioSource.isPlaying)
-        {
-            wingAudioSource.Play();
-        }
+        // Old version started a looping wing sound.
+        // New version plays one immediate wing sound.
+        PlayDragonWingSound();
     }
 
     void HandleTakeOffMovement()
@@ -1061,27 +1099,41 @@ public class DragonEnemy : MonoBehaviour
             fireballAudioSource.mute = !playerCanHearDragon;
         }
 
+        if (wingAudioSource == null)
+        {
+            wingAudioSource = GetComponent<AudioSource>();
+        }
+
+        if (wingAudioSource == null)
+        {
+            wingAudioSource = gameObject.AddComponent<AudioSource>();
+        }
+
         if (wingAudioSource != null)
         {
             wingAudioSource.playOnAwake = false;
-            wingAudioSource.loop = true;
+            wingAudioSource.loop = false;
+            wingAudioSource.spatialBlend = dragonWingSpatialBlend;
             wingAudioSource.mute = !playerCanHearDragon;
-
-            if (wingFlyingClip != null)
-                wingAudioSource.clip = wingFlyingClip;
-
             wingAudioSource.Stop();
+        }
+
+        if (footstepAudioSource == null)
+        {
+            footstepAudioSource = GetComponent<AudioSource>();
+        }
+
+        if (footstepAudioSource == null)
+        {
+            footstepAudioSource = gameObject.AddComponent<AudioSource>();
         }
 
         if (footstepAudioSource != null)
         {
             footstepAudioSource.playOnAwake = false;
-            footstepAudioSource.loop = true;
+            footstepAudioSource.loop = false;
+            footstepAudioSource.spatialBlend = dragonFootstepSpatialBlend;
             footstepAudioSource.mute = !playerCanHearDragon;
-
-            if (footstepLoopClip != null)
-                footstepAudioSource.clip = footstepLoopClip;
-
             footstepAudioSource.Stop();
         }
 
@@ -1092,7 +1144,90 @@ public class DragonEnemy : MonoBehaviour
             hitAudioSource.mute = !playerCanHearDragon;
         }
     }
+    public void PlayDragonWingSound()
+    {
+        if (Time.time < nextAllowedDragonWingSoundTime) return;
 
+        if (!CanPlayDragonWingSound()) return;
+
+        if (wingAudioSource == null)
+        {
+            wingAudioSource = GetComponent<AudioSource>();
+        }
+
+        if (wingAudioSource == null)
+        {
+            wingAudioSource = gameObject.AddComponent<AudioSource>();
+            wingAudioSource.playOnAwake = false;
+            wingAudioSource.loop = false;
+            wingAudioSource.spatialBlend = dragonWingSpatialBlend;
+        }
+
+        AudioClip selectedClip = GetRandomDragonWingClip();
+
+        if (selectedClip == null) return;
+
+        bool isTakeOffSound = isTakingOff;
+
+        float volume = isTakeOffSound ? dragonWingTakeOffVolume : dragonWingFlyVolume;
+        Vector2 pitchRange = isTakeOffSound ? dragonWingTakeOffPitchRange : dragonWingFlyPitchRange;
+
+        wingAudioSource.mute = !IsPlayerInsideDragonAudioArea();
+        wingAudioSource.loop = false;
+        wingAudioSource.pitch = Random.Range(pitchRange.x, pitchRange.y);
+
+        wingAudioSource.PlayOneShot(selectedClip, volume);
+
+        nextAllowedDragonWingSoundTime = Time.time + dragonMinWingSoundInterval;
+    }
+
+    bool CanPlayDragonWingSound()
+    {
+        if (isDead) return false;
+        if (isSkyDeath) return false;
+        if (isFalling) return false;
+        if (isLanding) return false;
+        if (isRecoveringFromFall) return false;
+
+        if (!isFlying && !isTakingOff) return false;
+
+        if (!IsPlayerInsideDragonAudioArea()) return false;
+
+        return true;
+    }
+
+    AudioClip GetRandomDragonWingClip()
+    {
+        if (dragonWingFlyingClips == null || dragonWingFlyingClips.Length == 0)
+        {
+            return null;
+        }
+
+        if (dragonWingFlyingClips.Length == 1)
+        {
+            return dragonWingFlyingClips[0];
+        }
+
+        AudioClip selectedClip = null;
+
+        for (int i = 0; i < 10; i++)
+        {
+            selectedClip = dragonWingFlyingClips[Random.Range(0, dragonWingFlyingClips.Length)];
+
+            if (selectedClip != null && selectedClip != lastDragonWingClip)
+            {
+                break;
+            }
+        }
+
+        if (selectedClip == null)
+        {
+            selectedClip = dragonWingFlyingClips[0];
+        }
+
+        lastDragonWingClip = selectedClip;
+        return selectedClip;
+    }
     void PlayDragonHitAudio()
     {
         if (hitAudioSource == null) return;
@@ -1149,34 +1284,22 @@ public class DragonEnemy : MonoBehaviour
         if (wingAudioSource == null) return;
 
         bool playerCanHearDragon = IsPlayerInsideDragonAudioArea();
-
         wingAudioSource.mute = !playerCanHearDragon;
 
-        if (wingFlyingClip != null && wingAudioSource.clip != wingFlyingClip)
+        bool dragonCannotPlayWingAudio =
+            isDead ||
+            isSkyDeath ||
+            isFalling ||
+            isLanding ||
+            isRecoveringFromFall ||
+            (!isFlying && !isTakingOff);
+
+        if (dragonCannotPlayWingAudio)
         {
-            wingAudioSource.clip = wingFlyingClip;
-        }
-
-        wingAudioSource.loop = true;
-
-        bool dragonShouldHaveWingAudio =
-            !isDead &&
-            !isSkyDeath &&
-            !isFalling &&
-            !isLanding &&
-            !isRecoveringFromFall &&
-            (isFlying || isTakingOff);
-
-        if (dragonShouldHaveWingAudio)
-        {
-            if (!wingAudioSource.isPlaying)
+            if (wingAudioSource.isPlaying)
             {
-                wingAudioSource.Play();
+                wingAudioSource.Stop();
             }
-        }
-        else
-        {
-            StopWingAudioNow();
         }
     }
     void UpdateFootstepAudio()
@@ -1184,51 +1307,113 @@ public class DragonEnemy : MonoBehaviour
         if (footstepAudioSource == null) return;
 
         bool playerCanHearDragon = IsPlayerInsideDragonAudioArea();
-
         footstepAudioSource.mute = !playerCanHearDragon;
 
-        if (footstepLoopClip != null && footstepAudioSource.clip != footstepLoopClip)
+        bool dragonCannotPlayFootsteps =
+            isDead ||
+            isSkyDeath ||
+            isFlying ||
+            isTakingOff ||
+            isLanding ||
+            isFalling ||
+            isRecoveringFromFall ||
+            isGroundHitStunned ||
+            (!animWalking && !animRunning);
+
+        if (dragonCannotPlayFootsteps)
         {
-            footstepAudioSource.clip = footstepLoopClip;
-        }
-
-        footstepAudioSource.loop = true;
-
-        bool dragonShouldHaveFootstepAudio =
-            !isDead &&
-            !isSkyDeath &&
-            !isFlying &&
-            !isTakingOff &&
-            !isLanding &&
-            !isFalling &&
-            !isRecoveringFromFall &&
-            !isGroundHitStunned &&
-            (animWalking || animRunning);
-
-        if (dragonShouldHaveFootstepAudio)
-        {
-            footstepAudioShouldStopTime = Time.time + 0.15f;
-
-            if (!footstepAudioSource.isPlaying)
+            if (footstepAudioSource.isPlaying)
             {
-                footstepAudioSource.Play();
-            }
-
-            if (animRunning)
-                footstepAudioSource.pitch = 1.15f;
-            else
-                footstepAudioSource.pitch = 1f;
-        }
-        else
-        {
-            if (Time.time >= footstepAudioShouldStopTime)
-            {
-                if (footstepAudioSource.isPlaying)
-                {
-                    footstepAudioSource.Stop();
-                }
+                footstepAudioSource.Stop();
             }
         }
+    }
+    public void PlayDragonFootstepSound()
+    {
+        if (Time.time < nextAllowedDragonFootstepTime) return;
+
+        if (!CanPlayDragonFootstepSound()) return;
+
+        if (footstepAudioSource == null)
+        {
+            footstepAudioSource = GetComponent<AudioSource>();
+        }
+
+        if (footstepAudioSource == null)
+        {
+            footstepAudioSource = gameObject.AddComponent<AudioSource>();
+            footstepAudioSource.playOnAwake = false;
+            footstepAudioSource.loop = false;
+            footstepAudioSource.spatialBlend = dragonFootstepSpatialBlend;
+        }
+
+        AudioClip selectedClip = GetRandomDragonGrassFootstepClip();
+
+        if (selectedClip == null) return;
+
+        bool isRunningStep = animRunning;
+
+        float volume = isRunningStep ? dragonRunFootstepVolume : dragonWalkFootstepVolume;
+        Vector2 pitchRange = isRunningStep ? dragonRunPitchRange : dragonWalkPitchRange;
+
+        footstepAudioSource.mute = !IsPlayerInsideDragonAudioArea();
+        footstepAudioSource.loop = false;
+        footstepAudioSource.pitch = Random.Range(pitchRange.x, pitchRange.y);
+
+        footstepAudioSource.PlayOneShot(selectedClip, volume);
+
+        nextAllowedDragonFootstepTime = Time.time + dragonMinFootstepInterval;
+    }
+
+    bool CanPlayDragonFootstepSound()
+    {
+        if (isDead) return false;
+        if (isSkyDeath) return false;
+        if (isFlying) return false;
+        if (isTakingOff) return false;
+        if (isLanding) return false;
+        if (isFalling) return false;
+        if (isRecoveringFromFall) return false;
+        if (isGroundHitStunned) return false;
+
+        if (!animWalking && !animRunning) return false;
+
+        if (!IsPlayerInsideDragonAudioArea()) return false;
+
+        return true;
+    }
+
+    AudioClip GetRandomDragonGrassFootstepClip()
+    {
+        if (dragonGrassFootstepClips == null || dragonGrassFootstepClips.Length == 0)
+        {
+            return null;
+        }
+
+        if (dragonGrassFootstepClips.Length == 1)
+        {
+            return dragonGrassFootstepClips[0];
+        }
+
+        AudioClip selectedClip = null;
+
+        for (int i = 0; i < 10; i++)
+        {
+            selectedClip = dragonGrassFootstepClips[Random.Range(0, dragonGrassFootstepClips.Length)];
+
+            if (selectedClip != null && selectedClip != lastDragonFootstepClip)
+            {
+                break;
+            }
+        }
+
+        if (selectedClip == null)
+        {
+            selectedClip = dragonGrassFootstepClips[0];
+        }
+
+        lastDragonFootstepClip = selectedClip;
+        return selectedClip;
     }
     void UpdateDragonAudioAreaMute()
     {
@@ -2104,12 +2289,9 @@ public class DragonEnemy : MonoBehaviour
     {
         wingAudioShouldStopTime = 0f;
 
-        if (wingAudioSource != null)
+        if (wingAudioSource != null && wingAudioSource.isPlaying)
         {
-            if (wingAudioSource.isPlaying)
-            {
-                wingAudioSource.Stop();
-            }
+            wingAudioSource.Stop();
         }
     }
     void ResetAllDragonTriggers()
