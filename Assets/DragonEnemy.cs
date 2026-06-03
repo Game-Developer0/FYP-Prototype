@@ -16,27 +16,6 @@ public class DragonEnemy : MonoBehaviour
     public float detectionRange = 45f;
     public float losePlayerRange = 75f;
 
-    [Header("Blood Effects")]
-    public GameObject[] hitBloodPrefabs;
-    public GameObject[] deathBloodPrefabs;
-
-    public float hitBloodDestroyTime = 3f;
-    public float deathBloodDestroyTime = 5f;
-
-    public Vector3 hitBloodScale = Vector3.one;
-    public Vector3 deathBloodScale = Vector3.one;
-
-    public int deathBloodAmount = 8;
-    public float deathBloodSpawnRadius = 2f;
-
-    public Transform[] deathBloodPoints;
-    [Header("Blood Decal")]
-    public GameObject groundBloodDecalPrefab;
-    public float groundBloodDecalDestroyTime = 30f;
-    public Vector3 groundBloodDecalScale = Vector3.one;
-    public LayerMask bloodGroundLayer;
-    public float bloodDecalRayDistance = 10f;
-
     [Header("Start Setting")]
     public bool startInSky = false;
     public Transform ownerRoot;
@@ -973,11 +952,38 @@ public class DragonEnemy : MonoBehaviour
     }
     bool IsDragonCloseToGround(float rayDistance)
     {
-        Vector3 rayStart = transform.position + Vector3.up * 1f;
+        float checkHeight = Mathf.Max(0.5f, fallGroundCheckHeight);
+        float checkDistance = rayDistance + checkHeight;
 
-        if (Physics.Raycast(rayStart, Vector3.down, out RaycastHit hit, rayDistance, groundLayer, QueryTriggerInteraction.Ignore))
+        Vector3 rayStart = transform.position + Vector3.up * checkHeight;
+
+        RaycastHit[] hits = Physics.RaycastAll(
+            rayStart,
+            Vector3.down,
+            checkDistance,
+            ~0,
+            QueryTriggerInteraction.Ignore
+        );
+
+        if (hits == null || hits.Length == 0)
+            return false;
+
+        System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+
+        foreach (RaycastHit hit in hits)
         {
-            return true;
+            if (hit.collider == null)
+                continue;
+
+            // Skip dragon's own colliders
+            if (hit.collider.transform.root == transform.root)
+                continue;
+
+            // Check ground by tag
+            if (hit.collider.CompareTag("Ground"))
+            {
+                return true;
+            }
         }
 
         return false;
@@ -1956,8 +1962,6 @@ public class DragonEnemy : MonoBehaviour
 
         arrowHits++;
 
-        SpawnHitBlood(hitPoint, hitNormal);
-
         Destroy(arrow);
 
         hasDetectedPlayer = true;
@@ -1988,98 +1992,6 @@ public class DragonEnemy : MonoBehaviour
 
         StartGroundHitReaction();
     }
-    void SpawnHitBlood(Vector3 hitPoint, Vector3 hitNormal)
-    {
-        GameObject bloodPrefab = GetRandomPrefab(hitBloodPrefabs);
-
-        if (bloodPrefab != null)
-        {
-            Quaternion bloodRotation = Quaternion.LookRotation(hitNormal);
-
-            GameObject blood = Instantiate(bloodPrefab, hitPoint, bloodRotation);
-            blood.transform.localScale = hitBloodScale;
-
-            Destroy(blood, hitBloodDestroyTime);
-        }
-
-        SpawnGroundBloodDecal(hitPoint);
-    }
-    void SpawnGroundBloodDecal(Vector3 startPoint)
-    {
-        if (groundBloodDecalPrefab == null) return;
-
-        Vector3 rayStart = startPoint + Vector3.up * 1f;
-
-        if (Physics.Raycast(rayStart, Vector3.down, out RaycastHit hit, bloodDecalRayDistance, bloodGroundLayer, QueryTriggerInteraction.Ignore))
-        {
-            Quaternion decalRotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
-
-            Vector3 decalPosition = hit.point + hit.normal * 0.02f;
-
-            GameObject decal = Instantiate(groundBloodDecalPrefab, decalPosition, decalRotation);
-
-            decal.transform.localScale = groundBloodDecalScale;
-
-            Destroy(decal, groundBloodDecalDestroyTime);
-        }
-    }
-    void SpawnDeathBlood()
-    {
-        for (int i = 0; i < deathBloodAmount; i++)
-        {
-            GameObject bloodPrefab = GetRandomPrefab(deathBloodPrefabs);
-
-            if (bloodPrefab == null)
-            {
-                bloodPrefab = GetRandomPrefab(hitBloodPrefabs);
-            }
-
-            if (bloodPrefab == null)
-            {
-                return;
-            }
-
-            Vector3 spawnPosition;
-            Quaternion spawnRotation;
-
-            if (deathBloodPoints != null && deathBloodPoints.Length > 0)
-            {
-                Transform randomPoint = deathBloodPoints[Random.Range(0, deathBloodPoints.Length)];
-
-                if (randomPoint == null)
-                {
-                    continue;
-                }
-
-                spawnPosition = randomPoint.position;
-                spawnRotation = randomPoint.rotation;
-            }
-            else
-            {
-                Vector3 randomOffset = Random.insideUnitSphere * deathBloodSpawnRadius;
-                randomOffset.y = Mathf.Abs(randomOffset.y);
-
-                spawnPosition = transform.position + randomOffset;
-                spawnRotation = Random.rotation;
-            }
-
-            GameObject blood = Instantiate(bloodPrefab, spawnPosition, spawnRotation);
-            blood.transform.localScale = deathBloodScale;
-
-            Destroy(blood, deathBloodDestroyTime);
-
-            SpawnGroundBloodDecal(spawnPosition);
-        }
-    }
-    GameObject GetRandomPrefab(GameObject[] prefabs)
-    {
-        if (prefabs == null) return null;
-        if (prefabs.Length == 0) return null;
-
-        GameObject selectedPrefab = prefabs[Random.Range(0, prefabs.Length)];
-
-        return selectedPrefab;
-    }
     void StartGroundHitReaction()
     {
         isGroundHitStunned = true;
@@ -2103,8 +2015,6 @@ public class DragonEnemy : MonoBehaviour
         SetBoolIfExists(isGlidingBoolName, false);
 
         ResetAllDragonTriggers();
-        SpawnDeathBlood();
-
         SetTriggerIfExists(getHit1TriggerName);
 
         if (animator != null && !string.IsNullOrEmpty(getHit1StateName))
@@ -2273,8 +2183,6 @@ public class DragonEnemy : MonoBehaviour
             SetBoolIfExists(isDeadBoolName, false);
 
             ResetAllDragonTriggers();
-            SpawnDeathBlood();
-
             SetTriggerIfExists(deathHitGroundTriggerName);
 
             if (animator != null && !string.IsNullOrEmpty(deathHitGroundStateName))
