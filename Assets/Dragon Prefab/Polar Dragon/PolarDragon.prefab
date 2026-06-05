@@ -237,6 +237,7 @@ GameObject:
   - component: {fileID: 8641239743728958275}
   - component: {fileID: 5393204300239670636}
   - component: {fileID: 9172686812819189867}
+  - component: {fileID: -4901580819700775012}
   m_Layer: 0
   m_Name: PolarDragon
   m_TagString: Untagged
@@ -349,6 +350,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DragonEnemy
   playerTarget: {fileID: 0}
+  autoFindPlayerByTag: 1
+  playerTag: Player
+  showPlayerFindWarnings: 1
   rb: {fileID: 5393204300239670636}
   animator: {fileID: 95782827657463394}
   zoneCenter: {fileID: 0}
@@ -391,6 +395,15 @@ MonoBehaviour:
   maxFlightSpeed: 22
   hoverBrakeForce: 5
   turnSpeed: 4
+  landingRayStartHeight: 80
+  landingRayDistance: 160
+  landingGroundOffset: 0.2
+  landingAnimationStartHeight: 1
+  landingFinishDistance: 0.8
+  flyStationaryToLandingStateName: FlyStationaryToLanding
+  glideToLandingStateName: GlideToLanding
+  minimumLandingAnimationTime: 1.2
+  landingAnimationFinishNormalizedTime: 0.9
   groundBiteRange: 5
   groundSpreadAcidRange: 12
   groundSpitAcidRange: 22
@@ -453,6 +466,10 @@ MonoBehaviour:
   breathSlowDuration: 1
   spreadAcidHitEffectPrefab: {fileID: 0}
   playerAcidHitPoint: {fileID: 0}
+  autoFindPlayerAcidHitPoint: 1
+  playerAcidHitPointChildName: PlayerAcidHitPoint
+  playerAcidHitPointTag: PlayerAcidHitPoint
+  searchAcidHitPointByTagIfChildNotFound: 1
   spreadAcidHitEffectDestroyTime: 1.5
   spreadAcidHitEffectScale: {x: 1, y: 1, z: 1}
   autoCalculateSpreadAcidHitDelay: 1
@@ -500,6 +517,28 @@ MonoBehaviour:
   wingAudioStopDelay: 80
   onlyPlayAudioInsideDragonArea: 1
   customAudioAreaRange: 80
+--- !u!114 &-4901580819700775012
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1112051999470744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e5079ebbf1850f428b869fe69cd176c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MiniMapRedDotMarker
+  player: {fileID: 0}
+  playerTag: Player
+  dragonAreaDistance: 120
+  minimapIconLayerName: MinimapIcon
+  heightAboveTarget: 5
+  dotSize: 6
+  dotMaterial: {fileID: 0}
+  hideDragonBodyWhenPlayerInArea: 1
+  hiddenFromMinimapLayerName: HideFromMinimap
+  dragonVisualRoot: {fileID: 4589399361868952}
 --- !u!1 &1113963020374574
 GameObject:
   m_ObjectHideFlags: 0

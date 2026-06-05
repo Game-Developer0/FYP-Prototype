@@ -7,6 +7,8 @@ TagManager:
   - Ground
   - Arrow
   - Wood
+  - Me
+  - PlayerAcidHitPoint
   layers:
   - Default
   - TransparentFX
@@ -26,9 +28,9 @@ TagManager:
   - 
   - MainGround
   - Grappleable
-  - 
-  - 
-  - 
+  - Not in map
+  - MinimapIcon
+  - HideFromMinimap
   - 
   - 
   - 

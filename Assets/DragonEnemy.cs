@@ -7,6 +7,14 @@ public class DragonEnemy : MonoBehaviour
     [Header("Target")]
     public Transform playerTarget;
 
+    [Header("Player Auto Detection")]
+    public bool autoFindPlayerByTag = true;
+    public string playerTag = "Player";
+    public bool showPlayerFindWarnings = true;
+
+    private bool playerMissingWarningShown = false;
+    private bool playerTagWarningShown = false;
+
     [Header("Components")]
     public Rigidbody rb;
     public Animator animator;
@@ -80,6 +88,26 @@ public class DragonEnemy : MonoBehaviour
     public float maxFlightSpeed = 22f;
     public float hoverBrakeForce = 5f;
     public float turnSpeed = 4f;
+
+    [Header("Landing Ground Fix")]
+    public float landingRayStartHeight = 80f;
+    public float landingRayDistance = 160f;
+    public float landingGroundOffset = 1f;
+    public float landingAnimationStartHeight = 4f;
+    public float landingFinishDistance = 0.8f;
+
+    private Vector3 currentLandingPoint;
+    private bool landingAnimationStarted = false;
+
+    [Header("Landing Animation Finish Control")]
+    public string flyStationaryToLandingStateName = "FlyStationaryToLanding";
+    public string glideToLandingStateName = "GlideToLanding";
+
+    public float minimumLandingAnimationTime = 1.2f;
+    public float landingAnimationFinishNormalizedTime = 0.9f;
+
+    private float landingAnimationStartedTime = 0f;
+    private bool dragonReachedLandingPoint = false;
 
     [Header("Attack")]
     public float groundBiteRange = 5f;
@@ -218,6 +246,13 @@ public class DragonEnemy : MonoBehaviour
     [Header("Spread Acid Player Hit Effect")]
     public GameObject spreadAcidHitEffectPrefab;
     public Transform playerAcidHitPoint;
+
+    [Header("Player Acid Hit Point Auto Detection")]
+    public bool autoFindPlayerAcidHitPoint = true;
+    public string playerAcidHitPointChildName = "PlayerAcidHitPoint";
+    public string playerAcidHitPointTag = "PlayerAcidHitPoint";
+    public bool searchAcidHitPointByTagIfChildNotFound = true;
+
     public float spreadAcidHitEffectDestroyTime = 1.5f;
     public Vector3 spreadAcidHitEffectScale = Vector3.one;
 
@@ -319,6 +354,8 @@ public class DragonEnemy : MonoBehaviour
         else
             zoneCenterPosition = transform.position;
 
+        FindPlayerTargetIfMissing();
+
         if (playerTarget != null)
             playerHealth = playerTarget.GetComponent<PlayerHealth>();
 
@@ -349,7 +386,6 @@ public class DragonEnemy : MonoBehaviour
 
         UpdateAnimatorBools();
     }
-
     void Update()
     {
         if (isSkyDeath)
@@ -358,9 +394,8 @@ public class DragonEnemy : MonoBehaviour
         if (isDead)
             return;
 
-        if (playerTarget == null)
+        if (!FindPlayerTargetIfMissing())
         {
-            Debug.LogWarning("Player Target missing. Drag Player into DragonEnemy script.");
             return;
         }
 
@@ -391,6 +426,7 @@ public class DragonEnemy : MonoBehaviour
 
         UpdateAnimatorBools();
     }
+
 
     void FixedUpdate()
     {
@@ -442,7 +478,153 @@ public class DragonEnemy : MonoBehaviour
             MoveOnGround(groundMoveTarget, currentGroundSpeed);
         }
     }
+    bool FindPlayerTargetIfMissing()
+    {
+        if (playerTarget != null)
+        {
+            if (playerHealth == null)
+            {
+                playerHealth = playerTarget.GetComponent<PlayerHealth>();
+            }
 
+            FindPlayerAcidHitPointIfMissing();
+
+            return true;
+        }
+
+        if (!autoFindPlayerByTag)
+        {
+            if (showPlayerFindWarnings && !playerMissingWarningShown)
+            {
+                Debug.LogWarning("Player Target is missing and autoFindPlayerByTag is disabled.", this);
+                playerMissingWarningShown = true;
+            }
+
+            return false;
+        }
+
+        if (string.IsNullOrEmpty(playerTag))
+        {
+            if (showPlayerFindWarnings && !playerTagWarningShown)
+            {
+                Debug.LogWarning("Player tag name is empty in DragonEnemy script.", this);
+                playerTagWarningShown = true;
+            }
+
+            return false;
+        }
+
+        try
+        {
+            GameObject foundPlayer = GameObject.FindGameObjectWithTag(playerTag);
+
+            if (foundPlayer != null)
+            {
+                playerTarget = foundPlayer.transform;
+                playerHealth = foundPlayer.GetComponent<PlayerHealth>();
+
+                FindPlayerAcidHitPointIfMissing();
+
+                playerMissingWarningShown = false;
+                playerTagWarningShown = false;
+
+                return true;
+            }
+
+            if (showPlayerFindWarnings && !playerMissingWarningShown)
+            {
+                Debug.LogWarning(
+                    "No object with tag '" + playerTag + "' was found. Make sure your Player object has Tag = " + playerTag + ".",
+                    this
+                );
+
+                playerMissingWarningShown = true;
+            }
+        }
+        catch
+        {
+            if (showPlayerFindWarnings && !playerTagWarningShown)
+            {
+                Debug.LogWarning(
+                    "Tag '" + playerTag + "' does not exist. Go to Inspector > Tag > Add Tag and create a tag named '" + playerTag + "'.",
+                    this
+                );
+
+                playerTagWarningShown = true;
+            }
+        }
+
+        return false;
+    }
+    void FindPlayerAcidHitPointIfMissing()
+    {
+        if (!autoFindPlayerAcidHitPoint)
+            return;
+
+        if (playerAcidHitPoint != null)
+            return;
+
+        if (playerTarget == null)
+            return;
+
+        if (!string.IsNullOrEmpty(playerAcidHitPointChildName))
+        {
+            Transform foundChild = FindChildRecursive(playerTarget, playerAcidHitPointChildName);
+
+            if (foundChild != null)
+            {
+                playerAcidHitPoint = foundChild;
+                return;
+            }
+        }
+
+        if (!searchAcidHitPointByTagIfChildNotFound)
+            return;
+
+        if (string.IsNullOrEmpty(playerAcidHitPointTag))
+            return;
+
+        try
+        {
+            GameObject foundByTag = GameObject.FindGameObjectWithTag(playerAcidHitPointTag);
+
+            if (foundByTag != null)
+            {
+                playerAcidHitPoint = foundByTag.transform;
+            }
+        }
+        catch
+        {
+            Debug.LogWarning(
+                "Tag '" + playerAcidHitPointTag + "' does not exist. " +
+                "Either create this tag or use the child name method with an object named '" + playerAcidHitPointChildName + "'.",
+                this
+            );
+        }
+    }
+
+    Transform FindChildRecursive(Transform parent, string childName)
+    {
+        if (parent == null)
+            return null;
+
+        foreach (Transform child in parent)
+        {
+            if (child.name == childName)
+            {
+                return child;
+            }
+
+            Transform found = FindChildRecursive(child, childName);
+
+            if (found != null)
+            {
+                return found;
+            }
+        }
+
+        return null;
+    }
     void HandleDetection()
     {
         if (Time.time < nextDetectionCheckTime) return;
@@ -812,57 +994,239 @@ public class DragonEnemy : MonoBehaviour
         if (!canUseGroundCombat && hasDetectedPlayer) return;
 
         isLanding = true;
+        landingAnimationStarted = false;
+        dragonReachedLandingPoint = false;
+        landingAnimationStartedTime = 0f;
+
+        currentLandingPoint = GetLandingPointBelowDragon();
 
         wantsFlyMove = false;
         wantsHover = false;
+        wantsGroundMove = false;
 
         animWalking = false;
         animRunning = false;
         animGliding = false;
 
-        // Stop flying audio as soon as dragon starts landing
         StopWingAudioNow();
 
-        SetTriggerIfExists(landTriggerName);
+        if (rb != null)
+        {
+            rb.useGravity = false;
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
+
+        // Do not trigger Land here.
+        // Landing animation starts only when dragon is close to ground.
+        UpdateAnimatorBools();
     }
 
     void HandleLandingMovement()
     {
-        Vector3 landingPoint = new Vector3(transform.position.x, GetZoneCenter().y + 1f, transform.position.z);
+        currentLandingPoint = GetLandingPointBelowDragon();
 
-        FlyToward(landingPoint, landingSpeed);
+        float heightFromGround = transform.position.y - currentLandingPoint.y;
 
-        // Make sure flying audio stays stopped during landing
         StopWingAudioNow();
 
-        if (Vector3.Distance(transform.position, landingPoint) <= 1.5f)
+        if (!dragonReachedLandingPoint)
         {
-            isLanding = false;
-            isFlying = false;
+            FlyTowardWithoutChangingRotation(currentLandingPoint, landingSpeed);
 
-            wantsFlyMove = false;
-            wantsHover = false;
+            if (playerTarget != null)
+                FaceTargetFlat(playerTarget.position);
+            else
+                FaceTargetFlat(currentLandingPoint + transform.forward * 5f);
 
-            animWalking = false;
-            animRunning = false;
-            animGliding = false;
-
-            if (rb != null)
+            if (!landingAnimationStarted && heightFromGround <= landingAnimationStartHeight)
             {
-                rb.useGravity = true;
-                rb.linearVelocity = Vector3.zero;
+                landingAnimationStarted = true;
+                landingAnimationStartedTime = Time.time;
+
+                ResetAllDragonTriggers();
+                SetTriggerIfExists(landTriggerName);
             }
 
-            // Stop again when dragon fully reaches ground
-            StopWingAudioNow();
+            float distanceToLandingPoint = Vector3.Distance(transform.position, currentLandingPoint);
 
-            ChooseNewGroundPatrolPoint();
-            SetNextCombatModeChangeTime();
+            if (distanceToLandingPoint <= landingFinishDistance)
+            {
+                dragonReachedLandingPoint = true;
+
+                if (rb != null)
+                {
+                    rb.linearVelocity = Vector3.zero;
+                    rb.angularVelocity = Vector3.zero;
+                    rb.useGravity = false;
+                }
+
+                transform.position = currentLandingPoint;
+            }
+
+            UpdateAnimatorBools();
+            return;
         }
+
+        // Dragon is now on/near ground, but we keep it in landing mode
+        // until the landing animation has finished.
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            rb.useGravity = false;
+        }
+
+        bool landingAnimationFinished = HasLandingAnimationFinished();
+
+        if (!landingAnimationFinished)
+        {
+            UpdateAnimatorBools();
+            return;
+        }
+
+        isLanding = false;
+        isFlying = false;
+        landingAnimationStarted = false;
+        dragonReachedLandingPoint = false;
+
+        wantsFlyMove = false;
+        wantsHover = false;
+        wantsGroundMove = false;
+
+        animWalking = false;
+        animRunning = false;
+        animGliding = false;
+
+        if (rb != null)
+        {
+            rb.useGravity = true;
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
+
+        StopWingAudioNow();
+
+        ChooseNewGroundPatrolPoint();
+        SetNextCombatModeChangeTime();
 
         UpdateAnimatorBools();
     }
+    bool HasLandingAnimationFinished()
+    {
+        if (!landingAnimationStarted)
+            return true;
 
+        if (Time.time < landingAnimationStartedTime + minimumLandingAnimationTime)
+            return false;
+
+        if (animator == null)
+            return true;
+
+        AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+
+        bool isInLandingState =
+            stateInfo.IsName(flyStationaryToLandingStateName) ||
+            stateInfo.IsName(glideToLandingStateName);
+
+        if (!isInLandingState)
+        {
+            // If animator already left landing after minimum time, allow script to finish.
+            return true;
+        }
+
+        return stateInfo.normalizedTime >= landingAnimationFinishNormalizedTime;
+    }
+    void FaceTargetFlat(Vector3 targetPosition)
+    {
+        Vector3 direction = targetPosition - transform.position;
+
+        // Remove up/down rotation.
+        // Dragon will only rotate left/right.
+        direction.y = 0f;
+
+        if (direction.sqrMagnitude < 0.01f)
+            return;
+
+        Quaternion targetRotation = Quaternion.LookRotation(direction.normalized);
+
+        Quaternion smoothRotation = Quaternion.Slerp(
+            transform.rotation,
+            targetRotation,
+            turnSpeed * Time.deltaTime
+        );
+
+        if (rb != null)
+            rb.MoveRotation(smoothRotation);
+        else
+            transform.rotation = smoothRotation;
+    }
+    void FlyTowardWithoutChangingRotation(Vector3 targetPosition, float moveSpeed)
+    {
+        if (rb == null) return;
+
+        Vector3 direction = targetPosition - transform.position;
+
+        if (direction.magnitude < 0.2f)
+            return;
+
+        Vector3 desiredVelocity = direction.normalized * moveSpeed;
+        Vector3 steeringForce = (desiredVelocity - rb.linearVelocity) * flightAcceleration;
+
+        rb.AddForce(steeringForce, ForceMode.Acceleration);
+
+        if (rb.linearVelocity.magnitude > maxFlightSpeed)
+        {
+            rb.linearVelocity = rb.linearVelocity.normalized * maxFlightSpeed;
+        }
+    }
+    Vector3 GetLandingPointBelowDragon()
+    {
+        Vector3 fallbackPoint = new Vector3(
+            transform.position.x,
+            GetZoneCenter().y + landingGroundOffset,
+            transform.position.z
+        );
+
+        Vector3 rayStart = transform.position + Vector3.up * landingRayStartHeight;
+        float totalRayDistance = landingRayStartHeight + landingRayDistance;
+
+        RaycastHit[] hits = Physics.RaycastAll(
+            rayStart,
+            Vector3.down,
+            totalRayDistance,
+            ~0,
+            QueryTriggerInteraction.Ignore
+        );
+
+        if (hits == null || hits.Length == 0)
+            return fallbackPoint;
+
+        System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+
+        foreach (RaycastHit hit in hits)
+        {
+            if (hit.collider == null)
+                continue;
+
+            // Skip dragon's own colliders.
+            if (hit.collider.transform.root == transform.root)
+                continue;
+
+            bool hasGroundTag = hit.collider.CompareTag("Ground");
+
+            bool isInGroundLayer =
+                groundLayer.value != 0 &&
+                (groundLayer.value & (1 << hit.collider.gameObject.layer)) != 0;
+
+            if (hasGroundTag || isInGroundLayer)
+            {
+                return hit.point + Vector3.up * landingGroundOffset;
+            }
+        }
+
+        return fallbackPoint;
+    }
     void StartFallingFromHit()
     {
         if (isDead) return;
@@ -1705,6 +2069,8 @@ public class DragonEnemy : MonoBehaviour
         if (spreadAcidHitEffectPrefab == null) return;
         if (playerTarget == null) return;
 
+        FindPlayerAcidHitPointIfMissing();
+
         Vector3 spawnPosition;
 
         if (playerAcidHitPoint != null)
@@ -1722,8 +2088,10 @@ public class DragonEnemy : MonoBehaviour
 
         hitEffect.transform.localScale = spreadAcidHitEffectScale;
 
-        // Make effect follow the player while it is playing
-        hitEffect.transform.SetParent(playerTarget);
+        if (playerAcidHitPoint != null)
+            hitEffect.transform.SetParent(playerAcidHitPoint);
+        else
+            hitEffect.transform.SetParent(playerTarget);
 
         Destroy(hitEffect, spreadAcidHitEffectDestroyTime);
     }
