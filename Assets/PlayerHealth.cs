@@ -16,6 +16,10 @@ public class PlayerHealth : MonoBehaviour
     public int maxHealth = 100;
     public int currentHealth;
 
+    [Header("Health Bar")]
+    public HealthBar healthBar;
+    public bool autoFindHealthBarIfMissing = true;
+
     [Header("Optional Animation")]
     public Animator animator;
     public string deathBoolName = "Death";
@@ -51,6 +55,13 @@ public class PlayerHealth : MonoBehaviour
             animator = GetComponent<Animator>();
         }
 
+        if (healthBar == null && autoFindHealthBarIfMissing)
+        {
+            healthBar = FindObjectOfType<HealthBar>();
+        }
+
+        UpdateHealthBarMax();
+
         StopScreenEffect(fireScreenEffectRoot);
         StopScreenEffect(acidScreenEffectRoot);
         StopScreenEffect(iceScreenEffectRoot);
@@ -59,12 +70,35 @@ public class PlayerHealth : MonoBehaviour
         SetPlayerSpeedMultiplier(1f);
     }
 
+    void UpdateHealthBarMax()
+    {
+        if (healthBar != null)
+        {
+            healthBar.SetMaxHealth(maxHealth);
+            healthBar.SetHealth(currentHealth);
+        }
+        else
+        {
+            Debug.LogWarning("HealthBar is not assigned on PlayerHealth.");
+        }
+    }
+
+    void UpdateHealthBar()
+    {
+        if (healthBar != null)
+        {
+            healthBar.SetHealth(currentHealth);
+        }
+    }
+
     public void TakeDamage(int damageAmount)
     {
         if (isDead) return;
 
         currentHealth -= damageAmount;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+
+        UpdateHealthBar();
 
         Debug.Log("Player HP: " + currentHealth);
 

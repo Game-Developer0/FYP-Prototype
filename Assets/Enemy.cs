@@ -71,10 +71,20 @@ public class Enemy : MonoBehaviour
     private float knockDownEndTime = 0f;
 
     [Header("Health")]
+    public int maxHealth = 100;
+    public int currentHealth;
+    public int defaultArrowDamage = 20;
+
+    [Tooltip("Still used for knock down after some hits.")]
     public int arrowHits = 0;
-    public int hitsToDie = 2;
+
     private bool isDead = false;
     public float destroyObjectTime = 4f;
+
+    [Header("Animal Health Bar")]
+    public AnimalHealthBar healthBar;
+    public GameObject healthBarRoot;
+    public bool hideHealthBarUntilHit = true;
 
     [Header("Blood Effects")]
     public GameObject[] hitBloodPrefabs;
@@ -108,6 +118,9 @@ public class Enemy : MonoBehaviour
         if (animator == null)
             animator = GetComponent<Animator>();
 
+        currentHealth = maxHealth;
+        SetupAnimalHealthBar();
+
         if (animator != null)
         {
             animator.applyRootMotion = false;
@@ -127,6 +140,72 @@ public class Enemy : MonoBehaviour
         }
 
         ChoosePassiveState();
+    }
+    void SetupAnimalHealthBar()
+    {
+        if (healthBar == null && healthBarRoot != null)
+        {
+            healthBar = healthBarRoot.GetComponentInChildren<AnimalHealthBar>(true);
+        }
+
+        if (healthBar == null)
+        {
+            healthBar = GetComponentInChildren<AnimalHealthBar>(true);
+        }
+
+        if (healthBar != null)
+        {
+            healthBar.SetMaxHealth(maxHealth);
+            healthBar.SetHealth(currentHealth);
+        }
+
+        if (healthBarRoot != null && hideHealthBarUntilHit)
+        {
+            healthBarRoot.SetActive(false);
+        }
+    }
+
+    void ShowAnimalHealthBar()
+    {
+        if (healthBarRoot != null)
+        {
+            healthBarRoot.SetActive(true);
+        }
+    }
+
+    void HideAnimalHealthBar()
+    {
+        if (healthBarRoot != null)
+        {
+            healthBarRoot.SetActive(false);
+        }
+    }
+
+    void UpdateAnimalHealthBar()
+    {
+        if (healthBar != null)
+        {
+            healthBar.SetHealth(currentHealth);
+        }
+    }
+
+    int GetArrowDamage(GameObject arrow)
+    {
+        if (arrow == null)
+            return defaultArrowDamage;
+
+        ArrowDamage arrowDamage = arrow.GetComponent<ArrowDamage>();
+
+        if (arrowDamage == null)
+            arrowDamage = arrow.GetComponentInParent<ArrowDamage>();
+
+        if (arrowDamage == null)
+            arrowDamage = arrow.GetComponentInChildren<ArrowDamage>();
+
+        if (arrowDamage != null)
+            return arrowDamage.damage;
+
+        return defaultArrowDamage;
     }
 
     void Update()
@@ -497,7 +576,18 @@ public class Enemy : MonoBehaviour
     {
         if (isDead) return;
 
+        int damageAmount = GetArrowDamage(arrow);
+
+        currentHealth -= damageAmount;
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+
         arrowHits++;
+
+        ShowAnimalHealthBar();
+        UpdateAnimalHealthBar();
+
+        Debug.Log(gameObject.name + " took arrow damage: " + damageAmount);
+        Debug.Log(gameObject.name + " HP: " + currentHealth + " / " + maxHealth);
 
         SpawnHitBlood(hitPoint, hitNormal);
 
@@ -509,7 +599,7 @@ public class Enemy : MonoBehaviour
         ClearPassiveStates();
         StopMovementAnimations();
 
-        if (arrowHits >= hitsToDie)
+        if (currentHealth <= 0)
         {
             Die();
             return;
@@ -690,6 +780,8 @@ public class Enemy : MonoBehaviour
     void Die()
     {
         isDead = true;
+
+        HideAnimalHealthBar();
 
         ClearPassiveStates();
         StopMovementAnimations();

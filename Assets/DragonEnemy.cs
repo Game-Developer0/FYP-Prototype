@@ -131,14 +131,32 @@ public class DragonEnemy : MonoBehaviour
     public Transform firePoint;
     public float projectileSpeed = 28f;
 
+    [Header("Projectile Shoot Safety")]
+    public float projectileShootLockTime = 0.8f;
+
+    private bool projectileShotDuringThisAttack = false;
+    private float nextAllowedProjectileShootTime = 0f;
+
     [Tooltip("If true, add Animation Event on attack animation and call ShootFireballFromAnimation or ShootAcidFromAnimation.")]
     public bool useAnimationEventsForProjectiles = false;
 
     [Header("Health")]
+    public int maxHealth = 300;
+    public int currentHealth;
+    public int defaultArrowDamage = 20;
+
+    [Tooltip("This is still used for falling from sky after some hits.")]
     public int arrowHits = 0;
-    public int hitsToDie = 8;
+
+    [Tooltip("Dragon will fall from sky after this many arrow hits, but death uses health now.")]
     public int fallAfterHits = 4;
+
     public float destroyAfterDeath = 7f;
+
+    [Header("Dragon Health Bar")]
+    public DragonHealthBar healthBar;
+    public GameObject healthBarRoot;
+    public bool hideHealthBarUntilHit = true;
 
     private bool hasAlreadyFallenFromSky = false;
 
@@ -174,6 +192,9 @@ public class DragonEnemy : MonoBehaviour
     public string skyDeathStartStateName = "FlyGetHitToFalling";
     public string skyFallingStateName = "Falling";
     public string deathHitGroundStateName = "DeathHitTheGround";
+
+    [Header("Fall Recovery Landing Animation")]
+    public string fallRecoveryLandingStateName = "FlyStationaryToLanding";
 
     [Header("Sky Death")]
     public float skyDeathGroundCheckHeight = 1.5f;
@@ -348,6 +369,9 @@ public class DragonEnemy : MonoBehaviour
 
         if (animator == null)
             animator = GetComponent<Animator>();
+
+        currentHealth = maxHealth;
+        SetupDragonHealthBar();
 
         if (zoneCenter != null)
             zoneCenterPosition = zoneCenter.position;
@@ -818,6 +842,8 @@ public class DragonEnemy : MonoBehaviour
         }
         else
         {
+            BeginNewProjectileAttack();
+
             SetTriggerIfExists(spitAcidTriggerName);
 
             if (!useAnimationEventsForProjectiles)
@@ -844,6 +870,8 @@ public class DragonEnemy : MonoBehaviour
         }
         else
         {
+            BeginNewProjectileAttack();
+
             SetTriggerIfExists(spitAcidTriggerName);
 
             if (!useAnimationEventsForProjectiles)
@@ -858,6 +886,8 @@ public class DragonEnemy : MonoBehaviour
     void TryGroundSpitAcidAttack()
     {
         if (Time.time < nextAttackTime) return;
+
+        BeginNewProjectileAttack();
 
         SetTriggerIfExists(spitAcidTriggerName);
 
@@ -1286,32 +1316,56 @@ public class DragonEnemy : MonoBehaviour
 
         if (IsDragonCloseToGround(fallingGroundRayDistance))
         {
-            isFalling = false;
-            isFlying = false;
-            isRecoveringFromFall = true;
-            fallRecoverEndTime = Time.time + recoverAfterFallTime;
+            StartFallRecoveryLanding();
+        }
+    }
 
-            if (rb != null)
-            {
-                rb.linearVelocity = Vector3.zero;
-                rb.angularVelocity = Vector3.zero;
-                rb.useGravity = true;
-            }
+    void StartFallRecoveryLanding()
+    {
+        if (isDead) return;
+        if (isSkyDeath) return;
 
-            animWalking = false;
-            animRunning = false;
-            animGliding = false;
+        isFalling = false;
+        isLanding = true;
+        isFlying = true;
+        isTakingOff = false;
+        isRecoveringFromFall = false;
 
-            SetBoolIfExists(isFlyingBoolName, false);
-            SetBoolIfExists(isFallingBoolName, false);
-            SetBoolIfExists(isDeadBoolName, false);
+        landingAnimationStarted = true;
+        landingAnimationStartedTime = Time.time;
+        dragonReachedLandingPoint = false;
 
-            ChooseNewGroundPatrolPoint();
+        currentLandingPoint = GetLandingPointBelowDragon();
 
-            if (animator != null && !string.IsNullOrEmpty(groundIdleStateName))
-            {
-                animator.CrossFadeInFixedTime(groundIdleStateName, 0.1f);
-            }
+        wantsFlyMove = false;
+        wantsGroundMove = false;
+        wantsHover = false;
+
+        animWalking = false;
+        animRunning = false;
+        animGliding = false;
+
+        if (rb != null)
+        {
+            rb.useGravity = false;
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
+
+        SetBoolIfExists(isFlyingBoolName, true);
+        SetBoolIfExists(isFallingBoolName, false);
+        SetBoolIfExists(isDeadBoolName, false);
+
+        ResetAllDragonTriggers();
+
+        // This trigger is useful if your Animator transition uses Land.
+        SetTriggerIfExists(landTriggerName);
+
+        // This forces the visual state:
+        // Falling -> FlyStationaryToLanding
+        if (animator != null && !string.IsNullOrEmpty(fallRecoveryLandingStateName))
+        {
+            animator.CrossFadeInFixedTime(fallRecoveryLandingStateName, 0.08f);
         }
     }
     bool IsDragonCloseToGround(float rayDistance)
@@ -1399,8 +1453,21 @@ public class DragonEnemy : MonoBehaviour
 
     public void ShootFireballFromAnimation()
     {
+        if (projectileShotDuringThisAttack)
+            return;
+
+        if (Time.time < nextAllowedProjectileShootTime)
+            return;
+
+        projectileShotDuringThisAttack = true;
+        nextAllowedProjectileShootTime = Time.time + projectileShootLockTime;
+
         PlayFireballShootAudio();
         ShootProjectile(fireballPrefab);
+    }
+    void BeginNewProjectileAttack()
+    {
+        projectileShotDuringThisAttack = false;
     }
     void PlayFireballShootAudio()
     {
@@ -2097,6 +2164,15 @@ public class DragonEnemy : MonoBehaviour
     }
     public void ShootAcidFromAnimation()
     {
+        if (projectileShotDuringThisAttack)
+            return;
+
+        if (Time.time < nextAllowedProjectileShootTime)
+            return;
+
+        projectileShotDuringThisAttack = true;
+        nextAllowedProjectileShootTime = Time.time + projectileShootLockTime;
+
         ShootProjectile(acidBallPrefab);
     }
     void TrySkyAttack()
@@ -2116,6 +2192,8 @@ public class DragonEnemy : MonoBehaviour
         }
         else
         {
+            BeginNewProjectileAttack();
+
             SetTriggerIfExists(spitAcidTriggerName);
 
             if (!useAnimationEventsForProjectiles)
@@ -2328,14 +2406,27 @@ public class DragonEnemy : MonoBehaviour
 
         PlayDragonHitAudio();
 
+        int damageAmount = GetArrowDamage(arrow);
+
+        currentHealth -= damageAmount;
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+
         arrowHits++;
+
+        ShowDragonHealthBar();
+        UpdateDragonHealthBar();
+
+        Debug.Log(gameObject.name + " took arrow damage: " + damageAmount);
+        Debug.Log("Dragon HP: " + currentHealth + " / " + maxHealth);
 
         Destroy(arrow);
 
         hasDetectedPlayer = true;
 
-        if (arrowHits >= hitsToDie)
+        if (currentHealth <= 0)
         {
+            HideDragonHealthBar();
+
             if (isFlying || isFalling || isTakingOff || isLanding)
                 StartSkyDeath();
             else
@@ -2658,6 +2749,72 @@ public class DragonEnemy : MonoBehaviour
         }
 
         return false;
+    }
+    void SetupDragonHealthBar()
+    {
+        if (healthBar == null && healthBarRoot != null)
+        {
+            healthBar = healthBarRoot.GetComponentInChildren<DragonHealthBar>(true);
+        }
+
+        if (healthBar == null)
+        {
+            healthBar = GetComponentInChildren<DragonHealthBar>(true);
+        }
+
+        if (healthBar != null)
+        {
+            healthBar.SetMaxHealth(maxHealth);
+            healthBar.SetHealth(currentHealth);
+        }
+
+        if (healthBarRoot != null && hideHealthBarUntilHit)
+        {
+            healthBarRoot.SetActive(false);
+        }
+    }
+
+    void ShowDragonHealthBar()
+    {
+        if (healthBarRoot != null)
+        {
+            healthBarRoot.SetActive(true);
+        }
+    }
+
+    void HideDragonHealthBar()
+    {
+        if (healthBarRoot != null)
+        {
+            healthBarRoot.SetActive(false);
+        }
+    }
+
+    void UpdateDragonHealthBar()
+    {
+        if (healthBar != null)
+        {
+            healthBar.SetHealth(currentHealth);
+        }
+    }
+
+    int GetArrowDamage(GameObject arrow)
+    {
+        if (arrow == null)
+            return defaultArrowDamage;
+
+        ArrowDamage arrowDamage = arrow.GetComponent<ArrowDamage>();
+
+        if (arrowDamage == null)
+            arrowDamage = arrow.GetComponentInParent<ArrowDamage>();
+
+        if (arrowDamage == null)
+            arrowDamage = arrow.GetComponentInChildren<ArrowDamage>();
+
+        if (arrowDamage != null)
+            return arrowDamage.damage;
+
+        return defaultArrowDamage;
     }
 
     private void OnDrawGizmosSelected()

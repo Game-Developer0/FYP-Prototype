@@ -103,14 +103,20 @@ MonoBehaviour:
   slowDuration: 1.5
   lifeTime: 5
   ignoreCollisionTime: 0.15
-  hitEffectPrefab: {fileID: 4782603780973126738}
-  destroyOnHit: 1
+  hitEffectPrefab: {fileID: 0}
   destroyHitEffectAfter: 3
+  destroyOnHit: 1
+  destroyProjectileAfterHitDelay: 0
   useAreaDamage: 0
   areaRadius: 3
   damageLayers:
     serializedVersion: 2
     m_Bits: 0
+  useExtraHitDetection: 1
+  extraDetectionRadius: 0.6
+  extraHitLayers:
+    serializedVersion: 2
+    m_Bits: 4104
 --- !u!1001 &8781645777447419606
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -163,23 +169,28 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 198706150799401992, guid: a990e3ac1318b834488c784d851f42a9, type: 3}
+    - target: {fileID: 198706150799401992, guid: a990e3ac1318b834488c784d851f42a9,
+        type: 3}
       propertyPath: ColorModule.gradient.maxGradient.key0.b
       value: 0.3137255
       objectReference: {fileID: 0}
-    - target: {fileID: 198706150799401992, guid: a990e3ac1318b834488c784d851f42a9, type: 3}
+    - target: {fileID: 198706150799401992, guid: a990e3ac1318b834488c784d851f42a9,
+        type: 3}
       propertyPath: ColorModule.gradient.maxGradient.key0.g
       value: 0.11764706
       objectReference: {fileID: 0}
-    - target: {fileID: 198706150799401992, guid: a990e3ac1318b834488c784d851f42a9, type: 3}
+    - target: {fileID: 198706150799401992, guid: a990e3ac1318b834488c784d851f42a9,
+        type: 3}
       propertyPath: ColorModule.gradient.maxGradient.key0.r
       value: 0.039215688
       objectReference: {fileID: 0}
-    - target: {fileID: 198706150799401992, guid: a990e3ac1318b834488c784d851f42a9, type: 3}
+    - target: {fileID: 198706150799401992, guid: a990e3ac1318b834488c784d851f42a9,
+        type: 3}
       propertyPath: ColorModule.gradient.maxGradient.m_ColorSpace
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 199577645087675124, guid: a990e3ac1318b834488c784d851f42a9, type: 3}
+    - target: {fileID: 199577645087675124, guid: a990e3ac1318b834488c784d851f42a9,
+        type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: b1cc66ea54865a941a5f09e5940c5847, type: 2}
@@ -190,6 +201,7 @@ PrefabInstance:
   m_SourcePrefab: {fileID: 100100000, guid: a990e3ac1318b834488c784d851f42a9, type: 3}
 --- !u!4 &8777613482166296260 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 4209731392266258, guid: a990e3ac1318b834488c784d851f42a9, type: 3}
+  m_CorrespondingSourceObject: {fileID: 4209731392266258, guid: a990e3ac1318b834488c784d851f42a9,
+    type: 3}
   m_PrefabInstance: {fileID: 8781645777447419606}
   m_PrefabAsset: {fileID: 0}

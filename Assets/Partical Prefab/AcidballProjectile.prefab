@@ -59,7 +59,7 @@ Rigidbody:
   m_ImplicitTensor: 1
   m_UseGravity: 0
   m_IsKinematic: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 2
 --- !u!135 &1599461830424637842
@@ -102,16 +102,21 @@ MonoBehaviour:
   slowMultiplier: 0.6
   slowDuration: 1.5
   lifeTime: 3
-  ownerRoot: {fileID: 0}
-  ignoreOwnerCollisionTime: 0.15
-  destroyRootObject: 1
-  hitEffectPrefab: {fileID: 4782603780973126738}
+  ignoreCollisionTime: 0.15
+  hitEffectPrefab: {fileID: 0}
   destroyHitEffectAfter: 3
+  destroyOnHit: 1
+  destroyProjectileAfterHitDelay: 0
   useAreaDamage: 0
   areaRadius: 3
   damageLayers:
     serializedVersion: 2
     m_Bits: 0
+  useExtraHitDetection: 1
+  extraDetectionRadius: 0.6
+  extraHitLayers:
+    serializedVersion: 2
+    m_Bits: 4104
 --- !u!1001 &8781645777447419606
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -164,7 +169,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 199577645087675124, guid: a990e3ac1318b834488c784d851f42a9, type: 3}
+    - target: {fileID: 199577645087675124, guid: a990e3ac1318b834488c784d851f42a9,
+        type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 08195823fb65a4247ba8ec5a9bdb13d8, type: 2}
@@ -175,6 +181,7 @@ PrefabInstance:
   m_SourcePrefab: {fileID: 100100000, guid: a990e3ac1318b834488c784d851f42a9, type: 3}
 --- !u!4 &8777613482166296260 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 4209731392266258, guid: a990e3ac1318b834488c784d851f42a9, type: 3}
+  m_CorrespondingSourceObject: {fileID: 4209731392266258, guid: a990e3ac1318b834488c784d851f42a9,
+    type: 3}
   m_PrefabInstance: {fileID: 8781645777447419606}
   m_PrefabAsset: {fileID: 0}
