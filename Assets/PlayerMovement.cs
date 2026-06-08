@@ -74,6 +74,10 @@ public class PlayerMovement : MonoBehaviour
     private float jumpCooldown = 0.25f;
     public float jumpForce = 550f;
 
+    [Header("Dialogue Lock")]
+    public bool blockJumpDuringDialogue = false;
+    private float jumpInputUnlockTime = 0f;
+
     float x, y;
     bool jumping, sprinting, crouching;
 
@@ -268,11 +272,31 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    public void SetJumpBlocked(bool blocked)
+    {
+        blockJumpDuringDialogue = blocked;
+        jumping = false;
+
+        // This prevents the player from jumping on the same Space press
+        // that closes the dialogue.
+        if (blocked)
+        {
+            jumpInputUnlockTime = Time.time + 0.1f;
+        }
+        else
+        {
+            jumpInputUnlockTime = Time.time + 0.2f;
+        }
+    }
+
     private void MyInput()
     {
         x = Input.GetAxisRaw("Horizontal");
         y = Input.GetAxisRaw("Vertical");
-        jumping = Input.GetButton("Jump");
+
+        bool jumpAllowed = !blockJumpDuringDialogue && Time.time >= jumpInputUnlockTime;
+        jumping = jumpAllowed && Input.GetButton("Jump");
+
         sprinting = Input.GetKey(KeyCode.LeftShift);
 
         bool controlHeld = Input.GetKey(KeyCode.LeftControl);
@@ -334,7 +358,6 @@ public class PlayerMovement : MonoBehaviour
 
         crouching = controlHeld && !sprinting;
     }
-
     private void Animate()
     {
         if (!animator) return;
@@ -545,14 +568,15 @@ public class PlayerMovement : MonoBehaviour
         {
             readyToJump = false;
 
-            rb.AddForce(Vector2.up * jumpForce * 1.5f);
-            rb.AddForce(normalVector * jumpForce * 0.5f);
-
             Vector3 vel = rb.linearVelocity;
-            if (rb.linearVelocity.y < 0.5f)
-                rb.linearVelocity = new Vector3(vel.x, 0, vel.z);
-            else if (rb.linearVelocity.y > 0)
-                rb.linearVelocity = new Vector3(vel.x, vel.y / 2, vel.z);
+
+            if (vel.y < 0f)
+            {
+                vel.y = 0f;
+                rb.linearVelocity = vel;
+            }
+
+            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
 
             Invoke(nameof(ResetJump), jumpCooldown);
         }
