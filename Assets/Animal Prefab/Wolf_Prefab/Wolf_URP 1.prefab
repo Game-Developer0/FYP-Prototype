@@ -606,6 +606,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 8277850079989273278}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2a9979b14acae404f8d4cd863daf1b34,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -3189536569993154880}
   m_SourcePrefab: {fileID: 100100000, guid: 2a9979b14acae404f8d4cd863daf1b34, type: 3}
 --- !u!1 &5770573810426789456 stripped
 GameObject:
@@ -693,16 +697,19 @@ MonoBehaviour:
   playerTarget: {fileID: 0}
   agent: {fileID: 3963003853340104944}
   animator: {fileID: 1668348642462098275}
+  ecosystemAnimal: {fileID: 0}
+  autoFindPlayerByTag: 1
+  playerTag: Player
   zoneWalkSpeed: 1.5
   chaseRunSpeed: 6
   zoneWalkBoolName: WalkForward
   chaseRunBoolName: Run Forward
-  detectionRange: 15
+  detectionRange: 30
   attackRange: 3
-  losePlayerRange: 30
+  losePlayerRange: 60
   returnToStartPosition: 1
   canWalkInZone: 1
-  patrolRadius: 8
+  patrolRadius: 80
   passiveStateMinTime: 4
   passiveStateMaxTime: 8
   passiveBoolNames:
@@ -714,7 +721,7 @@ MonoBehaviour:
   detectStunDuration: 1.5
   attackDamage: 10
   damageRange: 3
-  attackCooldown: 0
+  attackCooldown: 2
   attackTriggers:
   - Attack1
   - Attack2
@@ -759,6 +766,19 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   bloodDecalRayDistance: 10
+--- !u!114 &-3189536569993154880
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5770573810426789456}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49c15f7c95bfbfd49802fd809f0210dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EcosystemAnimal
+  species: 2
 --- !u!4 &6583949165856384234 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 2a9979b14acae404f8d4cd863daf1b34,

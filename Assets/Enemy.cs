@@ -10,6 +10,13 @@ public class Enemy : MonoBehaviour
     public NavMeshAgent agent;
     public Animator animator;
 
+    [Header("Ecosystem")]
+    public EcosystemAnimal ecosystemAnimal;
+
+    [Header("Player Auto Detection")]
+    public bool autoFindPlayerByTag = true;
+    public string playerTag = "Player";
+
     [Header("Movement Speeds")]
     public float zoneWalkSpeed = 1.5f;
     public float chaseRunSpeed = 4f;
@@ -75,6 +82,13 @@ public class Enemy : MonoBehaviour
     public int currentHealth;
     public int defaultArrowDamage = 20;
 
+    [Header("Soft Despawn Return")]
+    public bool allowSoftDespawnReturn = true;
+
+    private bool isReturningHomeForDespawn = false;
+    private Vector3 softDespawnHomePosition;
+    private float softDespawnRepathTime = 0f;
+
     [Tooltip("Still used for knock down after some hits.")]
     public int arrowHits = 0;
 
@@ -110,15 +124,19 @@ public class Enemy : MonoBehaviour
 
     void Start()
     {
+        AssignReferencesIfMissing();
+
         startPosition = transform.position;
 
-        if (agent == null)
-            agent = GetComponent<NavMeshAgent>();
-
-        if (animator == null)
-            animator = GetComponent<Animator>();
-
         currentHealth = maxHealth;
+        arrowHits = 0;
+        isDead = false;
+        hasDetectedPlayer = false;
+        isDetectStunning = false;
+        isKnockedDown = false;
+        knockDownAlreadyPlayed = false;
+        isWalkingInZone = false;
+
         SetupAnimalHealthBar();
 
         if (animator != null)
@@ -137,6 +155,72 @@ public class Enemy : MonoBehaviour
             agent.updatePosition = true;
             agent.updateRotation = true;
             agent.isStopped = false;
+        }
+
+        ChoosePassiveState();
+    }
+    void AssignReferencesIfMissing()
+    {
+        if (agent == null)
+            agent = GetComponent<NavMeshAgent>();
+
+        if (animator == null)
+            animator = GetComponent<Animator>();
+
+        if (ecosystemAnimal == null)
+            ecosystemAnimal = GetComponent<EcosystemAnimal>();
+
+        if (playerTarget == null && autoFindPlayerByTag)
+        {
+            GameObject playerObject = GameObject.FindGameObjectWithTag(playerTag);
+
+            if (playerObject != null)
+            {
+                playerTarget = playerObject.transform;
+            }
+        }
+
+        if (playerTarget != null && playerHealth == null)
+        {
+            playerHealth = playerTarget.GetComponent<PlayerHealth>();
+        }
+    }
+    public void ResetAnimalForSpawn()
+    {
+        AssignReferencesIfMissing();
+
+        startPosition = transform.position;
+
+        currentHealth = maxHealth;
+        arrowHits = 0;
+
+        isDead = false;
+        hasDetectedPlayer = false;
+        isDetectStunning = false;
+        isKnockedDown = false;
+        knockDownAlreadyPlayed = false;
+        isWalkingInZone = false;
+
+        nextAttackTime = 0f;
+        nextPassiveChangeTime = 0f;
+
+        HideAnimalHealthBar();
+        SetupAnimalHealthBar();
+
+        ClearPassiveStates();
+        StopMovementAnimations();
+
+        SetBoolIfExists("Death", false);
+
+        if (agent != null && agent.isOnNavMesh)
+        {
+            agent.enabled = true;
+            agent.speed = zoneWalkSpeed;
+            agent.stoppingDistance = attackRange;
+            agent.updatePosition = true;
+            agent.updateRotation = true;
+            agent.isStopped = false;
+            agent.ResetPath();
         }
 
         ChoosePassiveState();
@@ -224,16 +308,22 @@ public class Enemy : MonoBehaviour
             return;
         }
 
+        if (isReturningHomeForDespawn)
+        {
+            HandleReturnHomeForDespawning();
+            return;
+        }
+
         if (isKnockedDown)
         {
             HandleKnockDown();
             return;
         }
 
-        float distanceFromStartArea = Vector3.Distance(startPosition, playerTarget.position);
+        // Detection range now moves with the animal.
         float distanceToPlayer = Vector3.Distance(transform.position, playerTarget.position);
 
-        if (!hasDetectedPlayer && distanceFromStartArea <= detectionRange)
+        if (!hasDetectedPlayer && distanceToPlayer <= detectionRange)
         {
             hasDetectedPlayer = true;
             StartDetectionStun();
@@ -247,6 +337,8 @@ public class Enemy : MonoBehaviour
                 return;
             }
 
+            // Lose player range is unchanged.
+            // It still checks distance between animal and player.
             if (distanceToPlayer > losePlayerRange)
             {
                 hasDetectedPlayer = false;
@@ -276,6 +368,8 @@ public class Enemy : MonoBehaviour
         }
         else
         {
+            // Patrol radius is unchanged.
+            // It still uses startPosition as the animal home area.
             float distanceFromHome = Vector3.Distance(transform.position, startPosition);
 
             if (returnToStartPosition && distanceFromHome > patrolRadius + 2f)
@@ -288,7 +382,77 @@ public class Enemy : MonoBehaviour
             }
         }
     }
+    public void BeginReturnHomeForDespawning(Vector3 homePosition)
+    {
+        if (!allowSoftDespawnReturn)
+            return;
 
+        if (isDead)
+            return;
+
+        softDespawnHomePosition = homePosition;
+        isReturningHomeForDespawn = true;
+        softDespawnRepathTime = 0f;
+
+        hasDetectedPlayer = false;
+        isDetectStunning = false;
+        isKnockedDown = false;
+        isWalkingInZone = false;
+
+        ClearPassiveStates();
+        StopMovementAnimations();
+
+        SetBoolIfExists(detectStunBoolName, false);
+
+        if (agent != null && agent.isOnNavMesh)
+        {
+            agent.isStopped = false;
+            agent.speed = zoneWalkSpeed;
+            agent.stoppingDistance = 0.5f;
+            agent.ResetPath();
+            agent.SetDestination(softDespawnHomePosition);
+        }
+
+        SetBoolIfExists(zoneWalkBoolName, true);
+        SetBoolIfExists(chaseRunBoolName, false);
+    }
+
+    public void CancelReturnHomeForDespawning()
+    {
+        if (!isReturningHomeForDespawn)
+            return;
+
+        isReturningHomeForDespawn = false;
+
+        ClearPassiveStates();
+        StopMovementAnimations();
+
+        ChoosePassiveState();
+    }
+
+    void HandleReturnHomeForDespawning()
+    {
+        if (isDead)
+            return;
+
+        ClearPassiveStates();
+
+        if (agent != null && agent.isOnNavMesh)
+        {
+            agent.speed = zoneWalkSpeed;
+            agent.isStopped = false;
+            agent.stoppingDistance = 0.5f;
+
+            if (Time.time >= softDespawnRepathTime)
+            {
+                agent.SetDestination(softDespawnHomePosition);
+                softDespawnRepathTime = Time.time + 1f;
+            }
+        }
+
+        SetBoolIfExists(zoneWalkBoolName, true);
+        SetBoolIfExists(chaseRunBoolName, false);
+    }
     void StartDetectionStun()
     {
         ClearPassiveStates();
@@ -779,14 +943,24 @@ public class Enemy : MonoBehaviour
 
     void Die()
     {
+        if (isDead) return;
+
         isDead = true;
+
+        if (ecosystemAnimal == null)
+            ecosystemAnimal = GetComponent<EcosystemAnimal>();
+
+        if (ecosystemAnimal != null)
+        {
+            ecosystemAnimal.ReportDeathToEcosystem();
+        }
 
         HideAnimalHealthBar();
 
         ClearPassiveStates();
         StopMovementAnimations();
 
-        if (agent != null)
+        if (agent != null && agent.isOnNavMesh)
         {
             agent.isStopped = true;
             agent.ResetPath();
@@ -856,17 +1030,21 @@ public class Enemy : MonoBehaviour
 
     private void OnDrawGizmosSelected()
     {
-        Vector3 center = Application.isPlaying ? startPosition : transform.position;
-
+        // Detection range moves with animal.
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(center, detectionRange);
+        Gizmos.DrawWireSphere(transform.position, detectionRange);
+
+        // Patrol radius stays at animal home/start area.
+        Vector3 patrolCenter = Application.isPlaying ? startPosition : transform.position;
 
         Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(center, patrolRadius);
+        Gizmos.DrawWireSphere(patrolCenter, patrolRadius);
 
+        // Attack range follows animal.
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackRange);
 
+        // Lose player range follows animal, same as your current logic.
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(transform.position, losePlayerRange);
     }

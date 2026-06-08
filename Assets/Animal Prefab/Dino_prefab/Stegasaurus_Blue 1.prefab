@@ -742,6 +742,7 @@ GameObject:
   - component: {fileID: 2119113922508150511}
   - component: {fileID: 7176016753770846270}
   - component: {fileID: 9161862667827663147}
+  - component: {fileID: 7802462404713351823}
   m_Layer: 0
   m_Name: Stegasaurus_Blue 1
   m_TagString: Untagged
@@ -994,16 +995,19 @@ MonoBehaviour:
   playerTarget: {fileID: 0}
   agent: {fileID: 9161862667827663147}
   animator: {fileID: 6817075198519136697}
+  ecosystemAnimal: {fileID: 0}
+  autoFindPlayerByTag: 1
+  playerTag: Player
   zoneWalkSpeed: 1.5
   chaseRunSpeed: 4
   zoneWalkBoolName: WalkForward
   chaseRunBoolName: Run Forward
-  detectionRange: 15
+  detectionRange: 30
   attackRange: 5
-  losePlayerRange: 30
+  losePlayerRange: 70
   returnToStartPosition: 1
   canWalkInZone: 1
-  patrolRadius: 8
+  patrolRadius: 80
   passiveStateMinTime: 4
   passiveStateMaxTime: 8
   passiveBoolNames:
@@ -1080,6 +1084,19 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &7802462404713351823
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2205393045723903395}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49c15f7c95bfbfd49802fd809f0210dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EcosystemAnimal
+  species: 1
 --- !u!1 &2330759849783479631
 GameObject:
   m_ObjectHideFlags: 0

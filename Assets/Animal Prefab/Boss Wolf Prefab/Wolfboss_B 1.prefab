@@ -576,6 +576,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 6570389214363001043}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e6b070634da492a48a576974248d64b9,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6827063029302935983}
   m_SourcePrefab: {fileID: 100100000, guid: e6b070634da492a48a576974248d64b9, type: 3}
 --- !u!1 &5792931029913412252 stripped
 GameObject:
@@ -642,16 +646,19 @@ MonoBehaviour:
   playerTarget: {fileID: 0}
   agent: {fileID: 2447787610591816847}
   animator: {fileID: 6148952002550667867}
+  ecosystemAnimal: {fileID: 0}
+  autoFindPlayerByTag: 1
+  playerTag: Player
   zoneWalkSpeed: 3
   chaseRunSpeed: 7
   zoneWalkBoolName: WalkForward
   chaseRunBoolName: Run Forward
-  detectionRange: 15
+  detectionRange: 35
   attackRange: 5
-  losePlayerRange: 30
+  losePlayerRange: 80
   returnToStartPosition: 1
   canWalkInZone: 1
-  patrolRadius: 8
+  patrolRadius: 80
   passiveStateMinTime: 4
   passiveStateMaxTime: 8
   passiveBoolNames:
@@ -662,7 +669,7 @@ MonoBehaviour:
   detectStunDuration: 1.5
   attackDamage: 10
   damageRange: 3
-  attackCooldown: 1
+  attackCooldown: 2
   attackTriggers:
   - Attack1
   - Attack2
@@ -729,8 +736,21 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.61, y: 1.71, z: 5.1}
-  m_Center: {x: 1.26, y: 2.47, z: 0.84}
+  m_Size: {x: 2.25, y: 1.97, z: 5.1}
+  m_Center: {x: 1.07, y: 2.4, z: 0.84}
+--- !u!114 &6827063029302935983
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5792931029913412252}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49c15f7c95bfbfd49802fd809f0210dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EcosystemAnimal
+  species: 4
 --- !u!4 &6570594320370628646 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: e6b070634da492a48a576974248d64b9,
