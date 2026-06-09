@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3975457547598869623}
-  - component: {fileID: 3110208811200968691}
   - component: {fileID: 207495765307802987}
   - component: {fileID: 8155274695289465113}
   m_Layer: 0
@@ -35,23 +34,6 @@ Transform:
   - {fileID: 1997206235299664205}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3110208811200968691
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3942825033974895155}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0e01a05787dfa0840a5af2fc0caad96b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  screenEffect: {fileID: 207495765307802987}
-  sourceCamera: {fileID: 0}
-  fallbackDistance: 0.05
-  snapOnStart: 1
-  parentToCameraOnStart: 1
 --- !u!198 &207495765307802987
 ParticleSystem:
   m_ObjectHideFlags: 0
@@ -67,9 +49,9 @@ ParticleSystem:
   ringBufferMode: 1
   ringBufferLoopRange: {x: 0, y: 1}
   emitterVelocityMode: 1
-  looping: 0
+  looping: 1
   prewarm: 0
-  playOnAwake: 1
+  playOnAwake: 0
   useUnscaledTime: 0
   autoRandomSeed: 1
   startDelay:
@@ -306,7 +288,7 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 4.453138
+      scalar: 2092.9343
       minScalar: 1
       maxCurve:
         serializedVersion: 2
@@ -359,7 +341,7 @@ ParticleSystem:
     startSizeY:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 3.3503335
+      scalar: 1580.5879
       minScalar: 1
       maxCurve:
         serializedVersion: 2
@@ -691,7 +673,7 @@ ParticleSystem:
     donutRadius: 0.2
     m_Position: {x: 0, y: 0, z: 0}
     m_Rotation: {x: 0, y: 0, z: 0}
-    m_Scale: {x: 4.453138, y: 3.3503335, z: 1}
+    m_Scale: {x: 2092.9343, y: 1580.5879, z: 1}
     placementMode: 0
     m_MeshMaterialIndex: 0
     m_MeshNormalOffset: 0
@@ -4835,7 +4817,7 @@ ParticleSystem:
     vectorLabel1_3: W
 --- !u!199 &8155274695289465113
 ParticleSystemRenderer:
-  serializedVersion: 6
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -4854,6 +4836,8 @@ ParticleSystemRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -4875,9 +4859,11 @@ ParticleSystemRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: -1155228377
+  m_SortingLayer: 1
+  m_SortingOrder: 160
+  m_MaskInteraction: 0
   m_RenderMode: 4
   m_MeshDistribution: 0
   m_SortMode: 0
@@ -4909,7 +4895,6 @@ ParticleSystemRenderer:
   m_MeshWeighting1: 1
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
-  m_MaskInteraction: 0
 --- !u!1 &4569730213044538686
 GameObject:
   m_ObjectHideFlags: 0
@@ -4959,8 +4944,14 @@ MonoBehaviour:
   screenEffect: {fileID: 4928745586645793543}
   sourceCamera: {fileID: 0}
   fallbackDistance: 0.05
+  extraDistanceFromNearClip: 0.2
+  screenCoverageMultiplier: 1.6
   snapOnStart: 1
   parentToCameraOnStart: 0
+  lockToCameraEveryFrame: 1
+  forceLocalSimulationSpace: 1
+  clearOnStop: 1
+  warmupTime: 0.05
 --- !u!198 &4928745586645793543
 ParticleSystem:
   m_ObjectHideFlags: 0
@@ -4978,7 +4969,7 @@ ParticleSystem:
   emitterVelocityMode: 1
   looping: 0
   prewarm: 0
-  playOnAwake: 1
+  playOnAwake: 0
   useUnscaledTime: 0
   autoRandomSeed: 1
   startDelay:
@@ -5215,7 +5206,7 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 4.453138
+      scalar: 2092.9343
       minScalar: 1
       maxCurve:
         serializedVersion: 2
@@ -5268,7 +5259,7 @@ ParticleSystem:
     startSizeY:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 3.3503335
+      scalar: 1580.5879
       minScalar: 1
       maxCurve:
         serializedVersion: 2
@@ -5600,7 +5591,7 @@ ParticleSystem:
     donutRadius: 0.2
     m_Position: {x: 0, y: 0, z: 0}
     m_Rotation: {x: 0, y: 0, z: 0}
-    m_Scale: {x: 4.453138, y: 3.3503335, z: 1}
+    m_Scale: {x: 2092.9343, y: 1580.5879, z: 1}
     placementMode: 0
     m_MeshMaterialIndex: 0
     m_MeshNormalOffset: 0
@@ -9744,7 +9735,7 @@ ParticleSystem:
     vectorLabel1_3: W
 --- !u!199 &7389590457936390032
 ParticleSystemRenderer:
-  serializedVersion: 6
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -9763,6 +9754,8 @@ ParticleSystemRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -9784,9 +9777,11 @@ ParticleSystemRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_RenderMode: 4
   m_MeshDistribution: 0
   m_SortMode: 0
@@ -9818,4 +9813,3 @@ ParticleSystemRenderer:
   m_MeshWeighting1: 1
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
-  m_MaskInteraction: 0

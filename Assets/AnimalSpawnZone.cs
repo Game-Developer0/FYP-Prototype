@@ -52,6 +52,14 @@ public class AnimalSpawnZone : MonoBehaviour
     public float forceDespawnIfVeryFarFromPlayer = 250f;
     public float returnHomeRepathInterval = 1f;
 
+    [Header("Ground Placement")]
+    public bool snapSpawnToGround = true;
+    public LayerMask groundLayer = ~0;
+    public float groundRayStartHeight = 50f;
+    public float groundRayDistance = 120f;
+    public float spawnHeightOffset = 0.05f;
+    public bool warpAgentToSpawnPosition = true;
+
     [Header("NavMesh")]
     public bool useNavMeshSampling = true;
     public float navMeshSampleRadius = 8f;
@@ -242,9 +250,14 @@ public class AnimalSpawnZone : MonoBehaviour
 
         NavMeshAgent spawnedAgent = animalObject.GetComponent<NavMeshAgent>();
 
-        if (spawnedAgent != null && spawnedAgent.isOnNavMesh)
+        if (spawnedAgent != null)
         {
-            spawnedAgent.Warp(spawnPosition);
+            spawnedAgent.baseOffset = 0f;
+
+            if (warpAgentToSpawnPosition && spawnedAgent.isOnNavMesh)
+            {
+                spawnedAgent.Warp(spawnPosition);
+            }
         }
 
         EcosystemAnimal ecosystemAnimal = animalObject.GetComponent<EcosystemAnimal>();
@@ -255,9 +268,7 @@ public class AnimalSpawnZone : MonoBehaviour
         }
 
         ecosystemAnimal.SpawnedByEcosystem(this, rule.species);
-
         activeAnimals.Add(ecosystemAnimal);
-        animalHomePositions[ecosystemAnimal] = spawnPosition;
 
         if (showDebugMessages)
         {
@@ -266,7 +277,6 @@ public class AnimalSpawnZone : MonoBehaviour
 
         return true;
     }
-
     private bool TryGetSpawnPosition(SpawnRule rule, out Vector3 spawnPosition, out Quaternion spawnRotation)
     {
         spawnPosition = Vector3.zero;
@@ -306,18 +316,33 @@ public class AnimalSpawnZone : MonoBehaviour
             {
                 bool foundNavMeshPosition = NavMesh.SamplePosition(
                     rawPosition,
-                    out NavMeshHit hit,
+                    out NavMeshHit navMeshHit,
                     navMeshSampleRadius,
                     NavMesh.AllAreas
                 );
 
-                if (foundNavMeshPosition)
-                {
-                    finalPosition = hit.position;
-                }
-                else
-                {
+                if (!foundNavMeshPosition)
                     continue;
+
+                finalPosition = navMeshHit.position;
+            }
+
+            if (snapSpawnToGround)
+            {
+                Vector3 rayStart = finalPosition + Vector3.up * groundRayStartHeight;
+
+                bool hitGround = Physics.Raycast(
+                    rayStart,
+                    Vector3.down,
+                    out RaycastHit groundHit,
+                    groundRayDistance,
+                    groundLayer,
+                    QueryTriggerInteraction.Ignore
+                );
+
+                if (hitGround)
+                {
+                    finalPosition = groundHit.point + Vector3.up * spawnHeightOffset;
                 }
             }
 

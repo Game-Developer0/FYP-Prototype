@@ -24,21 +24,29 @@ public class PlayerHealth : MonoBehaviour
     public Animator animator;
     public string deathBoolName = "Death";
 
-    [Header("Screen Effects")]
+    [Header("Canvas Screen Particles")]
     public GameObject fireScreenEffectRoot;
     public GameObject acidScreenEffectRoot;
     public GameObject iceScreenEffectRoot;
     public GameObject volcanoScreenEffectRoot;
 
-    [Tooltip("Keep this OFF if your screen effect uses HS_ScreenEffect.")]
-    public bool disableScreenEffectObjectOnStop = false;
-
+    [Header("Canvas Particle Settings")]
+    public bool forceParticlesLocalSpace = true;
+    public bool disableElementObjectAfterStop = true;
     public bool clearParticlesOnStop = true;
+
+    [Header("Canvas Blood Particle Effect")]
+    public GameObject bloodScreenEffectRoot;
+    public int bloodScreenHealthThreshold = 40;
+    public bool disableBloodObjectWhenHidden = true;
+    public bool keepBloodEffectOnDeath = true;
 
     private Coroutine fireEffectRoutine;
     private Coroutine acidEffectRoutine;
     private Coroutine iceEffectRoutine;
     private Coroutine volcanoEffectRoutine;
+
+    private bool bloodEffectActive = false;
 
     [Header("Slow Effect")]
     public bool allowSlowEffect = true;
@@ -62,10 +70,12 @@ public class PlayerHealth : MonoBehaviour
 
         UpdateHealthBarMax();
 
-        StopScreenEffect(fireScreenEffectRoot);
-        StopScreenEffect(acidScreenEffectRoot);
-        StopScreenEffect(iceScreenEffectRoot);
-        StopScreenEffect(volcanoScreenEffectRoot);
+        StopCanvasParticleEffect(fireScreenEffectRoot, true);
+        StopCanvasParticleEffect(acidScreenEffectRoot, true);
+        StopCanvasParticleEffect(iceScreenEffectRoot, true);
+        StopCanvasParticleEffect(volcanoScreenEffectRoot, true);
+
+        HideBloodScreenEffect();
 
         SetPlayerSpeedMultiplier(1f);
     }
@@ -99,6 +109,7 @@ public class PlayerHealth : MonoBehaviour
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
 
         UpdateHealthBar();
+        UpdateBloodScreenEffect();
 
         Debug.Log("Player HP: " + currentHealth);
 
@@ -132,29 +143,42 @@ public class PlayerHealth : MonoBehaviour
         }
     }
 
+    public void Heal(int healAmount)
+    {
+        if (isDead) return;
+
+        currentHealth += healAmount;
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+
+        UpdateHealthBar();
+        UpdateBloodScreenEffect();
+
+        Debug.Log("Player HP: " + currentHealth);
+    }
+
     void PlayScreenEffect(DamageEffectType effectType, float duration)
     {
         if (duration <= 0f) return;
 
         if (effectType == DamageEffectType.Fire)
         {
-            StartScreenEffectRoutine(ref fireEffectRoutine, fireScreenEffectRoot, duration);
+            StartCanvasParticleRoutine(ref fireEffectRoutine, fireScreenEffectRoot, duration);
         }
         else if (effectType == DamageEffectType.Acid)
         {
-            StartScreenEffectRoutine(ref acidEffectRoutine, acidScreenEffectRoot, duration);
+            StartCanvasParticleRoutine(ref acidEffectRoutine, acidScreenEffectRoot, duration);
         }
         else if (effectType == DamageEffectType.Ice)
         {
-            StartScreenEffectRoutine(ref iceEffectRoutine, iceScreenEffectRoot, duration);
+            StartCanvasParticleRoutine(ref iceEffectRoutine, iceScreenEffectRoot, duration);
         }
         else if (effectType == DamageEffectType.Volcano)
         {
-            StartScreenEffectRoutine(ref volcanoEffectRoutine, volcanoScreenEffectRoot, duration);
+            StartCanvasParticleRoutine(ref volcanoEffectRoutine, volcanoScreenEffectRoot, duration);
         }
     }
 
-    void StartScreenEffectRoutine(ref Coroutine routine, GameObject effectRoot, float duration)
+    void StartCanvasParticleRoutine(ref Coroutine routine, GameObject effectRoot, float duration)
     {
         if (effectRoot == null) return;
 
@@ -164,89 +188,167 @@ public class PlayerHealth : MonoBehaviour
             routine = null;
         }
 
-        StopScreenEffect(effectRoot);
+        StopCanvasParticleEffect(effectRoot, true);
 
-        routine = StartCoroutine(ScreenEffectRoutine(effectRoot, duration));
+        routine = StartCoroutine(CanvasParticleRoutine(effectRoot, duration));
     }
 
-    IEnumerator ScreenEffectRoutine(GameObject effectRoot, float duration)
+    IEnumerator CanvasParticleRoutine(GameObject effectRoot, float duration)
     {
         if (effectRoot == null) yield break;
 
-        effectRoot.SetActive(true);
-
-        Hovl.HS_ScreenEffect[] screenEffects = effectRoot.GetComponentsInChildren<Hovl.HS_ScreenEffect>(true);
-
-        if (screenEffects != null && screenEffects.Length > 0)
-        {
-            foreach (Hovl.HS_ScreenEffect screenEffect in screenEffects)
-            {
-                if (screenEffect == null) continue;
-                screenEffect.PlayEffect();
-            }
-        }
-        else
-        {
-            ParticleSystem[] particles = effectRoot.GetComponentsInChildren<ParticleSystem>(true);
-
-            foreach (ParticleSystem particle in particles)
-            {
-                if (particle == null) continue;
-
-                particle.gameObject.SetActive(true);
-
-                var emission = particle.emission;
-                emission.enabled = true;
-
-                particle.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-                particle.Clear(true);
-                particle.Play(true);
-            }
-        }
+        PlayCanvasParticleEffect(effectRoot);
 
         yield return new WaitForSeconds(duration);
 
-        StopScreenEffect(effectRoot);
+        StopCanvasParticleEffect(effectRoot, true);
     }
 
-    void StopScreenEffect(GameObject effectRoot)
+    void PlayCanvasParticleEffect(GameObject effectRoot)
     {
         if (effectRoot == null) return;
 
-        Hovl.HS_ScreenEffect[] screenEffects = effectRoot.GetComponentsInChildren<Hovl.HS_ScreenEffect>(true);
+        effectRoot.SetActive(true);
 
-        if (screenEffects != null && screenEffects.Length > 0)
+        ParticleSystem[] particles =
+            effectRoot.GetComponentsInChildren<ParticleSystem>(true);
+
+        foreach (ParticleSystem particle in particles)
         {
-            foreach (Hovl.HS_ScreenEffect screenEffect in screenEffects)
+            if (particle == null) continue;
+
+            particle.gameObject.SetActive(true);
+
+            ParticleSystem.MainModule main = particle.main;
+
+            if (forceParticlesLocalSpace)
             {
-                if (screenEffect == null) continue;
-                screenEffect.StopEffect();
+                main.simulationSpace = ParticleSystemSimulationSpace.Local;
+            }
+
+            main.loop = true;
+
+            ParticleSystem.EmissionModule emission = particle.emission;
+            emission.enabled = true;
+
+            particle.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            particle.Clear(true);
+            particle.Play(true);
+        }
+    }
+
+    void StopCanvasParticleEffect(GameObject effectRoot, bool disableObject)
+    {
+        if (effectRoot == null) return;
+
+        ParticleSystem[] particles =
+            effectRoot.GetComponentsInChildren<ParticleSystem>(true);
+
+        foreach (ParticleSystem particle in particles)
+        {
+            if (particle == null) continue;
+
+            ParticleSystem.EmissionModule emission = particle.emission;
+            emission.enabled = false;
+
+            particle.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+
+            if (clearParticlesOnStop)
+            {
+                particle.Clear(true);
             }
         }
-        else
-        {
-            ParticleSystem[] particles = effectRoot.GetComponentsInChildren<ParticleSystem>(true);
 
-            foreach (ParticleSystem particle in particles)
-            {
-                if (particle == null) continue;
-
-                var emission = particle.emission;
-                emission.enabled = false;
-
-                particle.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-
-                if (clearParticlesOnStop)
-                {
-                    particle.Clear(true);
-                }
-            }
-        }
-
-        if (disableScreenEffectObjectOnStop)
+        if (disableObject && disableElementObjectAfterStop)
         {
             effectRoot.SetActive(false);
         }
+    }
+
+    void UpdateBloodScreenEffect()
+    {
+        if (bloodScreenEffectRoot == null) return;
+
+        bool shouldShowBlood = currentHealth <= bloodScreenHealthThreshold;
+
+        if (isDead && !keepBloodEffectOnDeath)
+        {
+            shouldShowBlood = false;
+        }
+
+        if (shouldShowBlood && !bloodEffectActive)
+        {
+            ShowBloodScreenEffect();
+        }
+        else if (!shouldShowBlood && bloodEffectActive)
+        {
+            HideBloodScreenEffect();
+        }
+    }
+
+    void ShowBloodScreenEffect()
+    {
+        if (bloodScreenEffectRoot == null) return;
+
+        bloodScreenEffectRoot.SetActive(true);
+
+        ParticleSystem[] particles =
+            bloodScreenEffectRoot.GetComponentsInChildren<ParticleSystem>(true);
+
+        foreach (ParticleSystem particle in particles)
+        {
+            if (particle == null) continue;
+
+            particle.gameObject.SetActive(true);
+
+            ParticleSystem.MainModule main = particle.main;
+
+            if (forceParticlesLocalSpace)
+            {
+                main.simulationSpace = ParticleSystemSimulationSpace.Local;
+            }
+
+            main.loop = true;
+
+            ParticleSystem.EmissionModule emission = particle.emission;
+            emission.enabled = true;
+
+            particle.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            particle.Clear(true);
+            particle.Play(true);
+        }
+
+        bloodEffectActive = true;
+    }
+
+    void HideBloodScreenEffect()
+    {
+        if (bloodScreenEffectRoot == null) return;
+
+        ParticleSystem[] particles =
+            bloodScreenEffectRoot.GetComponentsInChildren<ParticleSystem>(true);
+
+        foreach (ParticleSystem particle in particles)
+        {
+            if (particle == null) continue;
+
+            ParticleSystem.EmissionModule emission = particle.emission;
+            emission.enabled = false;
+
+            particle.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+
+            if (clearParticlesOnStop)
+            {
+                particle.Clear(true);
+            }
+        }
+
+        if (disableBloodObjectWhenHidden)
+        {
+            bloodScreenEffectRoot.SetActive(false);
+        }
+
+        bloodEffectActive = false;
     }
 
     void ApplySlow(float slowMultiplier, float slowDuration)
@@ -288,6 +390,15 @@ public class PlayerHealth : MonoBehaviour
         isDead = true;
 
         SetPlayerSpeedMultiplier(1f);
+
+        if (!keepBloodEffectOnDeath)
+        {
+            HideBloodScreenEffect();
+        }
+        else
+        {
+            ShowBloodScreenEffect();
+        }
 
         Debug.Log("Player died");
 

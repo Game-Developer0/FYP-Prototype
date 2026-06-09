@@ -49,8 +49,14 @@ MonoBehaviour:
   screenEffect: {fileID: 681415535865468980}
   sourceCamera: {fileID: 0}
   fallbackDistance: 0.05
+  extraDistanceFromNearClip: 0.2
+  screenCoverageMultiplier: 1.6
   snapOnStart: 1
   parentToCameraOnStart: 1
+  lockToCameraEveryFrame: 1
+  forceLocalSimulationSpace: 1
+  clearOnStop: 1
+  warmupTime: 0.05
 --- !u!198 &681415535865468980
 ParticleSystem:
   m_ObjectHideFlags: 0
@@ -305,7 +311,7 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 4.453138
+      scalar: 2092.9343
       minScalar: 1
       maxCurve:
         serializedVersion: 2
@@ -358,7 +364,7 @@ ParticleSystem:
     startSizeY:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 3.3503335
+      scalar: 1580.5879
       minScalar: 1
       maxCurve:
         serializedVersion: 2
@@ -690,7 +696,7 @@ ParticleSystem:
     donutRadius: 0.2
     m_Position: {x: 0, y: 0, z: 0}
     m_Rotation: {x: 0, y: 0, z: 0}
-    m_Scale: {x: 4.453138, y: 3.3503335, z: 1}
+    m_Scale: {x: 2092.9343, y: 1580.5879, z: 1}
     placementMode: 0
     m_MeshMaterialIndex: 0
     m_MeshNormalOffset: 0
@@ -4834,7 +4840,7 @@ ParticleSystem:
     vectorLabel1_3: W
 --- !u!199 &8019837902469161358
 ParticleSystemRenderer:
-  serializedVersion: 6
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -4853,6 +4859,8 @@ ParticleSystemRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -4874,9 +4882,11 @@ ParticleSystemRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_RenderMode: 4
   m_MeshDistribution: 0
   m_SortMode: 0
@@ -4908,4 +4918,3 @@ ParticleSystemRenderer:
   m_MeshWeighting1: 1
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
-  m_MaskInteraction: 0

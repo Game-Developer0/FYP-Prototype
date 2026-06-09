@@ -36,8 +36,10 @@ public class GrapplingGun : MonoBehaviour
     [Header("Extra Pull Force")]
     public float pullForce = 15f;
 
-    [Header("Grapple Wind Screen Effect")]
+    [Header("Canvas Grapple Wind Screen Effect")]
     public GameObject windEffectRoot;
+    public bool forceWindParticlesLocalSpace = true;
+    public bool disableWindObjectOnStop = true;
     public bool clearWindOnStop = true;
     public float windWarmupTime = 0.15f;
 
@@ -71,11 +73,7 @@ public class GrapplingGun : MonoBehaviour
             playerMovement = player.GetComponent<PlayerMovement>();
         }
 
-        if (windEffectRoot != null)
-        {
-            windParticles = windEffectRoot.GetComponentsInChildren<ParticleSystem>(true);
-        }
-
+        CacheWindParticles();
         SetupGrappleSpeedSound();
     }
 
@@ -283,27 +281,46 @@ public class GrapplingGun : MonoBehaviour
         return isAimingGun || isInAir;
     }
 
+    void CacheWindParticles()
+    {
+        if (windEffectRoot == null)
+        {
+            windParticles = null;
+            return;
+        }
+
+        windParticles = windEffectRoot.GetComponentsInChildren<ParticleSystem>(true);
+    }
+
     void PlayGrappleWindEffect()
     {
         if (windEffectRoot == null) return;
 
-        if (!windEffectRoot.activeSelf)
-        {
-            windEffectRoot.SetActive(true);
-        }
+        windEffectRoot.SetActive(true);
 
-        if (windParticles == null || windParticles.Length == 0)
-        {
-            windParticles = windEffectRoot.GetComponentsInChildren<ParticleSystem>(true);
-        }
+        CacheWindParticles();
+
+        if (windParticles == null || windParticles.Length == 0) return;
 
         foreach (ParticleSystem particle in windParticles)
         {
             if (particle == null) continue;
 
-            var emission = particle.emission;
+            particle.gameObject.SetActive(true);
+
+            ParticleSystem.MainModule main = particle.main;
+
+            if (forceWindParticlesLocalSpace)
+            {
+                main.simulationSpace = ParticleSystemSimulationSpace.Local;
+            }
+
+            main.loop = true;
+
+            ParticleSystem.EmissionModule emission = particle.emission;
             emission.enabled = true;
 
+            particle.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             particle.Clear(true);
             particle.Play(true);
 
@@ -318,28 +335,30 @@ public class GrapplingGun : MonoBehaviour
     {
         if (windEffectRoot == null) return;
 
-        if (windParticles == null || windParticles.Length == 0)
+        CacheWindParticles();
+
+        if (windParticles != null)
         {
-            windParticles = windEffectRoot.GetComponentsInChildren<ParticleSystem>(true);
-        }
-
-        foreach (ParticleSystem particle in windParticles)
-        {
-            if (particle == null) continue;
-
-            var emission = particle.emission;
-            emission.enabled = false;
-
-            particle.Stop(true, ParticleSystemStopBehavior.StopEmitting);
-
-            if (clearWindOnStop)
+            foreach (ParticleSystem particle in windParticles)
             {
-                particle.Clear(true);
+                if (particle == null) continue;
+
+                ParticleSystem.EmissionModule emission = particle.emission;
+                emission.enabled = false;
+
+                particle.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+
+                if (clearWindOnStop)
+                {
+                    particle.Clear(true);
+                }
             }
         }
 
-        // Do NOT disable windEffectRoot.
-        // HS_ScreenEffect must stay active.
+        if (disableWindObjectOnStop)
+        {
+            windEffectRoot.SetActive(false);
+        }
     }
 
     void SetupGrappleSpeedSound()

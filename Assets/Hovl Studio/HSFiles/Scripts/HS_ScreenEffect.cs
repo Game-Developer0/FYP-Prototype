@@ -3,6 +3,7 @@ using UnityEngine;
 namespace Hovl
 {
     [ExecuteAlways]
+    [DefaultExecutionOrder(10000)]
     public class HS_ScreenEffect : MonoBehaviour
     {
         public ParticleSystem screenEffect;
@@ -12,9 +13,16 @@ namespace Hovl
         public float fallbackDistance = 0.5f;
         public float extraDistanceFromNearClip = 0.2f;
 
+        [Header("Screen Size")]
+        public float screenCoverageMultiplier = 1.6f;
+
         [Header("Start Setup")]
         public bool snapOnStart = true;
         public bool parentToCameraOnStart = true;
+
+        [Header("Screen Lock")]
+        public bool lockToCameraEveryFrame = true;
+        public bool forceLocalSimulationSpace = true;
 
         [Header("Play Settings")]
         public bool clearOnStop = true;
@@ -28,12 +36,13 @@ namespace Hovl
                 sourceCamera = Camera.main;
 
             if (screenEffect == null)
-                screenEffect = GetComponentInChildren<ParticleSystem>();
+                screenEffect = GetComponentInChildren<ParticleSystem>(true);
         }
 
         void Awake()
         {
             CacheParticles();
+            ForceScreenParticleSettings();
         }
 
         void OnEnable()
@@ -42,9 +51,16 @@ namespace Hovl
                 sourceCamera = Camera.main;
 
             if (screenEffect == null)
-                screenEffect = GetComponentInChildren<ParticleSystem>();
+                screenEffect = GetComponentInChildren<ParticleSystem>(true);
 
             CacheParticles();
+            ForceScreenParticleSettings();
+
+            if (Application.isPlaying && snapOnStart)
+            {
+                SnapToCamera();
+            }
+
             UpdateSize();
         }
 
@@ -53,22 +69,9 @@ namespace Hovl
             if (!Application.isPlaying)
                 return;
 
-            if (!snapOnStart)
-                return;
-
-            Camera cam = sourceCamera != null ? sourceCamera : Camera.main;
-            if (cam == null)
-                return;
-
-            float safeDistance = GetSafeDistance(cam);
-
-            transform.position = cam.transform.position + cam.transform.forward * safeDistance;
-
-            if (parentToCameraOnStart)
+            if (snapOnStart)
             {
-                transform.SetParent(cam.transform, true);
-                transform.localPosition = Vector3.forward * safeDistance;
-                transform.localRotation = Quaternion.identity;
+                SnapToCamera();
             }
 
             UpdateSize();
@@ -77,13 +80,12 @@ namespace Hovl
 
         void LateUpdate()
         {
-            Camera cam = sourceCamera != null ? sourceCamera : Camera.main;
+            if (sourceCamera == null)
+                sourceCamera = Camera.main;
 
-            if (Application.isPlaying && cam != null && parentToCameraOnStart)
+            if (Application.isPlaying && lockToCameraEveryFrame)
             {
-                float safeDistance = GetSafeDistance(cam);
-                transform.localPosition = Vector3.forward * safeDistance;
-                transform.localRotation = Quaternion.identity;
+                SnapToCamera();
             }
 
             UpdateSize();
@@ -95,15 +97,63 @@ namespace Hovl
                 sourceCamera = Camera.main;
 
             if (screenEffect == null)
-                screenEffect = GetComponentInChildren<ParticleSystem>();
+                screenEffect = GetComponentInChildren<ParticleSystem>(true);
 
             CacheParticles();
+            ForceScreenParticleSettings();
             UpdateSize();
         }
 
         void CacheParticles()
         {
             allParticles = GetComponentsInChildren<ParticleSystem>(true);
+        }
+
+        void ForceScreenParticleSettings()
+        {
+            if (allParticles == null)
+                CacheParticles();
+
+            if (allParticles == null) return;
+
+            foreach (ParticleSystem particle in allParticles)
+            {
+                if (particle == null) continue;
+
+                var main = particle.main;
+
+                if (forceLocalSimulationSpace)
+                {
+                    main.simulationSpace = ParticleSystemSimulationSpace.Local;
+                }
+
+                main.scalingMode = ParticleSystemScalingMode.Local;
+            }
+        }
+
+        void SnapToCamera()
+        {
+            Camera cam = sourceCamera != null ? sourceCamera : Camera.main;
+            if (cam == null) return;
+
+            float safeDistance = GetSafeDistance(cam);
+
+            if (parentToCameraOnStart)
+            {
+                if (transform.parent != cam.transform)
+                {
+                    transform.SetParent(cam.transform, false);
+                }
+
+                transform.localPosition = Vector3.forward * safeDistance;
+                transform.localRotation = Quaternion.identity;
+                transform.localScale = Vector3.one;
+            }
+            else
+            {
+                transform.position = cam.transform.position + cam.transform.forward * safeDistance;
+                transform.rotation = cam.transform.rotation;
+            }
         }
 
         float GetSafeDistance(Camera cam)
@@ -126,6 +176,8 @@ namespace Hovl
                 sourceCamera = Camera.main;
 
             CacheParticles();
+            ForceScreenParticleSettings();
+            SnapToCamera();
             UpdateSize();
 
             if (allParticles == null || allParticles.Length == 0)
@@ -174,19 +226,17 @@ namespace Hovl
                     particle.Clear(true);
                 }
             }
-
-            // Do not disable this GameObject.
-            // It must stay active so HS_ScreenEffect keeps following the camera.
         }
 
         void UpdateSize()
         {
-            if (screenEffect == null)
-                return;
-
             Camera cam = sourceCamera != null ? sourceCamera : Camera.main;
-            if (cam == null)
-                return;
+            if (cam == null) return;
+
+            if (screenEffect == null)
+                screenEffect = GetComponentInChildren<ParticleSystem>(true);
+
+            if (screenEffect == null) return;
 
             float dist = cam.transform.InverseTransformPoint(transform.position).z;
 
@@ -209,14 +259,24 @@ namespace Hovl
 
             float width = height * cam.aspect;
 
-            var main = screenEffect.main;
-            main.startSize3D = true;
-            main.startSizeX = new ParticleSystem.MinMaxCurve(width);
-            main.startSizeY = new ParticleSystem.MinMaxCurve(height);
-            main.startSizeZ = new ParticleSystem.MinMaxCurve(1f);
+            width *= screenCoverageMultiplier;
+            height *= screenCoverageMultiplier;
 
-            var shape = screenEffect.shape;
-            shape.scale = new Vector3(width, height, 1f);
+            ParticleSystem[] particles = GetComponentsInChildren<ParticleSystem>(true);
+
+            foreach (ParticleSystem particle in particles)
+            {
+                if (particle == null) continue;
+
+                var main = particle.main;
+                main.startSize3D = true;
+                main.startSizeX = new ParticleSystem.MinMaxCurve(width);
+                main.startSizeY = new ParticleSystem.MinMaxCurve(height);
+                main.startSizeZ = new ParticleSystem.MinMaxCurve(1f);
+
+                var shape = particle.shape;
+                shape.scale = new Vector3(width, height, 1f);
+            }
         }
     }
 }
