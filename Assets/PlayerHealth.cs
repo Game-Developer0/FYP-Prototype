@@ -24,11 +24,15 @@ public class PlayerHealth : MonoBehaviour
     public Animator animator;
     public string deathBoolName = "Death";
 
-    [Header("Canvas Screen Particles")]
+    [Header("Canvas Damage Screen Particles")]
     public GameObject fireScreenEffectRoot;
     public GameObject acidScreenEffectRoot;
     public GameObject iceScreenEffectRoot;
     public GameObject volcanoScreenEffectRoot;
+
+    [Header("Canvas Health Increase Screen Particle")]
+    public GameObject healthIncreaseScreenEffectRoot;
+    public float defaultHealthIncreaseEffectDuration = 1f;
 
     [Header("Canvas Particle Settings")]
     public bool forceParticlesLocalSpace = true;
@@ -45,6 +49,7 @@ public class PlayerHealth : MonoBehaviour
     private Coroutine acidEffectRoutine;
     private Coroutine iceEffectRoutine;
     private Coroutine volcanoEffectRoutine;
+    private Coroutine healthIncreaseEffectRoutine;
 
     private bool bloodEffectActive = false;
 
@@ -74,6 +79,7 @@ public class PlayerHealth : MonoBehaviour
         StopCanvasParticleEffect(acidScreenEffectRoot, true);
         StopCanvasParticleEffect(iceScreenEffectRoot, true);
         StopCanvasParticleEffect(volcanoScreenEffectRoot, true);
+        StopCanvasParticleEffect(healthIncreaseScreenEffectRoot, true);
 
         HideBloodScreenEffect();
 
@@ -134,7 +140,7 @@ public class PlayerHealth : MonoBehaviour
 
         if (effectType != DamageEffectType.None)
         {
-            PlayScreenEffect(effectType, screenEffectDuration);
+            PlayDamageScreenEffect(effectType, screenEffectDuration);
         }
 
         if (applySlow && allowSlowEffect)
@@ -145,7 +151,15 @@ public class PlayerHealth : MonoBehaviour
 
     public void Heal(int healAmount)
     {
+        HealWithEffect(healAmount, defaultHealthIncreaseEffectDuration);
+    }
+
+    public void HealWithEffect(int healAmount, float screenEffectDuration)
+    {
         if (isDead) return;
+        if (healAmount <= 0) return;
+
+        int oldHealth = currentHealth;
 
         currentHealth += healAmount;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
@@ -154,9 +168,14 @@ public class PlayerHealth : MonoBehaviour
         UpdateBloodScreenEffect();
 
         Debug.Log("Player HP: " + currentHealth);
+
+        if (currentHealth > oldHealth && screenEffectDuration > 0f)
+        {
+            PlayHealthIncreaseScreenEffect(screenEffectDuration);
+        }
     }
 
-    void PlayScreenEffect(DamageEffectType effectType, float duration)
+    void PlayDamageScreenEffect(DamageEffectType effectType, float duration)
     {
         if (duration <= 0f) return;
 
@@ -178,15 +197,47 @@ public class PlayerHealth : MonoBehaviour
         }
     }
 
+    void PlayHealthIncreaseScreenEffect(float duration)
+    {
+        Debug.Log("Health increase screen effect called.");
+
+        if (healthIncreaseScreenEffectRoot == null)
+        {
+            Debug.LogWarning("Health Increase Screen Effect Root is NOT assigned.");
+            return;
+        }
+
+        Debug.Log("Health effect root assigned: " + healthIncreaseScreenEffectRoot.name);
+        Debug.Log("Health effect active before play: " + healthIncreaseScreenEffectRoot.activeSelf);
+
+        StartCanvasParticleRoutine(
+            ref healthIncreaseEffectRoutine,
+            healthIncreaseScreenEffectRoot,
+            duration
+        );
+    }
+
     void StartCanvasParticleRoutine(ref Coroutine routine, GameObject effectRoot, float duration)
     {
-        if (effectRoot == null) return;
+        if (effectRoot == null)
+        {
+            Debug.LogWarning("StartCanvasParticleRoutine failed: effectRoot is NULL.");
+            return;
+        }
+
+        if (duration <= 0f)
+        {
+            Debug.LogWarning("StartCanvasParticleRoutine failed: duration is 0 or less.");
+            return;
+        }
 
         if (routine != null)
         {
             StopCoroutine(routine);
             routine = null;
         }
+
+        Debug.Log("Starting canvas particle routine for: " + effectRoot.name);
 
         StopCanvasParticleEffect(effectRoot, true);
 
@@ -206,16 +257,28 @@ public class PlayerHealth : MonoBehaviour
 
     void PlayCanvasParticleEffect(GameObject effectRoot)
     {
-        if (effectRoot == null) return;
+        if (effectRoot == null)
+        {
+            Debug.LogWarning("PlayCanvasParticleEffect failed: effectRoot is NULL.");
+            return;
+        }
+
+        Debug.Log("Trying to enable effect root: " + effectRoot.name);
 
         effectRoot.SetActive(true);
+
+        Debug.Log("Effect root active after SetActive(true): " + effectRoot.activeSelf);
 
         ParticleSystem[] particles =
             effectRoot.GetComponentsInChildren<ParticleSystem>(true);
 
+        Debug.Log("Particles found inside " + effectRoot.name + ": " + particles.Length);
+
         foreach (ParticleSystem particle in particles)
         {
             if (particle == null) continue;
+
+            Debug.Log("Playing particle: " + particle.name);
 
             particle.gameObject.SetActive(true);
 
@@ -227,9 +290,18 @@ public class PlayerHealth : MonoBehaviour
             }
 
             main.loop = true;
+            main.scalingMode = ParticleSystemScalingMode.Local;
 
             ParticleSystem.EmissionModule emission = particle.emission;
             emission.enabled = true;
+
+            ParticleSystemRenderer renderer = particle.GetComponent<ParticleSystemRenderer>();
+
+            if (renderer != null)
+            {
+                renderer.sortingLayerName = "UI";
+                renderer.sortingOrder = 200;
+            }
 
             particle.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             particle.Clear(true);

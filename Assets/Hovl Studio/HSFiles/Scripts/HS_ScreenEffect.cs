@@ -1,48 +1,28 @@
 using UnityEngine;
 
+
 namespace Hovl
 {
     [ExecuteAlways]
-    [DefaultExecutionOrder(10000)]
     public class HS_ScreenEffect : MonoBehaviour
     {
         public ParticleSystem screenEffect;
         public Camera sourceCamera;
 
-        [Header("Distance From Camera")]
-        public float fallbackDistance = 0.5f;
-        public float extraDistanceFromNearClip = 0.2f;
+        // If the effect is placed in front of the camera, this is a fallback distance in case calculation fails
+        // Also used as the snap distance on start if snapping is enabled
+        public float fallbackDistance = 0.05f;
 
-        [Header("Screen Size")]
-        public float screenCoverageMultiplier = 1.6f;
-
-        [Header("Start Setup")]
+        // Snap the effect to a fixed distance from the camera automatically on start (play mode only)
         public bool snapOnStart = true;
+
+        // Parent the effect to the camera on start so it follows the camera
         public bool parentToCameraOnStart = true;
-
-        [Header("Screen Lock")]
-        public bool lockToCameraEveryFrame = true;
-        public bool forceLocalSimulationSpace = true;
-
-        [Header("Play Settings")]
-        public bool clearOnStop = true;
-        public float warmupTime = 0.05f;
-
-        private ParticleSystem[] allParticles;
 
         void Reset()
         {
             if (sourceCamera == null)
                 sourceCamera = Camera.main;
-
-            if (screenEffect == null)
-                screenEffect = GetComponentInChildren<ParticleSystem>(true);
-        }
-
-        void Awake()
-        {
-            CacheParticles();
-            ForceScreenParticleSettings();
         }
 
         void OnEnable()
@@ -50,203 +30,66 @@ namespace Hovl
             if (sourceCamera == null)
                 sourceCamera = Camera.main;
 
-            if (screenEffect == null)
-                screenEffect = GetComponentInChildren<ParticleSystem>(true);
-
-            CacheParticles();
-            ForceScreenParticleSettings();
-
-            if (Application.isPlaying && snapOnStart)
-            {
-                SnapToCamera();
-            }
-
             UpdateSize();
         }
 
         void Start()
         {
+            // Only snap when entering Play mode
             if (!Application.isPlaying)
                 return;
 
-            if (snapOnStart)
+            if (!snapOnStart)
+                return;
+
+            Camera cam = sourceCamera != null ? sourceCamera : Camera.main;
+            if (cam == null)
+                return;
+
+            // Place the effect directly in front of the camera at the configured distance
+            transform.position = cam.transform.position + cam.transform.forward * fallbackDistance;
+
+            // Optionally keep the effect facing the camera by matching rotation (comment out if not desired)
+            // transform.rotation = cam.transform.rotation;
+
+            // Parent to camera so the effect follows it
+            if (parentToCameraOnStart)
             {
-                SnapToCamera();
+                // Make the camera the parent and set a local offset forward at fallbackDistance
+                transform.SetParent(cam.transform, true);
+                transform.localPosition = Vector3.forward * fallbackDistance;
+                transform.localRotation = Quaternion.identity;
             }
 
             UpdateSize();
-            StopEffect();
         }
 
         void LateUpdate()
         {
-            if (sourceCamera == null)
-                sourceCamera = Camera.main;
-
-            if (Application.isPlaying && lockToCameraEveryFrame)
-            {
-                SnapToCamera();
-            }
-
             UpdateSize();
         }
 
         void OnValidate()
         {
-            if (sourceCamera == null)
-                sourceCamera = Camera.main;
-
-            if (screenEffect == null)
-                screenEffect = GetComponentInChildren<ParticleSystem>(true);
-
-            CacheParticles();
-            ForceScreenParticleSettings();
+            // Keep editor changes live
             UpdateSize();
-        }
-
-        void CacheParticles()
-        {
-            allParticles = GetComponentsInChildren<ParticleSystem>(true);
-        }
-
-        void ForceScreenParticleSettings()
-        {
-            if (allParticles == null)
-                CacheParticles();
-
-            if (allParticles == null) return;
-
-            foreach (ParticleSystem particle in allParticles)
-            {
-                if (particle == null) continue;
-
-                var main = particle.main;
-
-                if (forceLocalSimulationSpace)
-                {
-                    main.simulationSpace = ParticleSystemSimulationSpace.Local;
-                }
-
-                main.scalingMode = ParticleSystemScalingMode.Local;
-            }
-        }
-
-        void SnapToCamera()
-        {
-            Camera cam = sourceCamera != null ? sourceCamera : Camera.main;
-            if (cam == null) return;
-
-            float safeDistance = GetSafeDistance(cam);
-
-            if (parentToCameraOnStart)
-            {
-                if (transform.parent != cam.transform)
-                {
-                    transform.SetParent(cam.transform, false);
-                }
-
-                transform.localPosition = Vector3.forward * safeDistance;
-                transform.localRotation = Quaternion.identity;
-                transform.localScale = Vector3.one;
-            }
-            else
-            {
-                transform.position = cam.transform.position + cam.transform.forward * safeDistance;
-                transform.rotation = cam.transform.rotation;
-            }
-        }
-
-        float GetSafeDistance(Camera cam)
-        {
-            float safeDistance = cam.nearClipPlane + extraDistanceFromNearClip;
-
-            if (fallbackDistance > safeDistance)
-            {
-                safeDistance = fallbackDistance;
-            }
-
-            return safeDistance;
-        }
-
-        public void PlayEffect()
-        {
-            gameObject.SetActive(true);
-
-            if (sourceCamera == null)
-                sourceCamera = Camera.main;
-
-            CacheParticles();
-            ForceScreenParticleSettings();
-            SnapToCamera();
-            UpdateSize();
-
-            if (allParticles == null || allParticles.Length == 0)
-                return;
-
-            foreach (ParticleSystem particle in allParticles)
-            {
-                if (particle == null) continue;
-
-                particle.gameObject.SetActive(true);
-
-                var emission = particle.emission;
-                emission.enabled = true;
-
-                particle.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-                particle.Clear(true);
-
-                particle.Simulate(0f, true, true, true);
-                particle.Play(true);
-
-                if (warmupTime > 0f)
-                {
-                    particle.Simulate(warmupTime, true, false, true);
-                }
-            }
-        }
-
-        public void StopEffect()
-        {
-            CacheParticles();
-
-            if (allParticles == null || allParticles.Length == 0)
-                return;
-
-            foreach (ParticleSystem particle in allParticles)
-            {
-                if (particle == null) continue;
-
-                var emission = particle.emission;
-                emission.enabled = false;
-
-                particle.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-
-                if (clearOnStop)
-                {
-                    particle.Clear(true);
-                }
-            }
         }
 
         void UpdateSize()
         {
-            Camera cam = sourceCamera != null ? sourceCamera : Camera.main;
-            if (cam == null) return;
-
             if (screenEffect == null)
-                screenEffect = GetComponentInChildren<ParticleSystem>(true);
+                return;
 
-            if (screenEffect == null) return;
+            Camera cam = sourceCamera != null ? sourceCamera : Camera.main;
+            if (cam == null)
+                return;
 
+            // distance from camera to this transform along camera forward (positive in front of camera)
             float dist = cam.transform.InverseTransformPoint(transform.position).z;
-
-            if (dist <= cam.nearClipPlane)
-            {
-                dist = GetSafeDistance(cam);
-            }
+            if (dist <= 0f)
+                dist = fallbackDistance;
 
             float height;
-
             if (cam.orthographic)
             {
                 height = 2f * cam.orthographicSize;
@@ -259,24 +102,16 @@ namespace Hovl
 
             float width = height * cam.aspect;
 
-            width *= screenCoverageMultiplier;
-            height *= screenCoverageMultiplier;
+            // Set particle start size to match the world size (enable3D start size)
+            var main = screenEffect.main;
+            main.startSize3D = true;
+            main.startSizeX = new ParticleSystem.MinMaxCurve(width);
+            main.startSizeY = new ParticleSystem.MinMaxCurve(height);
+            main.startSizeZ = new ParticleSystem.MinMaxCurve(1f);
 
-            ParticleSystem[] particles = GetComponentsInChildren<ParticleSystem>(true);
-
-            foreach (ParticleSystem particle in particles)
-            {
-                if (particle == null) continue;
-
-                var main = particle.main;
-                main.startSize3D = true;
-                main.startSizeX = new ParticleSystem.MinMaxCurve(width);
-                main.startSizeY = new ParticleSystem.MinMaxCurve(height);
-                main.startSizeZ = new ParticleSystem.MinMaxCurve(1f);
-
-                var shape = particle.shape;
-                shape.scale = new Vector3(width, height, 1f);
-            }
+            // If the particle system uses a shape quad / box, update its scale too so emission area matches
+            var shape = screenEffect.shape;
+            shape.scale = new Vector3(width, height, 1f);
         }
     }
 }

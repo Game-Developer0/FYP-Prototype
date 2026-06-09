@@ -10,10 +10,23 @@ public class DialogueWindow : MonoBehaviour
     [Header("Typing Settings")]
     public float letterDelay = 0.03f;
 
+    [Header("Objective After Story")]
+    public ObjectiveUI objectiveUI;
+    public bool showObjectiveAfterStoryEnds = true;
+    public float objectiveDelayAfterStory = 0.5f;
+    public float objectiveShowDuration = 5f;
+
+    [TextArea(2, 4)]
+    public string objectiveTitle = "Objective Started";
+
+    [TextArea(2, 4)]
+    public string objectiveDescription = "Explore the forest.";
+
     private CanvasGroup group;
     private Coroutine typingCoroutine;
     private string currentFullText = "";
     private bool isTyping = false;
+    private bool objectiveAlreadyShown = false;
 
     public bool IsTyping
     {
@@ -94,6 +107,12 @@ public class DialogueWindow : MonoBehaviour
         group.alpha = 0;
         group.interactable = false;
         group.blocksRaycasts = false;
+
+        if (showObjectiveAfterStoryEnds && !objectiveAlreadyShown)
+        {
+            objectiveAlreadyShown = true;
+            StartCoroutine(ShowObjectiveAfterDelay());
+        }
     }
 
     private IEnumerator TypeText(string text)
@@ -108,5 +127,19 @@ public class DialogueWindow : MonoBehaviour
         }
 
         isTyping = false;
+    }
+
+    private IEnumerator ShowObjectiveAfterDelay()
+    {
+        yield return new WaitForSeconds(objectiveDelayAfterStory);
+
+        if (objectiveUI != null)
+        {
+            objectiveUI.ShowObjective(objectiveTitle, objectiveDescription, objectiveShowDuration);
+        }
+        else
+        {
+            Debug.LogWarning("DialogueWindow: ObjectiveUI is not assigned.");
+        }
     }
 }
