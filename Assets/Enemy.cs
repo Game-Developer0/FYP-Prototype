@@ -82,6 +82,11 @@ public class Enemy : MonoBehaviour
     public int currentHealth;
     public int defaultArrowDamage = 20;
 
+    [Header("Mission Settings")]
+    public bool countForBossWolfMission = false;
+
+    private bool missionKillAlreadyCounted = false;
+
     [Header("Soft Despawn Return")]
     public bool allowSoftDespawnReturn = true;
 
@@ -131,6 +136,7 @@ public class Enemy : MonoBehaviour
         currentHealth = maxHealth;
         arrowHits = 0;
         isDead = false;
+        missionKillAlreadyCounted = false;
         hasDetectedPlayer = false;
         isDetectStunning = false;
         isKnockedDown = false;
@@ -195,6 +201,7 @@ public class Enemy : MonoBehaviour
         arrowHits = 0;
 
         isDead = false;
+        missionKillAlreadyCounted = false;
         hasDetectedPlayer = false;
         isDetectStunning = false;
         isKnockedDown = false;
@@ -947,6 +954,8 @@ public class Enemy : MonoBehaviour
 
         isDead = true;
 
+        ReportKillToMission();
+
         if (ecosystemAnimal == null)
             ecosystemAnimal = GetComponent<EcosystemAnimal>();
 
@@ -1026,6 +1035,24 @@ public class Enemy : MonoBehaviour
         }
 
         return false;
+    }
+    void ReportKillToMission()
+    {
+        if (!countForBossWolfMission) return;
+        if (missionKillAlreadyCounted) return;
+
+        missionKillAlreadyCounted = true;
+
+        MissionSequenceManager missionManager = FindObjectOfType<MissionSequenceManager>();
+
+        if (missionManager != null)
+        {
+            missionManager.RegisterBossWolfKill();
+        }
+        else
+        {
+            Debug.LogWarning("Enemy: MissionSequenceManager not found in scene.");
+        }
     }
 
     private void OnDrawGizmosSelected()

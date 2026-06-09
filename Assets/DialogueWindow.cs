@@ -10,23 +10,16 @@ public class DialogueWindow : MonoBehaviour
     [Header("Typing Settings")]
     public float letterDelay = 0.03f;
 
-    [Header("Objective After Story")]
-    public ObjectiveUI objectiveUI;
-    public bool showObjectiveAfterStoryEnds = true;
-    public float objectiveDelayAfterStory = 0.5f;
-    public float objectiveShowDuration = 5f;
-
-    [TextArea(2, 4)]
-    public string objectiveTitle = "Objective Started";
-
-    [TextArea(2, 4)]
-    public string objectiveDescription = "Explore the forest.";
+    [Header("Mission After Story")]
+    public MissionSequenceManager missionSequenceManager;
+    public bool startMissionAfterStoryEnds = true;
+    public float missionDelayAfterStory = 0.5f;
 
     private CanvasGroup group;
     private Coroutine typingCoroutine;
     private string currentFullText = "";
     private bool isTyping = false;
-    private bool objectiveAlreadyShown = false;
+    private bool missionAlreadyStarted = false;
 
     public bool IsTyping
     {
@@ -108,10 +101,10 @@ public class DialogueWindow : MonoBehaviour
         group.interactable = false;
         group.blocksRaycasts = false;
 
-        if (showObjectiveAfterStoryEnds && !objectiveAlreadyShown)
+        if (startMissionAfterStoryEnds && !missionAlreadyStarted)
         {
-            objectiveAlreadyShown = true;
-            StartCoroutine(ShowObjectiveAfterDelay());
+            missionAlreadyStarted = true;
+            StartCoroutine(StartMissionAfterDelay());
         }
     }
 
@@ -129,17 +122,17 @@ public class DialogueWindow : MonoBehaviour
         isTyping = false;
     }
 
-    private IEnumerator ShowObjectiveAfterDelay()
+    private IEnumerator StartMissionAfterDelay()
     {
-        yield return new WaitForSeconds(objectiveDelayAfterStory);
+        yield return new WaitForSeconds(missionDelayAfterStory);
 
-        if (objectiveUI != null)
+        if (missionSequenceManager != null)
         {
-            objectiveUI.ShowObjective(objectiveTitle, objectiveDescription, objectiveShowDuration);
+            missionSequenceManager.StartMissionFlowAfterStory();
         }
         else
         {
-            Debug.LogWarning("DialogueWindow: ObjectiveUI is not assigned.");
+            Debug.LogWarning("DialogueWindow: MissionSequenceManager is not assigned.");
         }
     }
 }

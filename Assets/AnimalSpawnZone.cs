@@ -46,6 +46,10 @@ public class AnimalSpawnZone : MonoBehaviour
     public float respawnDelayAfterDeath = 25f;
     public int maxSpawnAttemptsPerRule = 20;
 
+    [Header("Disable / Enable Instead Of Destroy")]
+    public bool keepAnimalsDisabledWhenZoneInactive = true;
+    public bool moveAnimalsBackToHomeWhenEnabledAgain = true;
+
     [Header("Soft Despawn")]
     public bool useSoftDespawn = true;
     public float despawnWhenAnimalNearHomeDistance = 4f;
@@ -116,15 +120,16 @@ public class AnimalSpawnZone : MonoBehaviour
 
         if (zoneSoftDespawning)
         {
-            // If player comes back into the zone, cancel soft despawn.
             if (distanceFromPlayer <= spawnDistance)
             {
                 CancelSoftDespawn();
+                EnableStoredAnimals();
+
                 zoneActive = true;
 
                 if (showDebugMessages)
                 {
-                    Debug.Log($"[{name}] Player returned. Soft despawn cancelled.");
+                    Debug.Log($"[{name}] Player returned. Same animals enabled again.");
                 }
 
                 TrySpawnAnimals();
@@ -139,33 +144,50 @@ public class AnimalSpawnZone : MonoBehaviour
         {
             zoneActive = true;
 
+            EnableStoredAnimals();
+
             if (showDebugMessages)
             {
                 Debug.Log($"[{name}] Spawn zone activated.");
             }
+
+            TrySpawnAnimals();
+            return;
         }
 
         if (zoneActive && distanceFromPlayer >= despawnDistance)
         {
             zoneActive = false;
 
-            if (useSoftDespawn)
+            if (keepAnimalsDisabledWhenZoneInactive)
             {
-                StartSoftDespawn();
-
-                if (showDebugMessages)
+                if (useSoftDespawn)
                 {
-                    Debug.Log($"[{name}] Zone deactivated. Animals are returning home before despawn.");
+                    StartSoftDespawn();
+
+                    if (showDebugMessages)
+                    {
+                        Debug.Log($"[{name}] Zone deactivated. Animals are returning home, then they will be disabled.");
+                    }
+                }
+                else
+                {
+                    DisableAllAnimalsButKeepThem();
+
+                    if (showDebugMessages)
+                    {
+                        Debug.Log($"[{name}] Zone deactivated. Animals disabled but not destroyed.");
+                    }
                 }
             }
             else
             {
+                DespawnAllAnimalsImmediately();
+
                 if (showDebugMessages)
                 {
-                    Debug.Log($"[{name}] Zone deactivated. Despawning animals instantly.");
+                    Debug.Log($"[{name}] Zone deactivated. Animals destroyed/despawned.");
                 }
-
-                DespawnAllAnimalsImmediately();
             }
 
             return;
@@ -179,6 +201,9 @@ public class AnimalSpawnZone : MonoBehaviour
 
     private void TrySpawnAnimals()
     {
+        if (!zoneActive || zoneSoftDespawning)
+            return;
+
         CleanActiveAnimalList();
 
         if (EcosystemManager.Instance == null)
@@ -198,8 +223,8 @@ public class AnimalSpawnZone : MonoBehaviour
             if (Time.time < GetNextAllowedSpawnTime(rule.species))
                 continue;
 
-            int currentActiveInZone = CountActiveAnimalsOfSpecies(rule.species);
-            int missingAmount = rule.desiredActiveInThisZone - currentActiveInZone;
+            int currentInZone = CountLivingAnimalsOfSpecies(rule.species);
+            int missingAmount = rule.desiredActiveInThisZone - currentInZone;
 
             if (missingAmount <= 0)
                 continue;
@@ -268,7 +293,11 @@ public class AnimalSpawnZone : MonoBehaviour
         }
 
         ecosystemAnimal.SpawnedByEcosystem(this, rule.species);
+
         activeAnimals.Add(ecosystemAnimal);
+
+        // Very important: remember the animal's home/spawn position.
+        animalHomePositions[ecosystemAnimal] = spawnPosition;
 
         if (showDebugMessages)
         {
@@ -277,6 +306,7 @@ public class AnimalSpawnZone : MonoBehaviour
 
         return true;
     }
+
     private bool TryGetSpawnPosition(SpawnRule rule, out Vector3 spawnPosition, out Quaternion spawnRotation)
     {
         spawnPosition = Vector3.zero;
@@ -370,12 +400,14 @@ public class AnimalSpawnZone : MonoBehaviour
             if (animal.DeathReported)
                 continue;
 
+            if (!animal.gameObject.activeSelf)
+                continue;
+
             Vector3 homePosition = GetAnimalHomePosition(animal);
 
             animalsReturningHome.Add(animal);
             nextReturnPathTime[animal] = 0f;
 
-            // This calls the function we added in Enemy.cs.
             animal.gameObject.SendMessage(
                 "BeginReturnHomeForDespawning",
                 homePosition,
@@ -384,19 +416,24 @@ public class AnimalSpawnZone : MonoBehaviour
 
             SendAnimalBackHome(animal, homePosition);
         }
+
+        if (AreAllLivingAnimalsDisabled())
+        {
+            FinishSoftDespawn();
+        }
     }
 
     private void ProcessSoftDespawn()
     {
         CleanActiveAnimalList();
 
-        if (activeAnimals.Count == 0)
+        if (AreAllLivingAnimalsDisabled())
         {
             FinishSoftDespawn();
             return;
         }
 
-        List<EcosystemAnimal> animalsToDespawn = new List<EcosystemAnimal>();
+        List<EcosystemAnimal> animalsToDisable = new List<EcosystemAnimal>();
 
         foreach (EcosystemAnimal animal in activeAnimals)
         {
@@ -404,10 +441,10 @@ public class AnimalSpawnZone : MonoBehaviour
                 continue;
 
             if (animal.DeathReported)
-            {
-                animalsToDespawn.Add(animal);
                 continue;
-            }
+
+            if (!animal.gameObject.activeSelf)
+                continue;
 
             Vector3 homePosition = GetAnimalHomePosition(animal);
 
@@ -416,13 +453,13 @@ public class AnimalSpawnZone : MonoBehaviour
 
             if (distanceToHome <= despawnWhenAnimalNearHomeDistance)
             {
-                animalsToDespawn.Add(animal);
+                animalsToDisable.Add(animal);
                 continue;
             }
 
             if (distanceToPlayer >= forceDespawnIfVeryFarFromPlayer)
             {
-                animalsToDespawn.Add(animal);
+                animalsToDisable.Add(animal);
                 continue;
             }
 
@@ -433,12 +470,12 @@ public class AnimalSpawnZone : MonoBehaviour
             }
         }
 
-        foreach (EcosystemAnimal animal in animalsToDespawn)
+        foreach (EcosystemAnimal animal in animalsToDisable)
         {
-            SoftDespawnOneAnimal(animal);
+            DisableAnimalButKeepInZone(animal);
         }
 
-        if (activeAnimals.Count == 0)
+        if (AreAllLivingAnimalsDisabled())
         {
             FinishSoftDespawn();
         }
@@ -449,9 +486,15 @@ public class AnimalSpawnZone : MonoBehaviour
         if (animal == null)
             return;
 
+        if (!animal.gameObject.activeInHierarchy)
+            return;
+
         NavMeshAgent agent = animal.GetComponent<NavMeshAgent>();
 
         if (agent == null)
+            return;
+
+        if (!agent.enabled)
             return;
 
         if (!agent.isOnNavMesh)
@@ -462,20 +505,150 @@ public class AnimalSpawnZone : MonoBehaviour
         agent.SetDestination(homePosition);
     }
 
-    private void SoftDespawnOneAnimal(EcosystemAnimal animal)
+    private void DisableAllAnimalsButKeepThem()
+    {
+        CleanActiveAnimalList();
+
+        List<EcosystemAnimal> animalsToDisable = new List<EcosystemAnimal>(activeAnimals);
+
+        foreach (EcosystemAnimal animal in animalsToDisable)
+        {
+            DisableAnimalButKeepInZone(animal);
+        }
+
+        FinishSoftDespawn();
+    }
+
+    private void DisableAnimalButKeepInZone(EcosystemAnimal animal)
     {
         if (animal == null)
             return;
 
-        activeAnimals.Remove(animal);
-        animalHomePositions.Remove(animal);
+        if (animal.DeathReported)
+            return;
+
         animalsReturningHome.Remove(animal);
         nextReturnPathTime.Remove(animal);
 
-        if (!animal.DeathReported)
+        if (animal.gameObject.activeSelf)
         {
-            animal.DespawnWithoutDeath();
+            NavMeshAgent agent = animal.GetComponent<NavMeshAgent>();
+
+            if (agent != null && agent.enabled && agent.isOnNavMesh)
+            {
+                agent.ResetPath();
+                agent.isStopped = true;
+            }
+
+            animal.gameObject.SendMessage(
+                "CancelReturnHomeForDespawning",
+                SendMessageOptions.DontRequireReceiver
+            );
+
+            // This is the main fix.
+            // We do NOT destroy the animal.
+            // We do NOT remove it from activeAnimals.
+            // We only disable it.
+            animal.gameObject.SetActive(false);
+
+            if (showDebugMessages)
+            {
+                Debug.Log($"[{name}] Disabled {animal.species} but kept it saved in this zone.");
+            }
         }
+    }
+
+    private void EnableStoredAnimals()
+    {
+        CleanActiveAnimalList();
+
+        zoneSoftDespawning = false;
+        animalsReturningHome.Clear();
+        nextReturnPathTime.Clear();
+
+        foreach (EcosystemAnimal animal in activeAnimals)
+        {
+            if (animal == null)
+                continue;
+
+            if (animal.DeathReported)
+                continue;
+
+            if (!animal.gameObject.activeSelf)
+            {
+                animal.gameObject.SetActive(true);
+            }
+
+            if (moveAnimalsBackToHomeWhenEnabledAgain)
+            {
+                MoveAnimalToHome(animal);
+            }
+
+            NavMeshAgent agent = animal.GetComponent<NavMeshAgent>();
+
+            if (agent != null && agent.enabled && agent.isOnNavMesh)
+            {
+                agent.isStopped = false;
+            }
+
+            animal.gameObject.SendMessage(
+                "CancelReturnHomeForDespawning",
+                SendMessageOptions.DontRequireReceiver
+            );
+        }
+    }
+
+    private void MoveAnimalToHome(EcosystemAnimal animal)
+    {
+        if (animal == null)
+            return;
+
+        Vector3 homePosition = GetAnimalHomePosition(animal);
+
+        if (useNavMeshSampling)
+        {
+            bool foundNavMeshPosition = NavMesh.SamplePosition(
+                homePosition,
+                out NavMeshHit navMeshHit,
+                navMeshSampleRadius,
+                NavMesh.AllAreas
+            );
+
+            if (foundNavMeshPosition)
+            {
+                homePosition = navMeshHit.position;
+            }
+        }
+
+        NavMeshAgent agent = animal.GetComponent<NavMeshAgent>();
+
+        if (agent != null && agent.enabled && agent.isOnNavMesh)
+        {
+            agent.Warp(homePosition);
+            agent.ResetPath();
+            agent.isStopped = false;
+        }
+        else
+        {
+            animal.transform.position = homePosition;
+        }
+    }
+
+    private bool AreAllLivingAnimalsDisabled()
+    {
+        foreach (EcosystemAnimal animal in activeAnimals)
+        {
+            if (animal == null)
+                continue;
+
+            if (animal.DeathReported)
+                continue;
+
+            if (animal.gameObject.activeSelf)
+                return false;
+        }
+
+        return true;
     }
 
     private void FinishSoftDespawn()
@@ -486,7 +659,7 @@ public class AnimalSpawnZone : MonoBehaviour
 
         if (showDebugMessages)
         {
-            Debug.Log($"[{name}] Soft despawn finished.");
+            Debug.Log($"[{name}] Zone animals are now disabled/saved.");
         }
     }
 
@@ -497,6 +670,9 @@ public class AnimalSpawnZone : MonoBehaviour
         foreach (EcosystemAnimal animal in animalsReturningHome)
         {
             if (animal == null)
+                continue;
+
+            if (!animal.gameObject.activeSelf)
                 continue;
 
             animal.gameObject.SendMessage(
@@ -579,7 +755,7 @@ public class AnimalSpawnZone : MonoBehaviour
         return transform.position;
     }
 
-    private int CountActiveAnimalsOfSpecies(EcosystemSpecies species)
+    private int CountLivingAnimalsOfSpecies(EcosystemSpecies species)
     {
         int count = 0;
 

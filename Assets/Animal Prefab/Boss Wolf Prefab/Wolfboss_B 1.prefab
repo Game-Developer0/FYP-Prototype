@@ -791,6 +791,7 @@ MonoBehaviour:
   maxHealth: 100
   currentHealth: 0
   defaultArrowDamage: 20
+  countForBossWolfMission: 1
   allowSoftDespawnReturn: 1
   arrowHits: 0
   destroyObjectTime: 10

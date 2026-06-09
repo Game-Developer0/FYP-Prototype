@@ -18,6 +18,18 @@ public class ObjectiveUI : MonoBehaviour
 
     public void ShowObjective(string title, string description, float showDuration)
     {
+        ShowObjectivePermanent(title, description);
+
+        if (hideCoroutine != null)
+        {
+            StopCoroutine(hideCoroutine);
+        }
+
+        hideCoroutine = StartCoroutine(HideAfterDelay(showDuration));
+    }
+
+    public void ShowObjectivePermanent(string title, string description)
+    {
         if (objectivePanel == null)
         {
             Debug.LogError("ObjectiveUI: Objective Panel is not assigned.");
@@ -35,17 +47,24 @@ public class ObjectiveUI : MonoBehaviour
         }
 
         objectivePanel.SetActive(true);
+    }
 
-        if (hideCoroutine != null)
+    public void UpdateObjectiveDescription(string description)
+    {
+        if (objectiveDescriptionText != null)
         {
-            StopCoroutine(hideCoroutine);
+            objectiveDescriptionText.text = description;
         }
-
-        hideCoroutine = StartCoroutine(HideAfterDelay(showDuration));
     }
 
     public void HideObjective()
     {
+        if (hideCoroutine != null)
+        {
+            StopCoroutine(hideCoroutine);
+            hideCoroutine = null;
+        }
+
         if (objectivePanel != null)
         {
             objectivePanel.SetActive(false);

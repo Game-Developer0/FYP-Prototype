@@ -30981,6 +30981,63 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 2057769906}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &183733993
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 183733995}
+  - component: {fileID: 183733994}
+  m_Layer: 0
+  m_Name: Mission Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &183733994
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 183733993}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68984ed4d580be142922aec513676744, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MissionSequenceManager
+  objectiveUI: {fileID: 2031494076}
+  warningUI: {fileID: 66838123}
+  mission1ShowDuration: 5
+  mission1Title: Objective Started
+  mission1Description: Explore the forest
+  delayBeforeWarning: 1
+  warningShowDuration: 5
+  warningMessage: 'ECOSYSTEM WARNING!
+
+    Boss Wolves are hunting the deer population.'
+  delayBeforeMission2Objective: 0.5
+  bossWolvesRequired: 4
+  mission2Title: Current Objective
+--- !u!4 &183733995
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 183733993}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 138.31223, y: 400.13956, z: 1.17735}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &184186620
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -79671,6 +79728,8 @@ MonoBehaviour:
   checkInterval: 2
   respawnDelayAfterDeath: 25
   maxSpawnAttemptsPerRule: 20
+  keepAnimalsDisabledWhenZoneInactive: 1
+  moveAnimalsBackToHomeWhenEnabledAgain: 1
   useSoftDespawn: 1
   despawnWhenAnimalNearHomeDistance: 4
   forceDespawnIfVeryFarFromPlayer: 250
@@ -106867,12 +106926,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DialogueWindow
   Text: {fileID: 294767678}
   letterDelay: 0.03
-  objectiveUI: {fileID: 2031494076}
-  showObjectiveAfterStoryEnds: 1
-  objectiveDelayAfterStory: 5
-  objectiveShowDuration: 60
-  objectiveTitle: Objective Started
-  objectiveDescription: Explore the forest
+  missionSequenceManager: {fileID: 183733994}
+  startMissionAfterStoryEnds: 1
+  missionDelayAfterStory: 0.5
 --- !u!4 &599129723 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1681224996073516063, guid: bc51859a359a6124d9240419fc73341a,
@@ -261043,6 +261099,8 @@ MonoBehaviour:
   checkInterval: 2
   respawnDelayAfterDeath: 25
   maxSpawnAttemptsPerRule: 20
+  keepAnimalsDisabledWhenZoneInactive: 1
+  moveAnimalsBackToHomeWhenEnabledAgain: 1
   useSoftDespawn: 1
   despawnWhenAnimalNearHomeDistance: 4
   forceDespawnIfVeryFarFromPlayer: 250
@@ -283758,7 +283816,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AnimalSpawnZone
   player: {fileID: 87864768954373606}
   townCenter: {fileID: 1042745864}
-  spawnDistance: 80
+  spawnDistance: 125.9
   despawnDistance: 130
   minimumDistanceFromPlayer: 30
   preventSpawnInsideTownSafeZone: 1
@@ -283766,6 +283824,8 @@ MonoBehaviour:
   checkInterval: 2
   respawnDelayAfterDeath: 25
   maxSpawnAttemptsPerRule: 20
+  keepAnimalsDisabledWhenZoneInactive: 1
+  moveAnimalsBackToHomeWhenEnabledAgain: 1
   useSoftDespawn: 1
   despawnWhenAnimalNearHomeDistance: 4
   forceDespawnIfVeryFarFromPlayer: 250
@@ -348190,6 +348250,8 @@ MonoBehaviour:
   checkInterval: 2
   respawnDelayAfterDeath: 25
   maxSpawnAttemptsPerRule: 20
+  keepAnimalsDisabledWhenZoneInactive: 1
+  moveAnimalsBackToHomeWhenEnabledAgain: 1
   useSoftDespawn: 1
   despawnWhenAnimalNearHomeDistance: 4
   forceDespawnIfVeryFarFromPlayer: 250
@@ -390400,7 +390462,7 @@ Transform:
   m_GameObject: {fileID: 753218405590126428}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 9.4, y: -2.46, z: 22.8}
+  m_LocalPosition: {x: 240.4, y: 5, z: 342.8}
   m_LocalScale: {x: 2, y: 1.3333334, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -397476,3 +397538,4 @@ SceneRoots:
   - {fileID: 8769637219547117260}
   - {fileID: 2133969661}
   - {fileID: 2031494075}
+  - {fileID: 183733995}
