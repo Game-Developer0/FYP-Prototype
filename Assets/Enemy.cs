@@ -202,6 +202,19 @@ public class Enemy : MonoBehaviour
 
         isDead = false;
         missionKillAlreadyCounted = false;
+
+        MissionBossWolfTarget missionTarget = GetComponent<MissionBossWolfTarget>();
+
+        if (missionTarget == null)
+        {
+            missionTarget = GetComponentInChildren<MissionBossWolfTarget>(true);
+        }
+
+        if (missionTarget != null)
+        {
+            missionTarget.ResetTargetForSpawn();
+        }
+
         hasDetectedPlayer = false;
         isDetectStunning = false;
         isKnockedDown = false;
@@ -955,6 +968,7 @@ public class Enemy : MonoBehaviour
         isDead = true;
 
         ReportKillToMission();
+        NotifyBossWolfTargetKilled();
 
         if (ecosystemAnimal == null)
             ecosystemAnimal = GetComponent<EcosystemAnimal>();
@@ -1052,6 +1066,23 @@ public class Enemy : MonoBehaviour
         else
         {
             Debug.LogWarning("Enemy: MissionSequenceManager not found in scene.");
+        }
+    }
+
+    void NotifyBossWolfTargetKilled()
+    {
+        if (!countForBossWolfMission) return;
+
+        MissionBossWolfTarget missionTarget = GetComponent<MissionBossWolfTarget>();
+
+        if (missionTarget == null)
+        {
+            missionTarget = GetComponentInChildren<MissionBossWolfTarget>(true);
+        }
+
+        if (missionTarget != null)
+        {
+            missionTarget.NotifyKilled();
         }
     }
 

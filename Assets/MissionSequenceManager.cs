@@ -3,6 +3,9 @@ using UnityEngine;
 
 public class MissionSequenceManager : MonoBehaviour
 {
+    [Header("Boss Wolf Direction Guide")]
+    public BossWolfDirectionCanvas bossWolfDirectionCanvas;
+
     [Header("UI References")]
     public ObjectiveUI objectiveUI;
     public EcosystemWarningUI warningUI;
@@ -92,6 +95,11 @@ public class MissionSequenceManager : MonoBehaviour
         mission2Active = true;
         mission2Completed = false;
 
+        if (bossWolfDirectionCanvas != null)
+        {
+            bossWolfDirectionCanvas.ShowGuide();
+        }
+
         UpdateMission2UI();
     }
 
@@ -128,6 +136,11 @@ public class MissionSequenceManager : MonoBehaviour
     {
         mission2Completed = true;
         mission2Active = false;
+
+        if (bossWolfDirectionCanvas != null)
+        {
+            bossWolfDirectionCanvas.HideGuide();
+        }
 
         objectiveUI.ShowObjective(
             "Objective Complete",

@@ -74,6 +74,17 @@ public class AnimalSpawnZone : MonoBehaviour
     [Header("Debug")]
     public bool showDebugMessages = true;
 
+    [Header("Danger Area Warning")]
+    public bool showDangerWarningOnEnter = false;
+
+    [TextArea(2, 4)]
+    public string dangerWarningMessage = "DANGEROUS AREA!\nYou have entered Boss Wolf territory. Stay alert.";
+
+    public float dangerWarningShowTime = 4f;
+    public bool showDangerWarningEveryTimePlayerEnters = true;
+
+    private bool dangerWarningShownThisVisit = false;
+
     private readonly List<EcosystemAnimal> activeAnimals = new List<EcosystemAnimal>();
     private readonly Dictionary<EcosystemAnimal, Vector3> animalHomePositions = new Dictionary<EcosystemAnimal, Vector3>();
     private readonly HashSet<EcosystemAnimal> animalsReturningHome = new HashSet<EcosystemAnimal>();
@@ -114,6 +125,26 @@ public class AnimalSpawnZone : MonoBehaviour
         UpdateZoneState();
     }
 
+    private void ShowDangerAreaWarning()
+    {
+        if (!showDangerWarningOnEnter)
+            return;
+
+        if (!showDangerWarningEveryTimePlayerEnters && dangerWarningShownThisVisit)
+            return;
+
+        dangerWarningShownThisVisit = true;
+
+        if (EcosystemWarningUI.Instance != null)
+        {
+            EcosystemWarningUI.Instance.ShowWarning(dangerWarningMessage, dangerWarningShowTime);
+        }
+        else
+        {
+            Debug.LogWarning($"[{name}] EcosystemWarningUI not found in scene.");
+        }
+    }
+
     private void UpdateZoneState()
     {
         float distanceFromPlayer = Vector3.Distance(player.position, transform.position);
@@ -126,6 +157,8 @@ public class AnimalSpawnZone : MonoBehaviour
                 EnableStoredAnimals();
 
                 zoneActive = true;
+
+                ShowDangerAreaWarning();
 
                 if (showDebugMessages)
                 {
@@ -144,6 +177,8 @@ public class AnimalSpawnZone : MonoBehaviour
         {
             zoneActive = true;
 
+            ShowDangerAreaWarning();
+
             EnableStoredAnimals();
 
             if (showDebugMessages)
@@ -158,6 +193,7 @@ public class AnimalSpawnZone : MonoBehaviour
         if (zoneActive && distanceFromPlayer >= despawnDistance)
         {
             zoneActive = false;
+            dangerWarningShownThisVisit = false;
 
             if (keepAnimalsDisabledWhenZoneInactive)
             {
