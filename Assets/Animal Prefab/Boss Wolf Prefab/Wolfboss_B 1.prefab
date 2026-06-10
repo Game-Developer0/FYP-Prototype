@@ -935,6 +935,19 @@ MonoBehaviour:
   currentHealth: 0
   defaultArrowDamage: 20
   countForBossWolfMission: 1
+  countForBearMission: 0
+  dropItemOnDeath: 1
+  deathDropPrefab: {fileID: 1021588353636906, guid: f75e1608d9f1e4f06a5027de3c813b5d,
+    type: 3}
+  deathDropChance: 1
+  deathDropOffset: {x: 0, y: 0.94, z: 0}
+  snapDeathDropToGround: 1
+  deathDropGroundLayer:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  deathDropRayStartHeight: 5
+  deathDropRayDistance: 15
+  deathDropGroundOffset: 0.05
   allowSoftDespawnReturn: 1
   arrowHits: 0
   destroyObjectTime: 10

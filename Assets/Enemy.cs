@@ -88,6 +88,22 @@ public class Enemy : MonoBehaviour
 
     private bool missionKillAlreadyCounted = false;
 
+    [Header("Death Item Drop")]
+    public bool dropItemOnDeath = false;
+    public GameObject deathDropPrefab;
+
+    [Range(0f, 1f)]
+    public float deathDropChance = 1f;
+
+    public Vector3 deathDropOffset = new Vector3(0f, 0.5f, 0f);
+
+    [Header("Death Drop Ground Snap")]
+    public bool snapDeathDropToGround = true;
+    public LayerMask deathDropGroundLayer = ~0;
+    public float deathDropRayStartHeight = 5f;
+    public float deathDropRayDistance = 15f;
+    public float deathDropGroundOffset = 0.05f;
+
     [Header("Soft Despawn Return")]
     public bool allowSoftDespawnReturn = true;
 
@@ -962,6 +978,43 @@ public class Enemy : MonoBehaviour
         }
     }
 
+    void SpawnDeathDrop()
+    {
+        if (!dropItemOnDeath) return;
+        if (deathDropPrefab == null) return;
+
+        if (Random.value > deathDropChance) return;
+
+        Vector3 spawnPosition = transform.position + deathDropOffset;
+        Quaternion spawnRotation = Quaternion.identity;
+
+        if (snapDeathDropToGround)
+        {
+            Vector3 rayStart = transform.position + Vector3.up * deathDropRayStartHeight;
+
+            bool hitGround = Physics.Raycast(
+                rayStart,
+                Vector3.down,
+                out RaycastHit hit,
+                deathDropRayDistance,
+                deathDropGroundLayer,
+                QueryTriggerInteraction.Ignore
+            );
+
+            if (hitGround)
+            {
+                spawnPosition = hit.point + Vector3.up * deathDropGroundOffset;
+            }
+        }
+
+        Instantiate(deathDropPrefab, spawnPosition, spawnRotation);
+    }
+    void SpawnDropThenDestroy()
+    {
+        SpawnDeathDrop();
+        Destroy(gameObject);
+    }
+
     void Die()
     {
         if (isDead) return;
@@ -994,7 +1047,7 @@ public class Enemy : MonoBehaviour
 
         SetBoolIfExists("Death", true);
 
-        Destroy(gameObject, destroyObjectTime);
+        Invoke(nameof(SpawnDropThenDestroy), destroyObjectTime);
     }
 
     void ClearPassiveStates()

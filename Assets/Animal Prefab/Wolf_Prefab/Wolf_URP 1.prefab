@@ -704,7 +704,7 @@ MonoBehaviour:
   chaseRunSpeed: 6
   zoneWalkBoolName: WalkForward
   chaseRunBoolName: Run Forward
-  detectionRange: 30
+  detectionRange: 16.7
   attackRange: 3
   losePlayerRange: 60
   returnToStartPosition: 1
@@ -733,6 +733,9 @@ MonoBehaviour:
   maxHealth: 100
   currentHealth: 0
   defaultArrowDamage: 20
+  countForBossWolfMission: 0
+  countForBearMission: 0
+  allowSoftDespawnReturn: 1
   arrowHits: 0
   destroyObjectTime: 4
   healthBar: {fileID: 3080835469829852162}

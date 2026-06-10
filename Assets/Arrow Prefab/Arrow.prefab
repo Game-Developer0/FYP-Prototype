@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 737489501607804360}
   - component: {fileID: 3950344721355430800}
   m_Layer: 0
-  m_Name: Arrow_Prefabe
+  m_Name: Arrow
   m_TagString: Arrow
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -166,6 +166,7 @@ PrefabInstance:
   m_SourcePrefab: {fileID: 100100000, guid: 5187dfa4d8f19524e8bbf7c6894b7de7, type: 3}
 --- !u!4 &4532633213181499517 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 4534147065827568, guid: 5187dfa4d8f19524e8bbf7c6894b7de7, type: 3}
+  m_CorrespondingSourceObject: {fileID: 4534147065827568, guid: 5187dfa4d8f19524e8bbf7c6894b7de7,
+    type: 3}
   m_PrefabInstance: {fileID: 4537163508733036685}
   m_PrefabAsset: {fileID: 0}

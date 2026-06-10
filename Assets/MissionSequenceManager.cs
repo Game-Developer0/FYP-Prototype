@@ -34,16 +34,29 @@ public class MissionSequenceManager : MonoBehaviour
     public float warningShowDuration = 5f;
 
     [TextArea(2, 5)]
-    public string warningMessage = "ECOSYSTEM WARNING!\n\nBoss Wolves are hunting the deer population. If they are not stopped, the forest balance will collapse.";
+    public string warningMessage = "ECOSYSTEM WARNING!\n\nBoss Wolves are hunting the deer population. Stop them before the deer population collapses.";
 
     [Header("Mission 2 Objective")]
     public float delayBeforeMission2Objective = 0.5f;
     public int bossWolvesRequired = 4;
     public string mission2Title = "Current Objective";
 
+    [Header("Mission 2 Timer")]
+    public bool useMission2TimeLimit = true;
+    public float mission2TimeLimit = 180f;
+
+    [TextArea(2, 5)]
+    public string mission2FailWarningMessage = "ECOSYSTEM FAILURE!\n\nThe deer population has gone extinct because the Boss Wolves were not stopped in time.";
+
+    public float mission2FailObjectiveShowTime = 6f;
+    public bool continueToMission3AfterMission2Fail = true;
+
     private int bossWolvesKilled = 0;
     private bool mission2Active = false;
     private bool mission2Completed = false;
+    private bool mission2Failed = false;
+    private float mission2TimeRemaining = 0f;
+    private Coroutine mission2TimerCoroutine;
 
     [Header("Mission 3 Dragon Warning")]
     public float delayBeforeMission3Warning = 1f;
@@ -188,11 +201,21 @@ public class MissionSequenceManager : MonoBehaviour
         bossWolvesKilled = 0;
         mission2Active = true;
         mission2Completed = false;
+        mission2Failed = false;
 
         mission3Active = false;
         mission3Completed = false;
         mission4Active = false;
         mission4Completed = false;
+
+        mission2TimeRemaining = mission2TimeLimit;
+
+        StopMission2Timer();
+
+        if (useMission2TimeLimit && mission2TimeLimit > 0f)
+        {
+            mission2TimerCoroutine = StartCoroutine(Mission2TimerRoutine());
+        }
 
         if (bossWolfDirectionCanvas != null)
         {
@@ -202,10 +225,43 @@ public class MissionSequenceManager : MonoBehaviour
         UpdateMission2UI();
     }
 
+    private IEnumerator Mission2TimerRoutine()
+    {
+        while (mission2Active && !mission2Completed && !mission2Failed)
+        {
+            mission2TimeRemaining -= 1f;
+
+            if (mission2TimeRemaining < 0f)
+            {
+                mission2TimeRemaining = 0f;
+            }
+
+            UpdateMission2UI();
+
+            if (mission2TimeRemaining <= 0f)
+            {
+                FailMission2();
+                yield break;
+            }
+
+            yield return new WaitForSeconds(1f);
+        }
+    }
+
+    private void StopMission2Timer()
+    {
+        if (mission2TimerCoroutine != null)
+        {
+            StopCoroutine(mission2TimerCoroutine);
+            mission2TimerCoroutine = null;
+        }
+    }
+
     public void RegisterBossWolfKill()
     {
         if (!mission2Active) return;
         if (mission2Completed) return;
+        if (mission2Failed) return;
 
         bossWolvesKilled++;
 
@@ -224,17 +280,36 @@ public class MissionSequenceManager : MonoBehaviour
 
     private void UpdateMission2UI()
     {
+        if (objectiveUI == null) return;
+
         string description =
             "Kill " + bossWolvesRequired + " Boss Wolves.\n" +
             "Progress: " + bossWolvesKilled + " / " + bossWolvesRequired;
 
+        if (useMission2TimeLimit && mission2Active && !mission2Completed && !mission2Failed)
+        {
+            description += "\n\nTime Left: " + FormatTime(mission2TimeRemaining);
+        }
+
         objectiveUI.ShowObjectivePermanent(mission2Title, description);
+    }
+
+    private string FormatTime(float time)
+    {
+        int totalSeconds = Mathf.CeilToInt(time);
+        int minutes = totalSeconds / 60;
+        int seconds = totalSeconds % 60;
+
+        return minutes.ToString("00") + ":" + seconds.ToString("00");
     }
 
     private void CompleteMission2()
     {
         mission2Completed = true;
         mission2Active = false;
+        mission2Failed = false;
+
+        StopMission2Timer();
 
         if (bossWolfDirectionCanvas != null)
         {
@@ -251,6 +326,76 @@ public class MissionSequenceManager : MonoBehaviour
         {
             StartCoroutine(StartMission3AfterMission2Complete());
         }
+    }
+
+    private void FailMission2()
+    {
+        if (mission2Completed) return;
+        if (mission2Failed) return;
+
+        mission2Failed = true;
+        mission2Active = false;
+
+        StopMission2Timer();
+
+        if (bossWolfDirectionCanvas != null)
+        {
+            bossWolfDirectionCanvas.HideGuide();
+        }
+
+        if (warningUI == null)
+        {
+            warningUI = EcosystemWarningUI.Instance;
+        }
+
+        if (warningUI != null)
+        {
+            warningUI.ShowWarning(mission2FailWarningMessage, mission2FailObjectiveShowTime);
+        }
+
+        if (objectiveUI != null)
+        {
+            objectiveUI.ShowObjective(
+                "Mission Failed",
+                "The deer population is extinct.",
+                mission2FailObjectiveShowTime
+            );
+        }
+
+        if (continueToMission3AfterMission2Fail && debugStartMode == DebugStartMode.Normal)
+        {
+            StartCoroutine(StartMission3AfterMission2Fail());
+        }
+    }
+
+    private IEnumerator StartMission3AfterMission2Fail()
+    {
+        yield return new WaitForSeconds(mission2FailObjectiveShowTime + 1f);
+
+        if (warningUI == null)
+        {
+            warningUI = EcosystemWarningUI.Instance;
+        }
+
+        if (warningUI != null)
+        {
+            warningUI.ShowWarning(mission3WarningMessage, mission3WarningShowDuration);
+
+            float typingTime = 0f;
+
+            if (warningUI.useTypewriterEffect)
+            {
+                typingTime = mission3WarningMessage.Length * warningUI.typeSpeed;
+            }
+
+            yield return new WaitForSeconds(typingTime + mission3WarningShowDuration);
+        }
+        else
+        {
+            yield return new WaitForSeconds(mission3WarningShowDuration);
+        }
+
+        StartMission3();
     }
 
     private IEnumerator StartMission3AfterMission2Complete()
@@ -450,7 +595,7 @@ public class MissionSequenceManager : MonoBehaviour
 
         objectiveUI.ShowObjective(
             "Objective Complete",
-            "The bear threat has been controlled.",
+            "The bear threat has been controlled. The forest is safer now.",
             6f
         );
     }

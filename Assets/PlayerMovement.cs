@@ -158,6 +158,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
+        CheckGrounded();
+
         Movement();
 
         StopGroundSliding();
@@ -482,28 +484,17 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        rb.AddForce(Vector3.down * Time.deltaTime * 10);
+        // Helps keep the player attached to uneven ground
+        if (grounded && !jumping)
+        {
+            rb.AddForce(Vector3.down * 25f, ForceMode.Acceleration);
+        }
 
         Vector2 mag = FindVelRelativeToLook();
         float xMag = mag.x;
         float yMag = mag.y;
 
         CounterMovement(x, y, mag);
-
-        if (grounded && !jumping && !crouching && !sliding)
-        {
-            bool noMovementInput = Mathf.Abs(x) < 0.01f && Mathf.Abs(y) < 0.01f;
-
-            if (noMovementInput)
-            {
-                Vector3 horizontalVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
-
-                if (horizontalVelocity.magnitude < 2f)
-                {
-                    rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
-                }
-            }
-        }
 
         if (readyToJump && jumping)
         {
@@ -527,39 +518,36 @@ public class PlayerMovement : MonoBehaviour
         currentMoveSpeed *= externalSpeedMultiplier;
         currentMaxSpeed *= externalSpeedMultiplier;
 
-        if (crouching && grounded && readyToJump)
-        {
-            rb.AddForce(Vector3.down * Time.deltaTime * 3000);
-            return;
-        }
-
         if (x > 0 && xMag > currentMaxSpeed) x = 0;
         if (x < 0 && xMag < -currentMaxSpeed) x = 0;
         if (y > 0 && yMag > currentMaxSpeed) y = 0;
         if (y < 0 && yMag < -currentMaxSpeed) y = 0;
 
-        float multiplier = 1f;
-        float multiplierV = 1f;
-
-        if (!grounded)
-        {
-            multiplier = 0.5f;
-            multiplierV = 0.5f;
-        }
+        float multiplier = grounded ? 1f : 0.5f;
 
         if (sliding)
         {
-            rb.AddForce(orientation.forward * slideForce * Time.deltaTime * externalSpeedMultiplier);
+            Vector3 slideDirection = Vector3.ProjectOnPlane(orientation.forward, normalVector).normalized;
+            rb.AddForce(slideDirection * slideForce * Time.fixedDeltaTime * externalSpeedMultiplier);
             return;
         }
 
-        if (grounded && crouching)
+        Vector3 moveDirection =
+            orientation.forward * y +
+            orientation.right * x;
+
+        if (moveDirection.magnitude > 1f)
         {
-            multiplierV = 0f;
+            moveDirection.Normalize();
         }
 
-        rb.AddForce(orientation.transform.forward * y * currentMoveSpeed * Time.deltaTime * multiplier * multiplierV);
-        rb.AddForce(orientation.transform.right * x * currentMoveSpeed * Time.deltaTime * multiplier);
+        // Important fix for uneven ground
+        if (grounded)
+        {
+            moveDirection = Vector3.ProjectOnPlane(moveDirection, normalVector).normalized;
+        }
+
+        rb.AddForce(moveDirection * currentMoveSpeed * Time.fixedDeltaTime * multiplier);
     }
 
     private void Jump()
@@ -652,9 +640,9 @@ public class PlayerMovement : MonoBehaviour
         return angle < maxSlopeAngle;
     }
 
-    private bool cancellingGrounded;
+    //private bool cancellingGrounded;
 
-    private void OnCollisionStay(Collision other)
+    /*private void OnCollisionStay(Collision other)
     {
         int layer = other.gameObject.layer;
         if (whatIsGround != (whatIsGround | (1 << layer))) return;
@@ -678,12 +666,55 @@ public class PlayerMovement : MonoBehaviour
             cancellingGrounded = true;
             Invoke(nameof(StopGrounded), Time.deltaTime * delay);
         }
+    }*/
+
+    private void CheckGrounded()
+    {
+        if (playerCollider == null)
+        {
+            grounded = false;
+            normalVector = Vector3.up;
+            return;
+        }
+
+        Vector3 origin = transform.position + playerCollider.center + Vector3.up * 0.1f;
+
+        float sphereRadius = playerCollider.radius * 0.9f;
+        float checkDistance = (playerCollider.height * 0.5f) + 0.35f;
+
+        RaycastHit hit;
+
+        if (Physics.SphereCast(
+            origin,
+            sphereRadius,
+            Vector3.down,
+            out hit,
+            checkDistance,
+            whatIsGround,
+            QueryTriggerInteraction.Ignore))
+        {
+            if (IsFloor(hit.normal))
+            {
+                grounded = true;
+                normalVector = hit.normal;
+            }
+            else
+            {
+                grounded = false;
+                normalVector = Vector3.up;
+            }
+        }
+        else
+        {
+            grounded = false;
+            normalVector = Vector3.up;
+        }
     }
 
-    private void StopGrounded()
+    /*private void StopGrounded()
     {
         grounded = false;
-    }
+    }*/
 
     public bool IsGunAiming()
     {
