@@ -31108,7 +31108,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68984ed4d580be142922aec513676744, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MissionSequenceManager
-  debugStartMode: 0
+  debugStartMode: 3
   debugStartDelay: 1
   bossWolfDirectionCanvas: {fileID: 992695457}
   objectiveUI: {fileID: 2031494076}
@@ -31136,6 +31136,14 @@ MonoBehaviour:
   hideMission3DragonsOnStart: 1
   dragonsRequired: 2
   mission3Title: Current Objective
+  delayBeforeMission4Warning: 1
+  mission4WarningShowDuration: 5
+  mission4WarningMessage: 'DANGEROUS WILDLIFE ALERT!
+
+    Bears are hunting the Rabbit
+    population.'
+  bearsRequired: 4
+  mission4Title: Current Objective
 --- !u!4 &183733995
 Transform:
   m_ObjectHideFlags: 0
@@ -261492,9 +261500,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AnimalSpawnZone
   player: {fileID: 87864768954373606}
   townCenter: {fileID: 1042745864}
-  spawnDistance: 80
-  despawnDistance: 130
-  minimumDistanceFromPlayer: 30
+  spawnDistance: 266.4
+  despawnDistance: 300
+  minimumDistanceFromPlayer: 60
   preventSpawnInsideTownSafeZone: 1
   townSafeRadius: 125.6
   checkInterval: 2
@@ -261579,7 +261587,7 @@ Transform:
   m_GameObject: {fileID: 1426666074}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 629.82, y: 12.51, z: 309.46}
+  m_LocalPosition: {x: 657.8, y: 12.51, z: 309.46}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -331649,6 +331657,52 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ddfd4e07d34580a4e89ee5d0f094307d, type: 3}
+--- !u!1 &1831276171
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1831276172}
+  - component: {fileID: 1831276173}
+  m_Layer: 0
+  m_Name: BearAreaPoint_1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1831276172
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1831276171}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 704.5681, y: 0.67768, z: 757.07263}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1831276173
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1831276171}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae77f91163e174549a866abc27738e99, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BossWolfAreaPoint
+  targetID: Bear
+  killsRequiredInThisArea: 4
 --- !u!1001 &1831698134
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -348779,7 +348833,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1919040620
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -348987,6 +349041,52 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1509526090}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1920425253
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1920425255}
+  - component: {fileID: 1920425254}
+  m_Layer: 0
+  m_Name: BearAreaPoint_2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1920425254
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1920425253}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae77f91163e174549a866abc27738e99, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BossWolfAreaPoint
+  targetID: Bear
+  killsRequiredInThisArea: 4
+--- !u!4 &1920425255
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1920425253}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 889.3901, y: 25.31857, z: 274.012}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1920631627 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1681224996073516063, guid: bc51859a359a6124d9240419fc73341a,
@@ -391021,7 +391121,7 @@ Transform:
   m_GameObject: {fileID: 753218405590126428}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 104.4, y: 18.82, z: 519.6}
+  m_LocalPosition: {x: -117.7, y: 18.82, z: 518.4}
   m_LocalScale: {x: 2, y: 1.3333334, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -398104,3 +398204,5 @@ SceneRoots:
   - {fileID: 109743036}
   - {fileID: 1575447139}
   - {fileID: 383247791}
+  - {fileID: 1831276172}
+  - {fileID: 1920425255}

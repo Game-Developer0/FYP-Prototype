@@ -7,7 +7,8 @@ public class MissionSequenceManager : MonoBehaviour
     {
         Normal,
         Mission2,
-        Mission3
+        Mission3,
+        Mission4
     }
 
     [Header("Debug Start")]
@@ -63,6 +64,21 @@ public class MissionSequenceManager : MonoBehaviour
     private bool mission3Active = false;
     private bool mission3Completed = false;
 
+    [Header("Mission 4 Bear Warning")]
+    public float delayBeforeMission4Warning = 1f;
+    public float mission4WarningShowDuration = 5f;
+
+    [TextArea(2, 5)]
+    public string mission4WarningMessage = "DANGEROUS WILDLIFE ALERT!\n\nA group of aggressive bears is threatening the forest. Follow the minimap direction marker and reduce the bear threat.";
+
+    [Header("Mission 4 Objective")]
+    public int bearsRequired = 4;
+    public string mission4Title = "Current Objective";
+
+    private int bearsKilled = 0;
+    private bool mission4Active = false;
+    private bool mission4Completed = false;
+
     private Coroutine missionFlowCoroutine;
 
     private void Start()
@@ -104,6 +120,10 @@ public class MissionSequenceManager : MonoBehaviour
         else if (debugStartMode == DebugStartMode.Mission3)
         {
             StartMission3();
+        }
+        else if (debugStartMode == DebugStartMode.Mission4)
+        {
+            StartMission4();
         }
     }
 
@@ -155,7 +175,6 @@ public class MissionSequenceManager : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("MissionSequenceManager: WarningUI is not assigned and Instance was not found.");
             yield return new WaitForSeconds(warningShowDuration);
         }
 
@@ -172,6 +191,8 @@ public class MissionSequenceManager : MonoBehaviour
 
         mission3Active = false;
         mission3Completed = false;
+        mission4Active = false;
+        mission4Completed = false;
 
         if (bossWolfDirectionCanvas != null)
         {
@@ -265,13 +286,15 @@ public class MissionSequenceManager : MonoBehaviour
 
     public void StartMission3()
     {
-        bossWolvesKilled = Mathf.Clamp(bossWolvesKilled, 0, bossWolvesRequired);
         mission2Active = false;
         mission2Completed = true;
 
         dragonsKilled = 0;
         mission3Active = true;
         mission3Completed = false;
+
+        mission4Active = false;
+        mission4Completed = false;
 
         SetMission3DragonsActive(true);
         ResetMissionDragonTargets();
@@ -325,7 +348,109 @@ public class MissionSequenceManager : MonoBehaviour
 
         objectiveUI.ShowObjective(
             "Objective Complete",
-            "Dragons defeated. Ecosystem restored.",
+            "The elemental dragons have been defeated.",
+            6f
+        );
+
+        if (debugStartMode == DebugStartMode.Normal)
+        {
+            StartCoroutine(StartMission4AfterMission3Complete());
+        }
+    }
+
+    private IEnumerator StartMission4AfterMission3Complete()
+    {
+        yield return new WaitForSeconds(6f);
+        yield return new WaitForSeconds(delayBeforeMission4Warning);
+
+        if (warningUI == null)
+        {
+            warningUI = EcosystemWarningUI.Instance;
+        }
+
+        if (warningUI != null)
+        {
+            warningUI.ShowWarning(mission4WarningMessage, mission4WarningShowDuration);
+
+            float typingTime = 0f;
+
+            if (warningUI.useTypewriterEffect)
+            {
+                typingTime = mission4WarningMessage.Length * warningUI.typeSpeed;
+            }
+
+            yield return new WaitForSeconds(typingTime + mission4WarningShowDuration);
+        }
+        else
+        {
+            yield return new WaitForSeconds(mission4WarningShowDuration);
+        }
+
+        StartMission4();
+    }
+
+    public void StartMission4()
+    {
+        mission2Active = false;
+        mission2Completed = true;
+
+        mission3Active = false;
+        mission3Completed = true;
+
+        bearsKilled = 0;
+        mission4Active = true;
+        mission4Completed = false;
+
+        if (bossWolfDirectionCanvas != null)
+        {
+            bossWolfDirectionCanvas.ShowGuide("Bear");
+        }
+
+        UpdateMission4UI();
+    }
+
+    public void RegisterBearKill()
+    {
+        if (!mission4Active) return;
+        if (mission4Completed) return;
+
+        bearsKilled++;
+
+        if (bearsKilled > bearsRequired)
+        {
+            bearsKilled = bearsRequired;
+        }
+
+        UpdateMission4UI();
+
+        if (bearsKilled >= bearsRequired)
+        {
+            CompleteMission4();
+        }
+    }
+
+    private void UpdateMission4UI()
+    {
+        string description =
+            "Kill " + bearsRequired + " aggressive Bears.\n" +
+            "Progress: " + bearsKilled + " / " + bearsRequired;
+
+        objectiveUI.ShowObjectivePermanent(mission4Title, description);
+    }
+
+    private void CompleteMission4()
+    {
+        mission4Completed = true;
+        mission4Active = false;
+
+        if (bossWolfDirectionCanvas != null)
+        {
+            bossWolfDirectionCanvas.HideGuide();
+        }
+
+        objectiveUI.ShowObjective(
+            "Objective Complete",
+            "The bear threat has been controlled.",
             6f
         );
     }

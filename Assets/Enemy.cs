@@ -84,6 +84,7 @@ public class Enemy : MonoBehaviour
 
     [Header("Mission Settings")]
     public bool countForBossWolfMission = false;
+    public bool countForBearMission = false;
 
     private bool missionKillAlreadyCounted = false;
 
@@ -1052,26 +1053,33 @@ public class Enemy : MonoBehaviour
     }
     void ReportKillToMission()
     {
-        if (!countForBossWolfMission) return;
+        if (!countForBossWolfMission && !countForBearMission) return;
         if (missionKillAlreadyCounted) return;
 
         missionKillAlreadyCounted = true;
 
         MissionSequenceManager missionManager = FindObjectOfType<MissionSequenceManager>();
 
-        if (missionManager != null)
+        if (missionManager == null)
+        {
+            Debug.LogWarning("Enemy: MissionSequenceManager not found in scene.");
+            return;
+        }
+
+        if (countForBossWolfMission)
         {
             missionManager.RegisterBossWolfKill();
         }
-        else
+
+        if (countForBearMission)
         {
-            Debug.LogWarning("Enemy: MissionSequenceManager not found in scene.");
+            missionManager.RegisterBearKill();
         }
     }
 
     void NotifyBossWolfTargetKilled()
     {
-        if (!countForBossWolfMission) return;
+        if (!countForBossWolfMission && !countForBearMission) return;
 
         MissionBossWolfTarget missionTarget = GetComponent<MissionBossWolfTarget>();
 
