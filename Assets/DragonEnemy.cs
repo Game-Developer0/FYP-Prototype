@@ -212,6 +212,7 @@ public class DragonEnemy : MonoBehaviour
     private bool isLanding = false;
     private bool isFalling = false;
     private bool isDead = false;
+    private bool missionDragonDeathReported = false;
 
     private bool wantsFlyMove = false;
     private bool wantsGroundMove = false;
@@ -371,6 +372,7 @@ public class DragonEnemy : MonoBehaviour
             animator = GetComponent<Animator>();
 
         currentHealth = maxHealth;
+        missionDragonDeathReported = false;
         SetupDragonHealthBar();
 
         if (zoneCenter != null)
@@ -2426,6 +2428,7 @@ public class DragonEnemy : MonoBehaviour
         if (currentHealth <= 0)
         {
             HideDragonHealthBar();
+            ReportDragonDeathToMission();
 
             if (isFlying || isFalling || isTakingOff || isLanding)
                 StartSkyDeath();
@@ -2815,6 +2818,25 @@ public class DragonEnemy : MonoBehaviour
             return arrowDamage.damage;
 
         return defaultArrowDamage;
+    }
+
+    void ReportDragonDeathToMission()
+    {
+        if (missionDragonDeathReported) return;
+
+        missionDragonDeathReported = true;
+
+        MissionDragonTarget missionTarget = GetComponent<MissionDragonTarget>();
+
+        if (missionTarget == null)
+        {
+            missionTarget = GetComponentInChildren<MissionDragonTarget>(true);
+        }
+
+        if (missionTarget != null)
+        {
+            missionTarget.NotifyKilled();
+        }
     }
 
     private void OnDrawGizmosSelected()

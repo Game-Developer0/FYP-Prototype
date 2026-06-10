@@ -15,10 +15,7 @@ public class BossWolfDirectionCanvas : MonoBehaviour
     public float behindDistance = 4f;
 
     [Header("Rotation")]
-    [Tooltip("Use 90 or -90 depending on your minimap camera direction.")]
     public float flatXRotation = 90f;
-
-    [Tooltip("If arrow points wrong way, try 90, -90, or 180.")]
     public float rotationOffset = 0f;
 
     private bool guideActive = false;
@@ -27,25 +24,16 @@ public class BossWolfDirectionCanvas : MonoBehaviour
 
     private void Awake()
     {
-        if (arrowVisualRoot != null)
-        {
-            arrowVisualRoot.SetActive(false);
-        }
+        HideGuide();
     }
 
     private void Update()
     {
-        if (!guideActive)
-        {
-            return;
-        }
+        if (!guideActive) return;
 
         FindPlayerIfMissing();
 
-        if (player == null)
-        {
-            return;
-        }
+        if (player == null) return;
 
         Vector3 behindOffset = -player.forward * behindDistance;
         transform.position = player.position + Vector3.up * heightAbovePlayer + behindOffset;
@@ -74,10 +62,7 @@ public class BossWolfDirectionCanvas : MonoBehaviour
         Vector3 direction = currentDestination.position - player.position;
         direction.y = 0f;
 
-        if (direction.sqrMagnitude < 0.1f)
-        {
-            return;
-        }
+        if (direction.sqrMagnitude < 0.1f) return;
 
         float angle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
 
@@ -96,6 +81,12 @@ public class BossWolfDirectionCanvas : MonoBehaviour
         RefreshDestination();
     }
 
+    public void ShowGuide(string newTargetID)
+    {
+        targetID = newTargetID;
+        ShowGuide();
+    }
+
     public void HideGuide()
     {
         guideActive = false;
@@ -106,7 +97,7 @@ public class BossWolfDirectionCanvas : MonoBehaviour
             arrowVisualRoot.SetActive(false);
         }
 
-        HideAllBossWolfRedDots();
+        HideAllRedDots();
     }
 
     public void RefreshDestination()
@@ -119,15 +110,29 @@ public class BossWolfDirectionCanvas : MonoBehaviour
             return;
         }
 
-        MissionBossWolfTarget nearestAliveBossWolf = GetNearestAliveBossWolf();
-
-        if (nearestAliveBossWolf != null)
+        if (targetID == "Dragon")
         {
-            currentDestination = nearestAliveBossWolf.transform;
+            MissionDragonTarget nearestDragon = GetNearestAliveDragon();
+
+            if (nearestDragon != null)
+            {
+                currentDestination = nearestDragon.transform;
+                return;
+            }
+
+            currentDestination = null;
             return;
         }
 
-        BossWolfAreaPoint nearestUnclearedArea = GetNearestUnclearedArea();
+        MissionBossWolfTarget nearestBossWolf = GetNearestAliveBossWolf();
+
+        if (nearestBossWolf != null)
+        {
+            currentDestination = nearestBossWolf.transform;
+            return;
+        }
+
+        BossWolfAreaPoint nearestUnclearedArea = GetNearestUnclearedBossWolfArea();
 
         if (nearestUnclearedArea != null)
         {
@@ -136,6 +141,38 @@ public class BossWolfDirectionCanvas : MonoBehaviour
         }
 
         currentDestination = null;
+    }
+
+    private MissionDragonTarget GetNearestAliveDragon()
+    {
+        MissionDragonTarget[] dragons = FindObjectsOfType<MissionDragonTarget>();
+
+        MissionDragonTarget nearestDragon = null;
+        float nearestDistance = Mathf.Infinity;
+
+        foreach (MissionDragonTarget dragon in dragons)
+        {
+            if (dragon == null) continue;
+            if (dragon.targetID != targetID) continue;
+
+            if (!dragon.IsAlive())
+            {
+                dragon.ShowRedDot(false);
+                continue;
+            }
+
+            dragon.ShowRedDot(true);
+
+            float distance = Vector3.Distance(player.position, dragon.transform.position);
+
+            if (distance < nearestDistance)
+            {
+                nearestDistance = distance;
+                nearestDragon = dragon;
+            }
+        }
+
+        return nearestDragon;
     }
 
     private MissionBossWolfTarget GetNearestAliveBossWolf()
@@ -170,7 +207,7 @@ public class BossWolfDirectionCanvas : MonoBehaviour
         return nearestTarget;
     }
 
-    private BossWolfAreaPoint GetNearestUnclearedArea()
+    private BossWolfAreaPoint GetNearestUnclearedBossWolfArea()
     {
         BossWolfAreaPoint[] areaPoints = FindObjectsOfType<BossWolfAreaPoint>();
 
@@ -195,15 +232,25 @@ public class BossWolfDirectionCanvas : MonoBehaviour
         return nearestArea;
     }
 
-    private void HideAllBossWolfRedDots()
+    private void HideAllRedDots()
     {
-        MissionBossWolfTarget[] targets = FindObjectsOfType<MissionBossWolfTarget>();
+        MissionBossWolfTarget[] bossWolfTargets = FindObjectsOfType<MissionBossWolfTarget>();
 
-        foreach (MissionBossWolfTarget target in targets)
+        foreach (MissionBossWolfTarget target in bossWolfTargets)
         {
             if (target != null)
             {
                 target.ShowRedDot(false);
+            }
+        }
+
+        MissionDragonTarget[] dragonTargets = FindObjectsOfType<MissionDragonTarget>();
+
+        foreach (MissionDragonTarget dragon in dragonTargets)
+        {
+            if (dragon != null)
+            {
+                dragon.ShowRedDot(false);
             }
         }
     }

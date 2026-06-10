@@ -416,7 +416,7 @@ MonoBehaviour:
   fireballPrefab: {fileID: 4782603780973126738, guid: 57bce47e2da7a1f47a38db5528afd2dd,
     type: 3}
   acidBallPrefab: {fileID: 0}
-  firePoint: {fileID: 0}
+  firePoint: {fileID: 2852694888331916840}
   projectileSpeed: 28
   projectileShootLockTime: 0.8
   useAnimationEventsForProjectiles: 0
@@ -457,8 +457,8 @@ MonoBehaviour:
   aimMouthAtPlayer: 1
   mouthAimSpeed: 25
   mouthTargetOffset: {x: 0, y: 1.2, z: 0}
-  spreadAcidParticle: {fileID: 0}
-  spreadAcidPoint: {fileID: 0}
+  spreadAcidParticle: {fileID: 4609829805367324959}
+  spreadAcidPoint: {fileID: 2852694888331916840}
   spreadAcidBreathDuration: 2
   spreadAcidDamage: 8
   spreadAcidDamageRange: 16
@@ -4802,6 +4802,12 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fc695379b7d5c834cbe18e2233541d1d, type: 3}
+--- !u!198 &4609829805367324959 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 5545256784270298454, guid: fc695379b7d5c834cbe18e2233541d1d,
+    type: 3}
+  m_PrefabInstance: {fileID: 8290513811588054089}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &5388518498649044394 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4164157730190526947, guid: fc695379b7d5c834cbe18e2233541d1d,

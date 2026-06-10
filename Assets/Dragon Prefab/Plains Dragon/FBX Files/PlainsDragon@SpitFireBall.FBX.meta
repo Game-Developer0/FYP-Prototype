@@ -1,234 +1,641 @@
 fileFormatVersion: 2
 guid: fa471db6575ee90409726a3354713b21
-timeCreated: 1524873382
-licenseType: Store
+AssetOrigin:
+  serializedVersion: 1
+  productId: 117306
+  packageName: ELEMENTAL DRAGONS PACK
+  packageVersion: 1.22
+  assetPath: Assets/HEROIC FANTASY CREATURES FULL PACK VOL3/Elemental Dragons Pack/Plains
+    Dragon/FBX Files/PlainsDragon@SpitFireBall.FBX
+  uploadId: 669989
 ModelImporter:
-  serializedVersion: 19
-  fileIDToRecycleName:
-    100000: //RootNode
-    100002: PlainsDragon_
-    100004: PlainsDragon_ Footsteps
-    100006: PlainsDragon_ Head
-    100008: PlainsDragon_ L Calf
-    100010: PlainsDragon_ L Clavicle
-    100012: PlainsDragon_ L Finger0
-    100014: PlainsDragon_ L Finger01
-    100016: PlainsDragon_ L Finger1
-    100018: PlainsDragon_ L Finger11
-    100020: PlainsDragon_ L Finger2
-    100022: PlainsDragon_ L Finger21
-    100024: PlainsDragon_ L Finger3
-    100026: PlainsDragon_ L Finger31
-    100028: PlainsDragon_ L Foot
-    100030: PlainsDragon_ L Forearm
-    100032: PlainsDragon_ L Hand
-    100034: PlainsDragon_ L HorseLink
-    100036: PlainsDragon_ L Thigh
-    100038: PlainsDragon_ L Toe0
-    100040: PlainsDragon_ L Toe01
-    100042: PlainsDragon_ L Toe1
-    100044: PlainsDragon_ L Toe11
-    100046: PlainsDragon_ L Toe2
-    100048: PlainsDragon_ L Toe21
-    100050: PlainsDragon_ L Toe3
-    100052: PlainsDragon_ L Toe31
-    100054: PlainsDragon_ L UpperArm
-    100056: PlainsDragon_ Neck
-    100058: PlainsDragon_ Neck1
-    100060: PlainsDragon_ Pelvis
-    100062: PlainsDragon_ Ponytail1
-    100064: PlainsDragon_ R Calf
-    100066: PlainsDragon_ R Clavicle
-    100068: PlainsDragon_ R Finger0
-    100070: PlainsDragon_ R Finger01
-    100072: PlainsDragon_ R Finger1
-    100074: PlainsDragon_ R Finger11
-    100076: PlainsDragon_ R Finger2
-    100078: PlainsDragon_ R Finger21
-    100080: PlainsDragon_ R Finger3
-    100082: PlainsDragon_ R Finger31
-    100084: PlainsDragon_ R Foot
-    100086: PlainsDragon_ R Forearm
-    100088: PlainsDragon_ R Hand
-    100090: PlainsDragon_ R HorseLink
-    100092: PlainsDragon_ R Thigh
-    100094: PlainsDragon_ R Toe0
-    100096: PlainsDragon_ R Toe01
-    100098: PlainsDragon_ R Toe1
-    100100: PlainsDragon_ R Toe11
-    100102: PlainsDragon_ R Toe2
-    100104: PlainsDragon_ R Toe21
-    100106: PlainsDragon_ R Toe3
-    100108: PlainsDragon_ R Toe31
-    100110: PlainsDragon_ R UpperArm
-    100112: PlainsDragon_ Spine
-    100114: PlainsDragon_ Spine1
-    100116: PlainsDragon_ Tail
-    100118: PlainsDragon_ Tail1
-    100120: PlainsDragon_ Tail10
-    100122: PlainsDragon_ Tail2
-    100124: PlainsDragon_ Tail3
-    100126: PlainsDragon_ Tail4
-    100128: PlainsDragon_ Tail5
-    100130: PlainsDragon_ Tail6
-    100132: PlainsDragon_ Tail7
-    100134: PlainsDragon_ Tail8
-    100136: PlainsDragon_ Tail9
-    100138: PlainsDragon_Tongue_1
-    100140: PlainsDragon_Tongue_2
-    100142: PlainsDragon_Tongue_3
-    100144: PlainsDragon_Tongue_4
-    100146: PlainsDragon_WingL_Arm
-    100148: PlainsDragon_WingL_FingerA_1
-    100150: PlainsDragon_WingL_FingerA_3
-    100152: PlainsDragon_WingL_FingerB_1
-    100154: PlainsDragon_WingL_FingerB_2
-    100156: PlainsDragon_WingL_FingerB_3
-    100158: PlainsDragon_WingL_FingerC_1
-    100160: PlainsDragon_WingL_FingerC_2
-    100162: PlainsDragon_WingL_FingerC_3
-    100164: PlainsDragon_WingL_ForeArm
-    100166: PlainsDragon_WingL_Hand
-    100168: PlainsDragon_WingR_Arm
-    100170: PlainsDragon_WingR_FingerA_1
-    100172: PlainsDragon_WingR_FingerA_2
-    100174: PlainsDragon_WingR_FingerA_3
-    100176: PlainsDragon_WingR_FingerB_1
-    100178: PlainsDragon_WingR_FingerB_2
-    100180: PlainsDragon_WingR_FingerB_3
-    100182: PlainsDragon_WingR_FingerC_1
-    100184: PlainsDragon_WingR_FingerC_2
-    100186: PlainsDragon_WingR_FingerC_3
-    100188: PlainsDragon_WingR_ForeArm
-    100190: PlainsDragon_WingR_Hand
-    100192: PlainstDragon_WingL_FingerA_2
-    100194: root
-    400000: //RootNode
-    400002: PlainsDragon_
-    400004: PlainsDragon_ Footsteps
-    400006: PlainsDragon_ Head
-    400008: PlainsDragon_ L Calf
-    400010: PlainsDragon_ L Clavicle
-    400012: PlainsDragon_ L Finger0
-    400014: PlainsDragon_ L Finger01
-    400016: PlainsDragon_ L Finger1
-    400018: PlainsDragon_ L Finger11
-    400020: PlainsDragon_ L Finger2
-    400022: PlainsDragon_ L Finger21
-    400024: PlainsDragon_ L Finger3
-    400026: PlainsDragon_ L Finger31
-    400028: PlainsDragon_ L Foot
-    400030: PlainsDragon_ L Forearm
-    400032: PlainsDragon_ L Hand
-    400034: PlainsDragon_ L HorseLink
-    400036: PlainsDragon_ L Thigh
-    400038: PlainsDragon_ L Toe0
-    400040: PlainsDragon_ L Toe01
-    400042: PlainsDragon_ L Toe1
-    400044: PlainsDragon_ L Toe11
-    400046: PlainsDragon_ L Toe2
-    400048: PlainsDragon_ L Toe21
-    400050: PlainsDragon_ L Toe3
-    400052: PlainsDragon_ L Toe31
-    400054: PlainsDragon_ L UpperArm
-    400056: PlainsDragon_ Neck
-    400058: PlainsDragon_ Neck1
-    400060: PlainsDragon_ Pelvis
-    400062: PlainsDragon_ Ponytail1
-    400064: PlainsDragon_ R Calf
-    400066: PlainsDragon_ R Clavicle
-    400068: PlainsDragon_ R Finger0
-    400070: PlainsDragon_ R Finger01
-    400072: PlainsDragon_ R Finger1
-    400074: PlainsDragon_ R Finger11
-    400076: PlainsDragon_ R Finger2
-    400078: PlainsDragon_ R Finger21
-    400080: PlainsDragon_ R Finger3
-    400082: PlainsDragon_ R Finger31
-    400084: PlainsDragon_ R Foot
-    400086: PlainsDragon_ R Forearm
-    400088: PlainsDragon_ R Hand
-    400090: PlainsDragon_ R HorseLink
-    400092: PlainsDragon_ R Thigh
-    400094: PlainsDragon_ R Toe0
-    400096: PlainsDragon_ R Toe01
-    400098: PlainsDragon_ R Toe1
-    400100: PlainsDragon_ R Toe11
-    400102: PlainsDragon_ R Toe2
-    400104: PlainsDragon_ R Toe21
-    400106: PlainsDragon_ R Toe3
-    400108: PlainsDragon_ R Toe31
-    400110: PlainsDragon_ R UpperArm
-    400112: PlainsDragon_ Spine
-    400114: PlainsDragon_ Spine1
-    400116: PlainsDragon_ Tail
-    400118: PlainsDragon_ Tail1
-    400120: PlainsDragon_ Tail10
-    400122: PlainsDragon_ Tail2
-    400124: PlainsDragon_ Tail3
-    400126: PlainsDragon_ Tail4
-    400128: PlainsDragon_ Tail5
-    400130: PlainsDragon_ Tail6
-    400132: PlainsDragon_ Tail7
-    400134: PlainsDragon_ Tail8
-    400136: PlainsDragon_ Tail9
-    400138: PlainsDragon_Tongue_1
-    400140: PlainsDragon_Tongue_2
-    400142: PlainsDragon_Tongue_3
-    400144: PlainsDragon_Tongue_4
-    400146: PlainsDragon_WingL_Arm
-    400148: PlainsDragon_WingL_FingerA_1
-    400150: PlainsDragon_WingL_FingerA_3
-    400152: PlainsDragon_WingL_FingerB_1
-    400154: PlainsDragon_WingL_FingerB_2
-    400156: PlainsDragon_WingL_FingerB_3
-    400158: PlainsDragon_WingL_FingerC_1
-    400160: PlainsDragon_WingL_FingerC_2
-    400162: PlainsDragon_WingL_FingerC_3
-    400164: PlainsDragon_WingL_ForeArm
-    400166: PlainsDragon_WingL_Hand
-    400168: PlainsDragon_WingR_Arm
-    400170: PlainsDragon_WingR_FingerA_1
-    400172: PlainsDragon_WingR_FingerA_2
-    400174: PlainsDragon_WingR_FingerA_3
-    400176: PlainsDragon_WingR_FingerB_1
-    400178: PlainsDragon_WingR_FingerB_2
-    400180: PlainsDragon_WingR_FingerB_3
-    400182: PlainsDragon_WingR_FingerC_1
-    400184: PlainsDragon_WingR_FingerC_2
-    400186: PlainsDragon_WingR_FingerC_3
-    400188: PlainsDragon_WingR_ForeArm
-    400190: PlainsDragon_WingR_Hand
-    400192: PlainstDragon_WingL_FingerA_2
-    400194: root
-    7400000: SpitFireBall
-    9500000: //RootNode
+  serializedVersion: 24200
+  internalIDToNameTable:
+  - first:
+      1: 100000
+    second: //RootNode
+  - first:
+      1: 100002
+    second: PlainsDragon_
+  - first:
+      1: 100004
+    second: PlainsDragon_ Footsteps
+  - first:
+      1: 100006
+    second: PlainsDragon_ Head
+  - first:
+      1: 100008
+    second: PlainsDragon_ L Calf
+  - first:
+      1: 100010
+    second: PlainsDragon_ L Clavicle
+  - first:
+      1: 100012
+    second: PlainsDragon_ L Finger0
+  - first:
+      1: 100014
+    second: PlainsDragon_ L Finger01
+  - first:
+      1: 100016
+    second: PlainsDragon_ L Finger1
+  - first:
+      1: 100018
+    second: PlainsDragon_ L Finger11
+  - first:
+      1: 100020
+    second: PlainsDragon_ L Finger2
+  - first:
+      1: 100022
+    second: PlainsDragon_ L Finger21
+  - first:
+      1: 100024
+    second: PlainsDragon_ L Finger3
+  - first:
+      1: 100026
+    second: PlainsDragon_ L Finger31
+  - first:
+      1: 100028
+    second: PlainsDragon_ L Foot
+  - first:
+      1: 100030
+    second: PlainsDragon_ L Forearm
+  - first:
+      1: 100032
+    second: PlainsDragon_ L Hand
+  - first:
+      1: 100034
+    second: PlainsDragon_ L HorseLink
+  - first:
+      1: 100036
+    second: PlainsDragon_ L Thigh
+  - first:
+      1: 100038
+    second: PlainsDragon_ L Toe0
+  - first:
+      1: 100040
+    second: PlainsDragon_ L Toe01
+  - first:
+      1: 100042
+    second: PlainsDragon_ L Toe1
+  - first:
+      1: 100044
+    second: PlainsDragon_ L Toe11
+  - first:
+      1: 100046
+    second: PlainsDragon_ L Toe2
+  - first:
+      1: 100048
+    second: PlainsDragon_ L Toe21
+  - first:
+      1: 100050
+    second: PlainsDragon_ L Toe3
+  - first:
+      1: 100052
+    second: PlainsDragon_ L Toe31
+  - first:
+      1: 100054
+    second: PlainsDragon_ L UpperArm
+  - first:
+      1: 100056
+    second: PlainsDragon_ Neck
+  - first:
+      1: 100058
+    second: PlainsDragon_ Neck1
+  - first:
+      1: 100060
+    second: PlainsDragon_ Pelvis
+  - first:
+      1: 100062
+    second: PlainsDragon_ Ponytail1
+  - first:
+      1: 100064
+    second: PlainsDragon_ R Calf
+  - first:
+      1: 100066
+    second: PlainsDragon_ R Clavicle
+  - first:
+      1: 100068
+    second: PlainsDragon_ R Finger0
+  - first:
+      1: 100070
+    second: PlainsDragon_ R Finger01
+  - first:
+      1: 100072
+    second: PlainsDragon_ R Finger1
+  - first:
+      1: 100074
+    second: PlainsDragon_ R Finger11
+  - first:
+      1: 100076
+    second: PlainsDragon_ R Finger2
+  - first:
+      1: 100078
+    second: PlainsDragon_ R Finger21
+  - first:
+      1: 100080
+    second: PlainsDragon_ R Finger3
+  - first:
+      1: 100082
+    second: PlainsDragon_ R Finger31
+  - first:
+      1: 100084
+    second: PlainsDragon_ R Foot
+  - first:
+      1: 100086
+    second: PlainsDragon_ R Forearm
+  - first:
+      1: 100088
+    second: PlainsDragon_ R Hand
+  - first:
+      1: 100090
+    second: PlainsDragon_ R HorseLink
+  - first:
+      1: 100092
+    second: PlainsDragon_ R Thigh
+  - first:
+      1: 100094
+    second: PlainsDragon_ R Toe0
+  - first:
+      1: 100096
+    second: PlainsDragon_ R Toe01
+  - first:
+      1: 100098
+    second: PlainsDragon_ R Toe1
+  - first:
+      1: 100100
+    second: PlainsDragon_ R Toe11
+  - first:
+      1: 100102
+    second: PlainsDragon_ R Toe2
+  - first:
+      1: 100104
+    second: PlainsDragon_ R Toe21
+  - first:
+      1: 100106
+    second: PlainsDragon_ R Toe3
+  - first:
+      1: 100108
+    second: PlainsDragon_ R Toe31
+  - first:
+      1: 100110
+    second: PlainsDragon_ R UpperArm
+  - first:
+      1: 100112
+    second: PlainsDragon_ Spine
+  - first:
+      1: 100114
+    second: PlainsDragon_ Spine1
+  - first:
+      1: 100116
+    second: PlainsDragon_ Tail
+  - first:
+      1: 100118
+    second: PlainsDragon_ Tail1
+  - first:
+      1: 100120
+    second: PlainsDragon_ Tail10
+  - first:
+      1: 100122
+    second: PlainsDragon_ Tail2
+  - first:
+      1: 100124
+    second: PlainsDragon_ Tail3
+  - first:
+      1: 100126
+    second: PlainsDragon_ Tail4
+  - first:
+      1: 100128
+    second: PlainsDragon_ Tail5
+  - first:
+      1: 100130
+    second: PlainsDragon_ Tail6
+  - first:
+      1: 100132
+    second: PlainsDragon_ Tail7
+  - first:
+      1: 100134
+    second: PlainsDragon_ Tail8
+  - first:
+      1: 100136
+    second: PlainsDragon_ Tail9
+  - first:
+      1: 100138
+    second: PlainsDragon_Tongue_1
+  - first:
+      1: 100140
+    second: PlainsDragon_Tongue_2
+  - first:
+      1: 100142
+    second: PlainsDragon_Tongue_3
+  - first:
+      1: 100144
+    second: PlainsDragon_Tongue_4
+  - first:
+      1: 100146
+    second: PlainsDragon_WingL_Arm
+  - first:
+      1: 100148
+    second: PlainsDragon_WingL_FingerA_1
+  - first:
+      1: 100150
+    second: PlainsDragon_WingL_FingerA_3
+  - first:
+      1: 100152
+    second: PlainsDragon_WingL_FingerB_1
+  - first:
+      1: 100154
+    second: PlainsDragon_WingL_FingerB_2
+  - first:
+      1: 100156
+    second: PlainsDragon_WingL_FingerB_3
+  - first:
+      1: 100158
+    second: PlainsDragon_WingL_FingerC_1
+  - first:
+      1: 100160
+    second: PlainsDragon_WingL_FingerC_2
+  - first:
+      1: 100162
+    second: PlainsDragon_WingL_FingerC_3
+  - first:
+      1: 100164
+    second: PlainsDragon_WingL_ForeArm
+  - first:
+      1: 100166
+    second: PlainsDragon_WingL_Hand
+  - first:
+      1: 100168
+    second: PlainsDragon_WingR_Arm
+  - first:
+      1: 100170
+    second: PlainsDragon_WingR_FingerA_1
+  - first:
+      1: 100172
+    second: PlainsDragon_WingR_FingerA_2
+  - first:
+      1: 100174
+    second: PlainsDragon_WingR_FingerA_3
+  - first:
+      1: 100176
+    second: PlainsDragon_WingR_FingerB_1
+  - first:
+      1: 100178
+    second: PlainsDragon_WingR_FingerB_2
+  - first:
+      1: 100180
+    second: PlainsDragon_WingR_FingerB_3
+  - first:
+      1: 100182
+    second: PlainsDragon_WingR_FingerC_1
+  - first:
+      1: 100184
+    second: PlainsDragon_WingR_FingerC_2
+  - first:
+      1: 100186
+    second: PlainsDragon_WingR_FingerC_3
+  - first:
+      1: 100188
+    second: PlainsDragon_WingR_ForeArm
+  - first:
+      1: 100190
+    second: PlainsDragon_WingR_Hand
+  - first:
+      1: 100192
+    second: PlainstDragon_WingL_FingerA_2
+  - first:
+      1: 100194
+    second: root
+  - first:
+      4: 400000
+    second: //RootNode
+  - first:
+      4: 400002
+    second: PlainsDragon_
+  - first:
+      4: 400004
+    second: PlainsDragon_ Footsteps
+  - first:
+      4: 400006
+    second: PlainsDragon_ Head
+  - first:
+      4: 400008
+    second: PlainsDragon_ L Calf
+  - first:
+      4: 400010
+    second: PlainsDragon_ L Clavicle
+  - first:
+      4: 400012
+    second: PlainsDragon_ L Finger0
+  - first:
+      4: 400014
+    second: PlainsDragon_ L Finger01
+  - first:
+      4: 400016
+    second: PlainsDragon_ L Finger1
+  - first:
+      4: 400018
+    second: PlainsDragon_ L Finger11
+  - first:
+      4: 400020
+    second: PlainsDragon_ L Finger2
+  - first:
+      4: 400022
+    second: PlainsDragon_ L Finger21
+  - first:
+      4: 400024
+    second: PlainsDragon_ L Finger3
+  - first:
+      4: 400026
+    second: PlainsDragon_ L Finger31
+  - first:
+      4: 400028
+    second: PlainsDragon_ L Foot
+  - first:
+      4: 400030
+    second: PlainsDragon_ L Forearm
+  - first:
+      4: 400032
+    second: PlainsDragon_ L Hand
+  - first:
+      4: 400034
+    second: PlainsDragon_ L HorseLink
+  - first:
+      4: 400036
+    second: PlainsDragon_ L Thigh
+  - first:
+      4: 400038
+    second: PlainsDragon_ L Toe0
+  - first:
+      4: 400040
+    second: PlainsDragon_ L Toe01
+  - first:
+      4: 400042
+    second: PlainsDragon_ L Toe1
+  - first:
+      4: 400044
+    second: PlainsDragon_ L Toe11
+  - first:
+      4: 400046
+    second: PlainsDragon_ L Toe2
+  - first:
+      4: 400048
+    second: PlainsDragon_ L Toe21
+  - first:
+      4: 400050
+    second: PlainsDragon_ L Toe3
+  - first:
+      4: 400052
+    second: PlainsDragon_ L Toe31
+  - first:
+      4: 400054
+    second: PlainsDragon_ L UpperArm
+  - first:
+      4: 400056
+    second: PlainsDragon_ Neck
+  - first:
+      4: 400058
+    second: PlainsDragon_ Neck1
+  - first:
+      4: 400060
+    second: PlainsDragon_ Pelvis
+  - first:
+      4: 400062
+    second: PlainsDragon_ Ponytail1
+  - first:
+      4: 400064
+    second: PlainsDragon_ R Calf
+  - first:
+      4: 400066
+    second: PlainsDragon_ R Clavicle
+  - first:
+      4: 400068
+    second: PlainsDragon_ R Finger0
+  - first:
+      4: 400070
+    second: PlainsDragon_ R Finger01
+  - first:
+      4: 400072
+    second: PlainsDragon_ R Finger1
+  - first:
+      4: 400074
+    second: PlainsDragon_ R Finger11
+  - first:
+      4: 400076
+    second: PlainsDragon_ R Finger2
+  - first:
+      4: 400078
+    second: PlainsDragon_ R Finger21
+  - first:
+      4: 400080
+    second: PlainsDragon_ R Finger3
+  - first:
+      4: 400082
+    second: PlainsDragon_ R Finger31
+  - first:
+      4: 400084
+    second: PlainsDragon_ R Foot
+  - first:
+      4: 400086
+    second: PlainsDragon_ R Forearm
+  - first:
+      4: 400088
+    second: PlainsDragon_ R Hand
+  - first:
+      4: 400090
+    second: PlainsDragon_ R HorseLink
+  - first:
+      4: 400092
+    second: PlainsDragon_ R Thigh
+  - first:
+      4: 400094
+    second: PlainsDragon_ R Toe0
+  - first:
+      4: 400096
+    second: PlainsDragon_ R Toe01
+  - first:
+      4: 400098
+    second: PlainsDragon_ R Toe1
+  - first:
+      4: 400100
+    second: PlainsDragon_ R Toe11
+  - first:
+      4: 400102
+    second: PlainsDragon_ R Toe2
+  - first:
+      4: 400104
+    second: PlainsDragon_ R Toe21
+  - first:
+      4: 400106
+    second: PlainsDragon_ R Toe3
+  - first:
+      4: 400108
+    second: PlainsDragon_ R Toe31
+  - first:
+      4: 400110
+    second: PlainsDragon_ R UpperArm
+  - first:
+      4: 400112
+    second: PlainsDragon_ Spine
+  - first:
+      4: 400114
+    second: PlainsDragon_ Spine1
+  - first:
+      4: 400116
+    second: PlainsDragon_ Tail
+  - first:
+      4: 400118
+    second: PlainsDragon_ Tail1
+  - first:
+      4: 400120
+    second: PlainsDragon_ Tail10
+  - first:
+      4: 400122
+    second: PlainsDragon_ Tail2
+  - first:
+      4: 400124
+    second: PlainsDragon_ Tail3
+  - first:
+      4: 400126
+    second: PlainsDragon_ Tail4
+  - first:
+      4: 400128
+    second: PlainsDragon_ Tail5
+  - first:
+      4: 400130
+    second: PlainsDragon_ Tail6
+  - first:
+      4: 400132
+    second: PlainsDragon_ Tail7
+  - first:
+      4: 400134
+    second: PlainsDragon_ Tail8
+  - first:
+      4: 400136
+    second: PlainsDragon_ Tail9
+  - first:
+      4: 400138
+    second: PlainsDragon_Tongue_1
+  - first:
+      4: 400140
+    second: PlainsDragon_Tongue_2
+  - first:
+      4: 400142
+    second: PlainsDragon_Tongue_3
+  - first:
+      4: 400144
+    second: PlainsDragon_Tongue_4
+  - first:
+      4: 400146
+    second: PlainsDragon_WingL_Arm
+  - first:
+      4: 400148
+    second: PlainsDragon_WingL_FingerA_1
+  - first:
+      4: 400150
+    second: PlainsDragon_WingL_FingerA_3
+  - first:
+      4: 400152
+    second: PlainsDragon_WingL_FingerB_1
+  - first:
+      4: 400154
+    second: PlainsDragon_WingL_FingerB_2
+  - first:
+      4: 400156
+    second: PlainsDragon_WingL_FingerB_3
+  - first:
+      4: 400158
+    second: PlainsDragon_WingL_FingerC_1
+  - first:
+      4: 400160
+    second: PlainsDragon_WingL_FingerC_2
+  - first:
+      4: 400162
+    second: PlainsDragon_WingL_FingerC_3
+  - first:
+      4: 400164
+    second: PlainsDragon_WingL_ForeArm
+  - first:
+      4: 400166
+    second: PlainsDragon_WingL_Hand
+  - first:
+      4: 400168
+    second: PlainsDragon_WingR_Arm
+  - first:
+      4: 400170
+    second: PlainsDragon_WingR_FingerA_1
+  - first:
+      4: 400172
+    second: PlainsDragon_WingR_FingerA_2
+  - first:
+      4: 400174
+    second: PlainsDragon_WingR_FingerA_3
+  - first:
+      4: 400176
+    second: PlainsDragon_WingR_FingerB_1
+  - first:
+      4: 400178
+    second: PlainsDragon_WingR_FingerB_2
+  - first:
+      4: 400180
+    second: PlainsDragon_WingR_FingerB_3
+  - first:
+      4: 400182
+    second: PlainsDragon_WingR_FingerC_1
+  - first:
+      4: 400184
+    second: PlainsDragon_WingR_FingerC_2
+  - first:
+      4: 400186
+    second: PlainsDragon_WingR_FingerC_3
+  - first:
+      4: 400188
+    second: PlainsDragon_WingR_ForeArm
+  - first:
+      4: 400190
+    second: PlainsDragon_WingR_Hand
+  - first:
+      4: 400192
+    second: PlainstDragon_WingL_FingerA_2
+  - first:
+      4: 400194
+    second: root
+  - first:
+      74: 7400000
+    second: SpitFireBall
+  - first:
+      95: 9500000
+    second: //RootNode
+  externalObjects: {}
   materials:
-    importMaterials: 1
+    materialImportMode: 1
     materialName: 0
     materialSearch: 1
+    materialLocation: 0
   animations:
     legacyGenerateAnimations: 4
     bakeSimulation: 0
     resampleCurves: 1
     optimizeGameObjects: 0
+    removeConstantScaleCurves: 0
     motionNodeName: 
-    rigImportErrors: 
-    rigImportWarnings: 
     animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
     animationCompression: 0
     animationRotationError: 0.5
     animationPositionError: 0.5
     animationScaleError: 0.5
     animationWrapMode: 0
     extraExposedTransformPaths: []
+    extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
       name: SpitFireBall
       takeName: Take 001
+      internalID: 0
       firstFrame: 0
       lastFrame: 30
       wrapMode: 0
@@ -249,7 +656,14 @@ ModelImporter:
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
-      events: []
+      events:
+      - time: 0.3913793
+        functionName: ShootFireballFromAnimation
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
       transformMask:
       - path: 
         weight: 1
@@ -594,26 +1008,52 @@ ModelImporter:
     globalScale: 1
     meshCompression: 0
     addColliders: 0
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
+    importPhysicalCameras: 0
+    importVisibility: 0
     importBlendShapes: 1
+    importCameras: 0
+    importLights: 0
+    nodeNameCollisionStrategy: 0
+    fileIdsGeneration: 1
     swapUVChannels: 0
     generateSecondaryUV: 0
     useFileUnits: 1
-    optimizeMeshForGPU: 1
     keepQuads: 0
     weldVertices: 1
+    bakeAxisConversion: 0
+    preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    optimizeBones: 1
+    generateMeshLods: 0
+    meshLodGenerationFlags: 0
+    maximumMeshLod: -1
+    meshOptimizationFlags: -1
+    indexFormat: 1
     secondaryUVAngleDistortion: 8
     secondaryUVAreaDistortion: 15.000001
     secondaryUVHardAngle: 88
+    secondaryUVMarginMethod: 0
+    secondaryUVMinLightmapResolution: 40
+    secondaryUVMinObjectScale: 1
     secondaryUVPackMargin: 4
     useFileScale: 1
+    strictVertexDataChecks: 0
   tangentSpace:
     normalSmoothAngle: 60
     normalImportMode: 0
     tangentImportMode: 3
+    normalCalculationMode: 0
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 1
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  referencedClips: []
   importAnimation: 1
-  copyAvatar: 1
   humanDescription:
-    serializedVersion: 2
+    serializedVersion: 3
     human: []
     skeleton: []
     armTwist: 0.5
@@ -623,24 +1063,21 @@ ModelImporter:
     armStretch: 0.05
     legStretch: 0.05
     feetSpacing: 0
+    globalScale: 1
     rootMotionBoneName: root
-    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
     hasTranslationDoF: 0
     hasExtraRoot: 0
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {fileID: 9000000, guid: 374d36eea3bf09a4aa5d8d9160f0ef4b,
     type: 3}
+  autoGenerateAvatarMappingIfUnspecified: 1
   animationType: 2
   humanoidOversampling: 1
+  avatarSetup: 2
+  addHumanoidExtraRootOnlyWhenUsingAvatar: 0
+  importBlendShapeDeformPercent: 0
+  remapMaterialsIfMaterialImportModeIsNone: 1
   additionalBone: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 117306
-  packageName: ELEMENTAL DRAGONS PACK
-  packageVersion: 1.22
-  assetPath: Assets/HEROIC FANTASY CREATURES FULL PACK VOL3/Elemental Dragons Pack/Plains
-    Dragon/FBX Files/PlainsDragon@SpitFireBall.FBX
-  uploadId: 669989

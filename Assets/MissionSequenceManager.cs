@@ -3,7 +3,18 @@ using UnityEngine;
 
 public class MissionSequenceManager : MonoBehaviour
 {
-    [Header("Boss Wolf Direction Guide")]
+    public enum DebugStartMode
+    {
+        Normal,
+        Mission2,
+        Mission3
+    }
+
+    [Header("Debug Start")]
+    public DebugStartMode debugStartMode = DebugStartMode.Normal;
+    public float debugStartDelay = 1f;
+
+    [Header("Mission Direction Guide")]
     public BossWolfDirectionCanvas bossWolfDirectionCanvas;
 
     [Header("UI References")]
@@ -32,10 +43,77 @@ public class MissionSequenceManager : MonoBehaviour
     private int bossWolvesKilled = 0;
     private bool mission2Active = false;
     private bool mission2Completed = false;
+
+    [Header("Mission 3 Dragon Warning")]
+    public float delayBeforeMission3Warning = 1f;
+    public float mission3WarningShowDuration = 5f;
+
+    [TextArea(2, 5)]
+    public string mission3WarningMessage = "DRAGON THREAT DETECTED!\n\nTwo elemental dragons have appeared in different regions. Follow the minimap direction marker and defeat them.";
+
+    [Header("Mission 3 Dragons")]
+    public GameObject[] mission3Dragons;
+    public bool hideMission3DragonsOnStart = true;
+
+    [Header("Mission 3 Objective")]
+    public int dragonsRequired = 2;
+    public string mission3Title = "Current Objective";
+
+    private int dragonsKilled = 0;
+    private bool mission3Active = false;
+    private bool mission3Completed = false;
+
     private Coroutine missionFlowCoroutine;
+
+    private void Start()
+    {
+        if (warningUI == null)
+        {
+            warningUI = EcosystemWarningUI.Instance;
+        }
+
+        if (hideMission3DragonsOnStart)
+        {
+            SetMission3DragonsActive(false);
+        }
+
+        if (debugStartMode != DebugStartMode.Normal)
+        {
+            StartCoroutine(DebugStartRoutine());
+        }
+    }
+
+    private IEnumerator DebugStartRoutine()
+    {
+        yield return new WaitForSeconds(debugStartDelay);
+
+        if (objectiveUI != null)
+        {
+            objectiveUI.HideObjective();
+        }
+
+        if (bossWolfDirectionCanvas != null)
+        {
+            bossWolfDirectionCanvas.HideGuide();
+        }
+
+        if (debugStartMode == DebugStartMode.Mission2)
+        {
+            StartMission2();
+        }
+        else if (debugStartMode == DebugStartMode.Mission3)
+        {
+            StartMission3();
+        }
+    }
 
     public void StartMissionFlowAfterStory()
     {
+        if (debugStartMode != DebugStartMode.Normal)
+        {
+            return;
+        }
+
         if (missionFlowCoroutine != null)
         {
             StopCoroutine(missionFlowCoroutine);
@@ -57,13 +135,11 @@ public class MissionSequenceManager : MonoBehaviour
             warningUI = EcosystemWarningUI.Instance;
         }
 
-        // Mission 1 objective on Objective Canvas
         objectiveUI.ShowObjective(mission1Title, mission1Description, mission1ShowDuration);
 
         yield return new WaitForSeconds(mission1ShowDuration);
         yield return new WaitForSeconds(delayBeforeWarning);
 
-        // Mission 2 warning on Warning Canvas
         if (warningUI != null)
         {
             warningUI.ShowWarning(warningMessage, warningShowDuration);
@@ -85,19 +161,21 @@ public class MissionSequenceManager : MonoBehaviour
 
         yield return new WaitForSeconds(delayBeforeMission2Objective);
 
-        // Mission 2 objective on Objective Canvas
         StartMission2();
     }
 
-    private void StartMission2()
+    public void StartMission2()
     {
         bossWolvesKilled = 0;
         mission2Active = true;
         mission2Completed = false;
 
+        mission3Active = false;
+        mission3Completed = false;
+
         if (bossWolfDirectionCanvas != null)
         {
-            bossWolfDirectionCanvas.ShowGuide();
+            bossWolfDirectionCanvas.ShowGuide("BossWolf");
         }
 
         UpdateMission2UI();
@@ -147,5 +225,143 @@ public class MissionSequenceManager : MonoBehaviour
             "The deer population is safe for now.",
             5f
         );
+
+        if (debugStartMode == DebugStartMode.Normal)
+        {
+            StartCoroutine(StartMission3AfterMission2Complete());
+        }
+    }
+
+    private IEnumerator StartMission3AfterMission2Complete()
+    {
+        yield return new WaitForSeconds(5f);
+        yield return new WaitForSeconds(delayBeforeMission3Warning);
+
+        if (warningUI == null)
+        {
+            warningUI = EcosystemWarningUI.Instance;
+        }
+
+        if (warningUI != null)
+        {
+            warningUI.ShowWarning(mission3WarningMessage, mission3WarningShowDuration);
+
+            float typingTime = 0f;
+
+            if (warningUI.useTypewriterEffect)
+            {
+                typingTime = mission3WarningMessage.Length * warningUI.typeSpeed;
+            }
+
+            yield return new WaitForSeconds(typingTime + mission3WarningShowDuration);
+        }
+        else
+        {
+            yield return new WaitForSeconds(mission3WarningShowDuration);
+        }
+
+        StartMission3();
+    }
+
+    public void StartMission3()
+    {
+        bossWolvesKilled = Mathf.Clamp(bossWolvesKilled, 0, bossWolvesRequired);
+        mission2Active = false;
+        mission2Completed = true;
+
+        dragonsKilled = 0;
+        mission3Active = true;
+        mission3Completed = false;
+
+        SetMission3DragonsActive(true);
+        ResetMissionDragonTargets();
+
+        if (bossWolfDirectionCanvas != null)
+        {
+            bossWolfDirectionCanvas.ShowGuide("Dragon");
+        }
+
+        UpdateMission3UI();
+    }
+
+    public void RegisterDragonKill()
+    {
+        if (!mission3Active) return;
+        if (mission3Completed) return;
+
+        dragonsKilled++;
+
+        if (dragonsKilled > dragonsRequired)
+        {
+            dragonsKilled = dragonsRequired;
+        }
+
+        UpdateMission3UI();
+
+        if (dragonsKilled >= dragonsRequired)
+        {
+            CompleteMission3();
+        }
+    }
+
+    private void UpdateMission3UI()
+    {
+        string description =
+            "Defeat " + dragonsRequired + " elemental dragons.\n" +
+            "Progress: " + dragonsKilled + " / " + dragonsRequired;
+
+        objectiveUI.ShowObjectivePermanent(mission3Title, description);
+    }
+
+    private void CompleteMission3()
+    {
+        mission3Completed = true;
+        mission3Active = false;
+
+        if (bossWolfDirectionCanvas != null)
+        {
+            bossWolfDirectionCanvas.HideGuide();
+        }
+
+        objectiveUI.ShowObjective(
+            "Objective Complete",
+            "Dragons defeated. Ecosystem restored.",
+            6f
+        );
+    }
+
+    private void SetMission3DragonsActive(bool active)
+    {
+        if (mission3Dragons == null) return;
+
+        foreach (GameObject dragon in mission3Dragons)
+        {
+            if (dragon != null)
+            {
+                dragon.SetActive(active);
+            }
+        }
+    }
+
+    private void ResetMissionDragonTargets()
+    {
+        if (mission3Dragons == null) return;
+
+        foreach (GameObject dragonObject in mission3Dragons)
+        {
+            if (dragonObject == null) continue;
+
+            MissionDragonTarget dragonTarget = dragonObject.GetComponent<MissionDragonTarget>();
+
+            if (dragonTarget == null)
+            {
+                dragonTarget = dragonObject.GetComponentInChildren<MissionDragonTarget>(true);
+            }
+
+            if (dragonTarget != null)
+            {
+                dragonTarget.ResetTargetForMission();
+            }
+        }
     }
 }
