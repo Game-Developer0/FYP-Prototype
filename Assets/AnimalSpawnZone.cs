@@ -46,6 +46,11 @@ public class AnimalSpawnZone : MonoBehaviour
     public float respawnDelayAfterDeath = 25f;
     public int maxSpawnAttemptsPerRule = 20;
 
+    [Header("Spawn Spread / Anti Overlap")]
+    public float randomSpawnRadiusAroundPoint = 12f;
+    public float minimumDistanceBetweenAnimals = 4f;
+    public bool randomizeSpawnRotation = true;
+
     [Header("Disable / Enable Instead Of Destroy")]
     public bool keepAnimalsDisabledWhenZoneInactive = true;
     public bool moveAnimalsBackToHomeWhenEnabledAgain = true;
@@ -358,7 +363,16 @@ public class AnimalSpawnZone : MonoBehaviour
             if (point == null)
                 continue;
 
-            Vector3 rawPosition = point.position;
+            // NEW FIX:
+            // Instead of spawning exactly on the spawn point,
+            // choose a random position around that spawn point.
+            Vector2 randomCircle = UnityEngine.Random.insideUnitCircle * randomSpawnRadiusAroundPoint;
+
+            Vector3 rawPosition = point.position + new Vector3(
+                randomCircle.x,
+                0f,
+                randomCircle.y
+            );
 
             if (player != null)
             {
@@ -412,14 +426,56 @@ public class AnimalSpawnZone : MonoBehaviour
                 }
             }
 
+            // NEW FIX:
+            // Do not spawn if this position is too close to another animal.
+            if (!IsSpawnPositionFarEnoughFromOtherAnimals(finalPosition))
+                continue;
+
             spawnPosition = finalPosition;
-            spawnRotation = point.rotation;
+
+            if (randomizeSpawnRotation)
+            {
+                spawnRotation = Quaternion.Euler(0f, UnityEngine.Random.Range(0f, 360f), 0f);
+            }
+            else
+            {
+                spawnRotation = point.rotation;
+            }
+
             return true;
         }
 
         return false;
     }
+    private bool IsSpawnPositionFarEnoughFromOtherAnimals(Vector3 position)
+    {
+        foreach (EcosystemAnimal animal in activeAnimals)
+        {
+            if (animal == null)
+                continue;
 
+            if (animal.DeathReported)
+                continue;
+
+            Vector3 otherPosition;
+
+            if (animal.gameObject.activeSelf)
+            {
+                otherPosition = animal.transform.position;
+            }
+            else
+            {
+                otherPosition = GetAnimalHomePosition(animal);
+            }
+
+            float distance = Vector3.Distance(position, otherPosition);
+
+            if (distance < minimumDistanceBetweenAnimals)
+                return false;
+        }
+
+        return true;
+    }
     private void StartSoftDespawn()
     {
         CleanActiveAnimalList();

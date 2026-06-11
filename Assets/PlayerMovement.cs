@@ -23,6 +23,8 @@ public class PlayerMovement : MonoBehaviour
     private bool bowAiming;
     private bool gunAiming;
 
+    private bool handArrowHiddenBecauseShot = false;
+
     //Animation
     Animator animator;
 
@@ -30,14 +32,35 @@ public class PlayerMovement : MonoBehaviour
     public Transform cameraRoot;
     public Transform playerCam;
 
+    [Header("Death Camera")]
+    public bool useDeathCamera = true;
+    public float deathCameraDistance = 4f;
+    public float deathCameraHeight = 1.6f;
+    public float deathCameraLookHeight = 1.0f;
+    public float deathCameraMoveSpeed = 5f;
+    public float deathCameraRotateSpeed = 8f;
+    public bool unlockCursorOnDeath = false;
+
+    private bool isDead = false;
+
     public float mouseSensitivity = 50f;
     public float upperLimit = -40f;
     public float bottomLimit = 70f;
 
     private float xRotation;
 
-    [Header("Arrow")]
-    public GameObject HandArrow;
+    [Header("Current Arrow Type")]
+    public ArrowShoot.ArrowType currentArrowType = ArrowShoot.ArrowType.Simple;
+
+    [Header("Arrow Shoot Script")]
+    public ArrowShoot arrowShoot;
+
+    [Header("Hand Arrows")]
+    public GameObject SimpleHandArrow;
+    public GameObject FireHandArrow;
+    public GameObject IceHandArrow;
+    public GameObject AcidHandArrow;
+    public GameObject VolcanoHandArrow;
 
     public Transform orientation;
 
@@ -135,6 +158,11 @@ public class PlayerMovement : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         animator = GetComponent<Animator>();
 
+        if (arrowShoot == null)
+        {
+            arrowShoot = GetComponentInChildren<ArrowShoot>();
+        }
+
         playerCollider = GetComponent<CapsuleCollider>();
         originalColliderHeight = playerCollider.height;
         originalColliderCenter = playerCollider.center;
@@ -144,20 +172,142 @@ public class PlayerMovement : MonoBehaviour
 
     void Start()
     {
-        HandArrow.gameObject.SetActive(false);
+        HideAllHandArrows();
+
+        if (arrowShoot != null)
+        {
+            arrowShoot.SetArrowType(currentArrowType);
+        }
+
         playerScale = transform.localScale;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         animator.applyRootMotion = false;
     }
 
-    void HandArrowActive()
+    public void HandArrowActive()
     {
-        HandArrow.gameObject.SetActive(true);
+        if (!isGunEquipped && bowAiming && !handArrowHiddenBecauseShot)
+        {
+            ShowCurrentHandArrow();
+        }
+    }
+
+    public void SetArrowType(ArrowShoot.ArrowType newArrowType)
+    {
+        currentArrowType = newArrowType;
+
+        if (arrowShoot != null)
+        {
+            arrowShoot.SetArrowType(newArrowType);
+        }
+
+        HideAllHandArrows();
+
+        if (!isGunEquipped && bowAiming && !handArrowHiddenBecauseShot)
+        {
+            ShowCurrentHandArrow();
+        }
+
+        Debug.Log("Player arrow changed to: " + currentArrowType);
+    }
+
+    public void ShowCurrentHandArrow()
+    {
+        GameObject handArrow = GetCurrentHandArrow();
+
+        if (handArrow == null) return;
+
+        // If the correct hand arrow is already active, do not restart it every frame.
+        if (handArrow.activeSelf)
+        {
+            return;
+        }
+
+        HideAllHandArrows();
+
+        handArrow.SetActive(true);
+        PlayHandArrowParticles(handArrow);
+    }
+
+    public void HideCurrentHandArrow()
+    {
+        HideAllHandArrows();
+    }
+    public void HideHandArrowBecauseShot()
+    {
+        handArrowHiddenBecauseShot = true;
+        HideAllHandArrows();
+    }
+
+    public void HideAllHandArrows()
+    {
+        HideOneHandArrow(SimpleHandArrow);
+        HideOneHandArrow(FireHandArrow);
+        HideOneHandArrow(IceHandArrow);
+        HideOneHandArrow(AcidHandArrow);
+        HideOneHandArrow(VolcanoHandArrow);
+    }
+
+    private void HideOneHandArrow(GameObject handArrow)
+    {
+        if (handArrow == null) return;
+
+        ParticleSystem[] particles = handArrow.GetComponentsInChildren<ParticleSystem>(true);
+
+        foreach (ParticleSystem ps in particles)
+        {
+            ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        }
+
+        handArrow.SetActive(false);
+    }
+
+    private void PlayHandArrowParticles(GameObject handArrow)
+    {
+        ParticleSystem[] particles = handArrow.GetComponentsInChildren<ParticleSystem>(true);
+
+        foreach (ParticleSystem ps in particles)
+        {
+            ps.Clear(true);
+            ps.Play(true);
+        }
+    }
+
+    private GameObject GetCurrentHandArrow()
+    {
+        switch (currentArrowType)
+        {
+            case ArrowShoot.ArrowType.Fire:
+                return FireHandArrow;
+
+            case ArrowShoot.ArrowType.Ice:
+                return IceHandArrow;
+
+            case ArrowShoot.ArrowType.Acid:
+                return AcidHandArrow;
+
+            case ArrowShoot.ArrowType.Volcano:
+                return VolcanoHandArrow;
+
+            default:
+                return SimpleHandArrow;
+        }
     }
 
     private void FixedUpdate()
     {
+        if (isDead)
+        {
+            if (rb != null)
+            {
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+            }
+
+            return;
+        }
+
         CheckGrounded();
 
         Movement();
@@ -172,6 +322,19 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
+        if (isDead)
+        {
+            x = 0f;
+            y = 0f;
+            jumping = false;
+            sprinting = false;
+            crouching = false;
+            sliding = false;
+            yRotInput = 0f;
+
+            return;
+        }
+
         MyInput();
         Look();
         UpdateAimRig();
@@ -243,7 +406,14 @@ public class PlayerMovement : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (isDead)
+        {
+            UpdateDeathCamera();
+            return;
+        }
+
         if (!cameraRoot) return;
+        if (!playerCam) return;
 
         playerCam.position = cameraRoot.position;
     }
@@ -257,6 +427,8 @@ public class PlayerMovement : MonoBehaviour
         {
             animator.SetBool("aim", false);
         }
+
+        HideAllHandArrows();
 
         if (bowAimingRig != null)
         {
@@ -316,12 +488,27 @@ public class PlayerMovement : MonoBehaviour
                 bowAiming = Input.GetMouseButton(1);
                 gunAiming = false;
 
+                if (!bowAiming)
+                {
+                    handArrowHiddenBecauseShot = false;
+                }
+
                 animator.SetBool("aim", bowAiming);
+
+                if (bowAiming && !handArrowHiddenBecauseShot)
+                {
+                    ShowCurrentHandArrow();
+                }
+                else
+                {
+                    HideAllHandArrows();
+                }
             }
 
             if (isGunEquipped)
             {
                 bowAiming = false;
+                HideAllHandArrows();
 
                 if (Input.GetMouseButtonDown(1))
                 {
@@ -911,5 +1098,195 @@ public class PlayerMovement : MonoBehaviour
         }
 
         return false;
+    }
+    public void OnPlayerDeath()
+    {
+        if (isDead) return;
+
+        isDead = true;
+
+        x = 0f;
+        y = 0f;
+        jumping = false;
+        sprinting = false;
+        crouching = false;
+        sliding = false;
+        bowAiming = false;
+        gunAiming = false;
+        handArrowHiddenBecauseShot = true;
+        yRotInput = 0f;
+
+        HideAllHandArrows();
+
+        if (bowAimingRig != null)
+        {
+            bowAimingRig.weight = 0f;
+        }
+
+        if (gunAimingRig != null)
+        {
+            gunAimingRig.weight = 0f;
+        }
+
+        if (animator != null)
+        {
+            animator.SetBool("aim", false);
+            animator.SetBool("Jump", false);
+            animator.SetBool("Crouch", false);
+            animator.SetBool("Running", false);
+
+            animator.SetFloat("X_Velocity", 0f);
+            animator.SetFloat("Y_Velocity", 0f);
+            animator.SetFloat("X_Crouch", 0f);
+            animator.SetFloat("Y_Crouch", 0f);
+
+            animator.applyRootMotion = false;
+        }
+
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
+
+        if (playerCollider != null)
+        {
+            playerCollider.height = originalColliderHeight;
+            playerCollider.center = originalColliderCenter;
+        }
+
+        if (footstepAudioSource != null)
+        {
+            footstepAudioSource.Stop();
+        }
+
+        if (arrowShoot != null)
+        {
+            arrowShoot.enabled = false;
+        }
+
+        if (grapplingGun != null)
+        {
+            grapplingGun.SendMessage("StopGrapple", SendMessageOptions.DontRequireReceiver);
+            grapplingGun.enabled = false;
+        }
+
+        if (unlockCursorOnDeath)
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+    }
+
+    private void UpdateDeathCamera()
+    {
+        if (!useDeathCamera) return;
+        if (playerCam == null) return;
+
+        Vector3 targetPosition =
+            transform.position
+            - transform.forward * deathCameraDistance
+            + Vector3.up * deathCameraHeight;
+
+        Vector3 lookTarget =
+            transform.position
+            + Vector3.up * deathCameraLookHeight;
+
+        playerCam.position = Vector3.Lerp(
+            playerCam.position,
+            targetPosition,
+            Time.deltaTime * deathCameraMoveSpeed
+        );
+
+        Vector3 lookDirection = lookTarget - playerCam.position;
+
+        if (lookDirection.sqrMagnitude > 0.001f)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(lookDirection);
+
+            playerCam.rotation = Quaternion.Slerp(
+                playerCam.rotation,
+                targetRotation,
+                Time.deltaTime * deathCameraRotateSpeed
+            );
+        }
+    }
+    public void OnPlayerRespawn()
+    {
+        isDead = false;
+
+        x = 0f;
+        y = 0f;
+        jumping = false;
+        sprinting = false;
+        crouching = false;
+        sliding = false;
+        bowAiming = false;
+        gunAiming = false;
+        handArrowHiddenBecauseShot = false;
+        yRotInput = 0f;
+
+        HideAllHandArrows();
+
+        if (bowAimingRig != null)
+        {
+            bowAimingRig.weight = 0f;
+        }
+
+        if (gunAimingRig != null)
+        {
+            gunAimingRig.weight = 0f;
+        }
+
+        if (arrowShoot != null)
+        {
+            arrowShoot.enabled = true;
+        }
+
+        if (grapplingGun != null)
+        {
+            grapplingGun.enabled = true;
+        }
+
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
+
+        if (playerCollider != null)
+        {
+            playerCollider.height = originalColliderHeight;
+            playerCollider.center = originalColliderCenter;
+        }
+
+        if (footstepAudioSource != null)
+        {
+            footstepAudioSource.Stop();
+        }
+
+        if (animator != null)
+        {
+            animator.SetBool("aim", false);
+            animator.SetBool("Jump", false);
+            animator.SetBool("Crouch", false);
+            animator.SetBool("Running", false);
+
+            animator.SetFloat("X_Velocity", 0f);
+            animator.SetFloat("Y_Velocity", 0f);
+            animator.SetFloat("X_Crouch", 0f);
+            animator.SetFloat("Y_Crouch", 0f);
+
+            animator.applyRootMotion = false;
+        }
+
+        if (playerCam != null && cameraRoot != null)
+        {
+            playerCam.position = cameraRoot.position;
+            playerCam.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+        }
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 }

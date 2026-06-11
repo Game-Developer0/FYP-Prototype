@@ -704,10 +704,12 @@ MonoBehaviour:
   chaseRunSpeed: 6
   zoneWalkBoolName: WalkForward
   chaseRunBoolName: Run Forward
-  detectionRange: 16.7
+  detectionRange: 15.1
   attackRange: 3
   losePlayerRange: 60
   returnToStartPosition: 1
+  stopCombatWhenPlayerDies: 1
+  returnHomeWhenPlayerDies: 1
   canWalkInZone: 1
   patrolRadius: 80
   passiveStateMinTime: 4
@@ -735,6 +737,17 @@ MonoBehaviour:
   defaultArrowDamage: 20
   countForBossWolfMission: 0
   countForBearMission: 0
+  dropItemOnDeath: 0
+  deathDropPrefab: {fileID: 0}
+  deathDropChance: 1
+  deathDropOffset: {x: 0, y: 0.5, z: 0}
+  snapDeathDropToGround: 1
+  deathDropGroundLayer:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  deathDropRayStartHeight: 5
+  deathDropRayDistance: 15
+  deathDropGroundOffset: 0.05
   allowSoftDespawnReturn: 1
   arrowHits: 0
   destroyObjectTime: 4

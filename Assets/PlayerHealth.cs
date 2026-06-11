@@ -57,10 +57,20 @@ public class PlayerHealth : MonoBehaviour
     public bool allowSlowEffect = true;
     private Coroutine slowRoutine;
 
+    [Header("Respawn")]
+    public Transform respawnPoint;
+    public float respawnDelay = 5f;
+    public bool respawnWithFullHealth = true;
+    public string respawnAnimatorStateName = "Bow Movement";
+
+    private Coroutine respawnRoutine;
+    private Rigidbody rb;
+
     private bool isDead = false;
 
     void Start()
     {
+        rb = GetComponent<Rigidbody>();
         currentHealth = maxHealth;
 
         if (animator == null)
@@ -478,5 +488,86 @@ public class PlayerHealth : MonoBehaviour
         {
             animator.SetBool(deathBoolName, true);
         }
+
+        gameObject.SendMessage("OnPlayerDeath", SendMessageOptions.DontRequireReceiver);
+
+        if (respawnRoutine != null)
+        {
+            StopCoroutine(respawnRoutine);
+        }
+
+        respawnRoutine = StartCoroutine(RespawnAfterDelay());
+    }
+    IEnumerator RespawnAfterDelay()
+    {
+        yield return new WaitForSeconds(respawnDelay);
+
+        RespawnPlayer();
+    }
+
+    public void RespawnPlayer()
+    {
+        if (respawnPoint == null)
+        {
+            Debug.LogWarning("Respawn Point is not assigned on PlayerHealth.");
+            return;
+        }
+
+        if (slowRoutine != null)
+        {
+            StopCoroutine(slowRoutine);
+            slowRoutine = null;
+        }
+
+        SetPlayerSpeedMultiplier(1f);
+
+        StopCanvasParticleEffect(fireScreenEffectRoot, true);
+        StopCanvasParticleEffect(acidScreenEffectRoot, true);
+        StopCanvasParticleEffect(iceScreenEffectRoot, true);
+        StopCanvasParticleEffect(volcanoScreenEffectRoot, true);
+        StopCanvasParticleEffect(healthIncreaseScreenEffectRoot, true);
+
+        HideBloodScreenEffect();
+
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+
+            rb.position = respawnPoint.position;
+            rb.rotation = respawnPoint.rotation;
+        }
+        else
+        {
+            transform.SetPositionAndRotation(respawnPoint.position, respawnPoint.rotation);
+        }
+
+        if (respawnWithFullHealth)
+        {
+            currentHealth = maxHealth;
+        }
+        else
+        {
+            currentHealth = Mathf.Max(1, maxHealth / 2);
+        }
+
+        isDead = false;
+
+        UpdateHealthBar();
+        HideBloodScreenEffect();
+
+        if (animator != null)
+        {
+            animator.SetBool(deathBoolName, false);
+
+            if (!string.IsNullOrEmpty(respawnAnimatorStateName))
+            {
+                animator.CrossFadeInFixedTime(respawnAnimatorStateName, 0.05f);
+            }
+        }
+
+        gameObject.SendMessage("OnPlayerRespawn", SendMessageOptions.DontRequireReceiver);
+
+        Debug.Log("Player respawned");
     }
 }

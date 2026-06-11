@@ -1598,6 +1598,7 @@ Transform:
   - {fileID: 437160}
   - {fileID: 424186}
   - {fileID: 438576}
+  - {fileID: 5747583983753082094}
   m_Father: {fileID: 404508}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &148042
@@ -2090,6 +2091,14 @@ MonoBehaviour:
   arrowHits: 0
   fallAfterHits: 3
   destroyAfterDeath: 7
+  quiverDropPrefab: {fileID: 1198904032459423636, guid: b7629c9023423a74ea40feeef134f392,
+    type: 3}
+  quiverDropPoint: {fileID: 5747583983753082094}
+  dropQuiverOnDeath: 1
+  placeQuiverOnGround: 1
+  quiverDropGroundRayStartHeight: 5
+  quiverDropGroundRayDistance: 30
+  quiverDropGroundOffset: 1
   healthBar: {fileID: 4450940864579476869}
   healthBarRoot: {fileID: 9087561529403388885}
   hideHealthBarUntilHit: 1
@@ -3550,6 +3559,37 @@ Transform:
   m_Children:
   - {fileID: 2716920036231902247}
   m_Father: {fileID: 456180}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1162244753702653708
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5747583983753082094}
+  m_Layer: 0
+  m_Name: Quiver drop point
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5747583983753082094
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1162244753702653708}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 405084}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1298100473122135687
 GameObject:

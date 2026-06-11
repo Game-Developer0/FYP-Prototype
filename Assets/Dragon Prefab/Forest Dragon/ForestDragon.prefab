@@ -2080,14 +2080,14 @@ MonoBehaviour:
   minimumLandingAnimationTime: 1.2
   landingAnimationFinishNormalizedTime: 0.9
   groundBiteRange: 5
-  groundSpreadAcidRange: 12
+  groundSpreadAcidRange: 22
   groundSpitAcidRange: 22
   skyAttackRange: 35
   attackCooldown: 3
   biteDamage: 20
   closeRangeBiteChance: 0.5
   mediumRangeSpreadChance: 0.6
-  fireballPrefab: {fileID: 4782603780973126738, guid: a25a9070f45ea654eacb305d41635e10,
+  fireballPrefab: {fileID: 4782603780973126738, guid: 16e97c6fd5e033b46b06eb27bf324a10,
     type: 3}
   acidBallPrefab: {fileID: 0}
   firePoint: {fileID: 8863890020249577518}
@@ -2100,6 +2100,14 @@ MonoBehaviour:
   arrowHits: 0
   fallAfterHits: 3
   destroyAfterDeath: 7
+  quiverDropPrefab: {fileID: 1198904032459423636, guid: 6b8ee6c01d63c0840a15449b79cc9115,
+    type: 3}
+  quiverDropPoint: {fileID: 1256433459945598222}
+  dropQuiverOnDeath: 1
+  placeQuiverOnGround: 1
+  quiverDropGroundRayStartHeight: 5
+  quiverDropGroundRayDistance: 30
+  quiverDropGroundOffset: 1
   healthBar: {fileID: 2923402527500188461}
   healthBarRoot: {fileID: 4476351340135408613}
   hideHealthBarUntilHit: 1
@@ -2127,26 +2135,30 @@ MonoBehaviour:
   deathHitGroundStateName: DeathHitTheGround
   fallRecoveryLandingStateName: FlyStationaryToLanding
   skyDeathGroundCheckHeight: 1.5
+  stopCombatWhenPlayerDies: 1
+  stopAttackEffectsWhenPlayerDies: 1
+  chooseNewPatrolPointWhenPlayerDies: 1
   animGliding: 0
   aimMouthAtPlayer: 1
   mouthAimSpeed: 25
   mouthTargetOffset: {x: 0, y: 1.2, z: 0}
-  spreadAcidParticle: {fileID: 961684822491631929}
+  spreadAcidParticle: {fileID: 9218426594253538139}
   spreadAcidPoint: {fileID: 8863890020249577518}
   spreadAcidBreathDuration: 2
-  spreadAcidDamage: 8
-  spreadAcidDamageRange: 16
-  spreadAcidAngle: 55
+  spreadAcidDamage: 10
+  spreadAcidDamageRange: 50
+  spreadAcidAngle: 20
   spreadAcidDamageInterval: 0.4
   spreadAcidBlockLayers:
     serializedVersion: 2
     m_Bits: 0
-  breathEffectType: 4
+  lockBreathDirectionAtStart: 1
+  breathEffectType: 1
   breathScreenEffectDuration: 0.7
   breathSlowsPlayer: 1
   breathSlowMultiplier: 0.55
   breathSlowDuration: 1
-  spreadAcidHitEffectPrefab: {fileID: 5289399761374161563}
+  spreadAcidHitEffectPrefab: {fileID: 4310297149490247929}
   playerAcidHitPoint: {fileID: 0}
   autoFindPlayerAcidHitPoint: 1
   playerAcidHitPointChildName: PlayerAcidHitPoint
@@ -3410,6 +3422,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4142064906573320}
+  - {fileID: 1256433459945598222}
   m_Father: {fileID: 4096248162547862}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1950164117220772
@@ -3897,7 +3910,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 8675671823843202444}
+  - {fileID: 779356844472305646}
   m_Father: {fileID: 4549843487697456}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1918017583072283333
@@ -3975,6 +3988,37 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!1 &2867798550540043146
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1256433459945598222}
+  m_Layer: 0
+  m_Name: Quiver drop point
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1256433459945598222
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2867798550540043146}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.02, y: 0.03, z: -0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4435972722852788}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4476351340135408613
 GameObject:
   m_ObjectHideFlags: 0
@@ -4880,7 +4924,7 @@ MonoBehaviour:
   fill: {fileID: 1037412453486565395}
   faceCamera: 1
   targetCamera: {fileID: 0}
---- !u!1001 &4732195698902965359
+--- !u!1001 &3682497053172076045
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -4888,81 +4932,81 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 8863890020249577518}
     m_Modifications:
-    - target: {fileID: 633771578328364788, guid: 3c0e1ceabc926dd42a3985b0105f17d0,
+    - target: {fileID: 633771578328364788, guid: 6e4dec238e37c4b4eb760236da9811ae,
         type: 3}
       propertyPath: m_Name
-      value: VolcanoBreathParticle
+      value: FireFlameThrower
       objectReference: {fileID: 0}
-    - target: {fileID: 4164157730190526947, guid: 3c0e1ceabc926dd42a3985b0105f17d0,
+    - target: {fileID: 4164157730190526947, guid: 6e4dec238e37c4b4eb760236da9811ae,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.00003054738
+      value: -0.000032752752
       objectReference: {fileID: 0}
-    - target: {fileID: 4164157730190526947, guid: 3c0e1ceabc926dd42a3985b0105f17d0,
+    - target: {fileID: 4164157730190526947, guid: 6e4dec238e37c4b4eb760236da9811ae,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.000035256147
+      value: -0.0000141859055
       objectReference: {fileID: 0}
-    - target: {fileID: 4164157730190526947, guid: 3c0e1ceabc926dd42a3985b0105f17d0,
+    - target: {fileID: 4164157730190526947, guid: 6e4dec238e37c4b4eb760236da9811ae,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.000029521052
+      value: 0.00000004299227
       objectReference: {fileID: 0}
-    - target: {fileID: 4164157730190526947, guid: 3c0e1ceabc926dd42a3985b0105f17d0,
+    - target: {fileID: 4164157730190526947, guid: 6e4dec238e37c4b4eb760236da9811ae,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.7130786
+      value: 0.60281634
       objectReference: {fileID: 0}
-    - target: {fileID: 4164157730190526947, guid: 3c0e1ceabc926dd42a3985b0105f17d0,
+    - target: {fileID: 4164157730190526947, guid: 6e4dec238e37c4b4eb760236da9811ae,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.58551466
+      value: 0.6520714
       objectReference: {fileID: 0}
-    - target: {fileID: 4164157730190526947, guid: 3c0e1ceabc926dd42a3985b0105f17d0,
+    - target: {fileID: 4164157730190526947, guid: 6e4dec238e37c4b4eb760236da9811ae,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.3658898
+      value: -0.2734956
       objectReference: {fileID: 0}
-    - target: {fileID: 4164157730190526947, guid: 3c0e1ceabc926dd42a3985b0105f17d0,
+    - target: {fileID: 4164157730190526947, guid: 6e4dec238e37c4b4eb760236da9811ae,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.12172196
+      value: -0.36961532
       objectReference: {fileID: 0}
-    - target: {fileID: 4164157730190526947, guid: 3c0e1ceabc926dd42a3985b0105f17d0,
+    - target: {fileID: 4164157730190526947, guid: 6e4dec238e37c4b4eb760236da9811ae,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 48.242
+      value: 144.269
       objectReference: {fileID: 0}
-    - target: {fileID: 4164157730190526947, guid: 3c0e1ceabc926dd42a3985b0105f17d0,
+    - target: {fileID: 4164157730190526947, guid: 6e4dec238e37c4b4eb760236da9811ae,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: -85.988
+      value: 90
       objectReference: {fileID: 0}
-    - target: {fileID: 4164157730190526947, guid: 3c0e1ceabc926dd42a3985b0105f17d0,
+    - target: {fileID: 4164157730190526947, guid: 6e4dec238e37c4b4eb760236da9811ae,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: -64.691
+      value: 81.24
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 3c0e1ceabc926dd42a3985b0105f17d0, type: 3}
---- !u!198 &961684822491631929 stripped
-ParticleSystem:
-  m_CorrespondingSourceObject: {fileID: 5545256784270298454, guid: 3c0e1ceabc926dd42a3985b0105f17d0,
-    type: 3}
-  m_PrefabInstance: {fileID: 4732195698902965359}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &5289399761374161563 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 633771578328364788, guid: 3c0e1ceabc926dd42a3985b0105f17d0,
-    type: 3}
-  m_PrefabInstance: {fileID: 4732195698902965359}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &8675671823843202444 stripped
+  m_SourcePrefab: {fileID: 100100000, guid: 6e4dec238e37c4b4eb760236da9811ae, type: 3}
+--- !u!4 &779356844472305646 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 4164157730190526947, guid: 3c0e1ceabc926dd42a3985b0105f17d0,
+  m_CorrespondingSourceObject: {fileID: 4164157730190526947, guid: 6e4dec238e37c4b4eb760236da9811ae,
     type: 3}
-  m_PrefabInstance: {fileID: 4732195698902965359}
+  m_PrefabInstance: {fileID: 3682497053172076045}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &4310297149490247929 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 633771578328364788, guid: 6e4dec238e37c4b4eb760236da9811ae,
+    type: 3}
+  m_PrefabInstance: {fileID: 3682497053172076045}
+  m_PrefabAsset: {fileID: 0}
+--- !u!198 &9218426594253538139 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 5545256784270298454, guid: 6e4dec238e37c4b4eb760236da9811ae,
+    type: 3}
+  m_PrefabInstance: {fileID: 3682497053172076045}
   m_PrefabAsset: {fileID: 0}

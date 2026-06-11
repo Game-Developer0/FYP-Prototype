@@ -34,6 +34,12 @@ public class Enemy : MonoBehaviour
     private Vector3 startPosition;
     private bool hasDetectedPlayer = false;
 
+    [Header("Player Death Behaviour")]
+    public bool stopCombatWhenPlayerDies = true;
+    public bool returnHomeWhenPlayerDies = true;
+
+    private bool alreadyHandledPlayerDeath = false;
+
     [Header("Passive Before Detection")]
     public bool canWalkInZone = true;
     public float patrolRadius = 8f;
@@ -155,6 +161,7 @@ public class Enemy : MonoBehaviour
         isDead = false;
         missionKillAlreadyCounted = false;
         hasDetectedPlayer = false;
+        alreadyHandledPlayerDeath = false;
         isDetectStunning = false;
         isKnockedDown = false;
         knockDownAlreadyPlayed = false;
@@ -233,6 +240,7 @@ public class Enemy : MonoBehaviour
         }
 
         hasDetectedPlayer = false;
+        alreadyHandledPlayerDeath = false;
         isDetectStunning = false;
         isKnockedDown = false;
         knockDownAlreadyPlayed = false;
@@ -339,6 +347,11 @@ public class Enemy : MonoBehaviour
             return;
         }
 
+        if (playerHealth == null)
+        {
+            playerHealth = playerTarget.GetComponent<PlayerHealth>();
+        }
+
         if (agent == null || !agent.isOnNavMesh)
         {
             Debug.LogWarning("Animal is not on NavMesh.");
@@ -351,13 +364,20 @@ public class Enemy : MonoBehaviour
             return;
         }
 
+        if (stopCombatWhenPlayerDies && IsPlayerDead())
+        {
+            HandlePlayerDeathForAnimal();
+            return;
+        }
+
+        alreadyHandledPlayerDeath = false;
+
         if (isKnockedDown)
         {
             HandleKnockDown();
             return;
         }
 
-        // Detection range now moves with the animal.
         float distanceToPlayer = Vector3.Distance(transform.position, playerTarget.position);
 
         if (!hasDetectedPlayer && distanceToPlayer <= detectionRange)
@@ -374,8 +394,6 @@ public class Enemy : MonoBehaviour
                 return;
             }
 
-            // Lose player range is unchanged.
-            // It still checks distance between animal and player.
             if (distanceToPlayer > losePlayerRange)
             {
                 hasDetectedPlayer = false;
@@ -405,8 +423,6 @@ public class Enemy : MonoBehaviour
         }
         else
         {
-            // Patrol radius is unchanged.
-            // It still uses startPosition as the animal home area.
             float distanceFromHome = Vector3.Distance(transform.position, startPosition);
 
             if (returnToStartPosition && distanceFromHome > patrolRadius + 2f)
@@ -647,6 +663,12 @@ public class Enemy : MonoBehaviour
     {
         if (isDead) return;
 
+        if (IsPlayerDead())
+        {
+            HandlePlayerDeathForAnimal();
+            return;
+        }
+
         ClearPassiveStates();
         StopMovementAnimations();
 
@@ -672,6 +694,8 @@ public class Enemy : MonoBehaviour
 
     void DamagePlayer()
     {
+        if (IsPlayerDead()) return;
+
         if (playerTarget == null) return;
 
         if (playerHealth == null)
@@ -1147,6 +1171,91 @@ public class Enemy : MonoBehaviour
         }
     }
 
+    bool IsPlayerDead()
+    {
+        if (playerTarget == null)
+            return false;
+
+        if (playerHealth == null)
+        {
+            playerHealth = playerTarget.GetComponent<PlayerHealth>();
+        }
+
+        if (playerHealth == null)
+            return false;
+
+        return playerHealth.currentHealth <= 0;
+    }
+
+    void HandlePlayerDeathForAnimal()
+    {
+        hasDetectedPlayer = false;
+        isDetectStunning = false;
+        isKnockedDown = false;
+
+        if (!alreadyHandledPlayerDeath)
+        {
+            alreadyHandledPlayerDeath = true;
+
+            ClearPassiveStates();
+            StopMovementAnimations();
+            ResetAttackTriggers();
+
+            SetBoolIfExists(detectStunBoolName, false);
+
+            if (agent != null && agent.isOnNavMesh)
+            {
+                agent.isStopped = false;
+                agent.ResetPath();
+                agent.speed = zoneWalkSpeed;
+                agent.stoppingDistance = 0.5f;
+            }
+
+            nextAttackTime = Time.time + attackCooldown;
+        }
+
+        if (returnHomeWhenPlayerDies && returnToStartPosition)
+        {
+            float distanceFromHome = Vector3.Distance(transform.position, startPosition);
+
+            if (distanceFromHome > 1f)
+            {
+                ReturnHome();
+                return;
+            }
+        }
+
+        PassiveBehaviour();
+    }
+
+    void ResetAttackTriggers()
+    {
+        if (attackTriggers != null)
+        {
+            foreach (string triggerName in attackTriggers)
+            {
+                ResetTriggerIfExists(triggerName);
+            }
+        }
+
+        ResetTriggerIfExists(hitTriggerName);
+        ResetTriggerIfExists(knockDownTriggerName);
+    }
+
+    void ResetTriggerIfExists(string parameterName)
+    {
+        if (animator == null) return;
+        if (string.IsNullOrEmpty(parameterName)) return;
+
+        foreach (AnimatorControllerParameter parameter in animator.parameters)
+        {
+            if (parameter.name == parameterName && parameter.type == AnimatorControllerParameterType.Trigger)
+            {
+                animator.ResetTrigger(parameterName);
+                return;
+            }
+        }
+    }
     private void OnDrawGizmosSelected()
     {
         // Detection range moves with animal.
