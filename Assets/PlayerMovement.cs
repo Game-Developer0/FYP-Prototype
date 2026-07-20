@@ -160,7 +160,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (arrowShoot == null)
         {
-            arrowShoot = GetComponentInChildren<ArrowShoot>();
+            arrowShoot = GetComponentInChildren<ArrowShoot>(true);
         }
 
         playerCollider = GetComponent<CapsuleCollider>();
@@ -187,9 +187,16 @@ public class PlayerMovement : MonoBehaviour
 
     public void HandArrowActive()
     {
-        if (!isGunEquipped && bowAiming && !handArrowHiddenBecauseShot)
+        if (!isGunEquipped &&
+            bowAiming &&
+            !handArrowHiddenBecauseShot &&
+            HasArrowsAvailable())
         {
             ShowCurrentHandArrow();
+        }
+        else
+        {
+            HideAllHandArrows();
         }
     }
 
@@ -211,14 +218,32 @@ public class PlayerMovement : MonoBehaviour
 
         Debug.Log("Player arrow changed to: " + currentArrowType);
     }
+    private bool HasArrowsAvailable()
+    {
+        if (arrowShoot == null)
+        {
+            arrowShoot = GetComponentInChildren<ArrowShoot>(true);
+        }
+
+        return arrowShoot != null && arrowShoot.CurrentArrows > 0;
+    }
 
     public void ShowCurrentHandArrow()
     {
+        // Never show the hand arrow when ammunition is zero.
+        if (!HasArrowsAvailable())
+        {
+            HideAllHandArrows();
+            return;
+        }
+
         GameObject handArrow = GetCurrentHandArrow();
 
-        if (handArrow == null) return;
+        if (handArrow == null)
+        {
+            return;
+        }
 
-        // If the correct hand arrow is already active, do not restart it every frame.
         if (handArrow.activeSelf)
         {
             return;
@@ -495,7 +520,7 @@ public class PlayerMovement : MonoBehaviour
 
                 animator.SetBool("aim", bowAiming);
 
-                if (bowAiming && !handArrowHiddenBecauseShot)
+                if (bowAiming &&!handArrowHiddenBecauseShot &&HasArrowsAvailable())
                 {
                     ShowCurrentHandArrow();
                 }
@@ -521,12 +546,33 @@ public class PlayerMovement : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
-            bool clickWillGrapple = grapplingGun != null && grapplingGun.CanStartGrapple();
+            bool clickWillGrapple =
+                grapplingGun != null &&
+                grapplingGun.CanStartGrapple();
 
             if (!clickWillGrapple)
             {
-                ExitAim();
-                animator.SetTrigger("shoot");
+                // The gun can still use its shooting animation.
+                bool canShootWeapon = isGunEquipped;
+
+                // The bow can only use its shooting animation
+                // when at least one arrow is available.
+                if (!isGunEquipped)
+                {
+                    canShootWeapon =
+                        arrowShoot != null &&
+                        arrowShoot.CurrentArrows > 0;
+                }
+
+                if (canShootWeapon)
+                {
+                    ExitAim();
+                    animator.SetTrigger("shoot");
+                }
+                else
+                {
+                    Debug.Log("Cannot shoot: no arrows available.");
+                }
             }
         }
 
@@ -1238,9 +1284,15 @@ public class PlayerMovement : MonoBehaviour
             gunAimingRig.weight = 0f;
         }
 
+        if (arrowShoot == null)
+        {
+            arrowShoot = GetComponentInChildren<ArrowShoot>(true);
+        }
+
         if (arrowShoot != null)
         {
             arrowShoot.enabled = true;
+            arrowShoot.ResetArrowsToStartingAmount();
         }
 
         if (grapplingGun != null)

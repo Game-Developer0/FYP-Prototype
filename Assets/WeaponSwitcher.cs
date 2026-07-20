@@ -2,8 +2,12 @@ using UnityEngine;
 
 public class WeaponSwitcher : MonoBehaviour
 {
+    [Header("Weapon Holders")]
     public GameObject bowHolder;
     public GameObject gunHolder;
+
+    [Header("Arrow UI")]
+    public GameObject arrowAmmoUI;
 
     private PlayerMovement playerMovement;
     private Animator animator;
@@ -37,6 +41,12 @@ public class WeaponSwitcher : MonoBehaviour
         bowHolder.SetActive(true);
         gunHolder.SetActive(false);
 
+        // Show the arrow icon and arrow number.
+        if (arrowAmmoUI != null)
+        {
+            arrowAmmoUI.SetActive(true);
+        }
+
         if (playerMovement != null)
         {
             playerMovement.EquipBow();
@@ -53,6 +63,12 @@ public class WeaponSwitcher : MonoBehaviour
     {
         bowHolder.SetActive(false);
         gunHolder.SetActive(true);
+
+        // Hide the arrow icon and arrow number.
+        if (arrowAmmoUI != null)
+        {
+            arrowAmmoUI.SetActive(false);
+        }
 
         if (playerMovement != null)
         {
