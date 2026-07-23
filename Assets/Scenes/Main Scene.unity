@@ -411925,7 +411925,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 63.640015, y: 41.8}
+  m_AnchoredPosition: {x: 63.639893, y: 41.80005}
   m_SizeDelta: {x: 83.9, y: 76}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1549594701
@@ -575699,7 +575699,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ArrowShoot
   currentArrowType: 0
   maximumArrows: 20
-  startingArrows: 20
+  startingArrows: 15
   currentArrows: 0
   arrowCountText: {fileID: 892849288}
   SimpleArrowPrefab: {fileID: 6338586731609748616, guid: 2949af6bf679b4f4dbfaaf87d55decdd,
